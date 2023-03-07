@@ -21,9 +21,18 @@
     <ClCompile Include="tilingOpt.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Tool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="protoTile.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tilingOpt.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Tool.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
