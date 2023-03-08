@@ -24,6 +24,12 @@ namespace Tiling_tiles {
 		contour_f = set_flags(contour, feature_points);
 	}
 
+	protoTile::protoTile(vector<Point_f> conf)
+	{
+		contour_f = conf;
+		contour = conf_trans(contour_f);
+	}
+
 
 	void protoTile::feature(int  n_min, int n_max, double angle_cos)
 	{
@@ -107,14 +113,15 @@ namespace Tiling_tiles {
 	{
 		bool show_cand = true;
 		vector<int> cand_index;
-		int cand_num = 40; //目标候选点个数
+		int cand_num = 30; //目标候选点个数
 		int csize = contour_f.size();
 		int margin = csize / cand_num;
-		for (int i = 0; i < csize; i += margin) 
+		for (int i = 0; i < csize; i ++) 
 		{
-			if (contour_f[i].type != fea_p)
+			if (contour_f[i].type != fea_p &&contour_f[max(0, i - 1)].type != fea_p &&contour_f[min(csize - 1, i + 1)].type != fea_p)
 			{
 				contour_f[i].type = cand_p;
+				i = i + margin - 1;
 			}
 			else continue;
 		}
@@ -137,5 +144,11 @@ namespace Tiling_tiles {
 			imshow("protofirst cand points", drawing);
 		}
 		return cand_index;
+	}
+
+	void protoTile::show_contour(vector<Point2f> c, vector<int> anchor_p)
+	{
+		contour = c;
+		anchor_points = anchor_p;
 	}
 }

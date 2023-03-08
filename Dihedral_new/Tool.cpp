@@ -81,6 +81,15 @@ void draw_contour_points(Mat &drawing_, vector<Point2f> contour_s, Point2f shift
 	//cout << "n: " << n << endl;
 }
 
+void draw_pair(Mat &drawing_, vector<Point2f> contour1, vector<Point2f> contour2, vector<pair<int, int>> p, Point2f shift, int color, int thickness)
+{
+	draw_contour_points(drawing_, contour1, shift, 5, 2);
+	draw_contour_points(drawing_, contour2, shift, 7, 2);
+	FOR(i, 0, p.size())
+	{
+		line(drawing_, contour1[p[i].first] + shift, contour2[p[i].second] + shift, colorbar[6].second);
+	}
+}
 
 //geometry tool
 Point2f center_p(vector<Point2f> contour_)
@@ -466,6 +475,59 @@ vector<Point2f> sampling_ave(vector<Point2f> contour_, int points_num)  //points
 	return contour_sam;
 }
 
+vector<Point2f> sampling_seg(vector<Point2f> &segment, int points_num)
+{
+	if (points_num <= 2) return segment;
+	double length = 0; //contour_length(segment);
+	for (int i = 0; i < segment.size() - 1; i++)
+	{
+		length += length_2p(segment[i], segment[i + 1]);
+	}
+	//cout << length << endl;
+	double Lambda = length / (points_num - 1);
+
+	/*int sam_num = points_num * 100;
+	double Lambda = length / sam_num;*/
+
+	vector<Point2f> contour_sam;
+	Point2f sample;
+	//contour_sam_index记录初步采样点是哪些点
+	//contour_sam.push_back(contour_[0]);
+
+	sample = segment[0];
+	contour_sam.push_back(sample);
+	int csize = segment.size();
+	for (int t = 1; t <= csize; t++)
+	{
+		if (contour_sam.size() == points_num - 1) break;
+		double length_ = length_2p(sample, segment[t%csize]);
+		if (length_ > Lambda)
+		{
+			Point2f vec = unit_vec(segment[t%csize] - sample);
+			sample = sample + Lambda * vec;
+			contour_sam.push_back(sample);
+			t = t - 1;
+		}
+		else
+		{
+			while ((length_ + length_2p(segment[t], segment[(t + 1) % csize])) < Lambda)
+			{
+				length_ = length_ + length_2p(segment[t], segment[(t + 1) % csize]);
+				t++;
+			}
+			Point2f vec = unit_vec(segment[(t + 1) % csize] - segment[t]);
+			sample = segment[t] + (Lambda - length_) * vec;
+			contour_sam.push_back(sample);
+		}
+	}
+	/*if (length_two_point2f(contour_sam[0], contour_sam[contour_sam.size() - 1]) < 1)
+	{
+	contour_sam.pop_back();
+	}*/
+	contour_sam.push_back(segment.back());
+	return contour_sam;
+}
+
 //bbx
 vector<Point2f> bbx(vector<Point2f> &cont)
 {
@@ -561,6 +623,84 @@ Point2f vertical_vec(Point2f vec)
 	return unit_vec(vvec);
 }
 
+vector<Point2f> base_frame(vector<Point2f> frame, int type)  //two fixed point
+{
+	vector<Point2f> base_points = frame;
+	//vector<double> four_edges = { length_2p(frame[0],frame[1]), length_2p(frame[1],frame[2]), length_2p(frame[2],frame[3]), length_2p(frame[3],frame[0]) };
+	Point2f cen1 = 0.5* frame[0] + 0.5*frame[2];
+	Point2f cen2 = 0.5* frame[1] + 0.5*frame[3];
+	Point2f shift_ = cen1 - cen2;
+	frame[1] += shift_;
+	frame[3] += shift_;
+	// parallelogram to the end
+	if (type == 1) //rhombus
+	{
+		double length1 = 0.5*length_2p(frame[1], frame[3]);
+		Point2f vec_v = vertical_vec(frame[2] - frame[0]);
+		Point2f p1 = cen1 + length1*vec_v;
+		Point2f p2 = cen1 - length1*vec_v;
+		if (cos_2v(p1 - cen1, frame[1] - cen1) > 0)
+		{
+			frame[1] = p1;
+			frame[3] = p2;
+		}
+		else
+		{
+			frame[1] = p2;
+			frame[3] = p1;
+		}
+	}
+	else if (type == 2) //rectangle 
+	{
+		double length1 = 0.5*length_2p(frame[0], frame[2]);
+		frame[1] = cen1 + length1*unit_vec(frame[1] - cen1);
+		frame[3] = cen1 + length1*unit_vec(frame[3] - cen1);
+	}
+	else if (type == 3) //square
+	{
+		double length1 = 0.5*length_2p(frame[1], frame[3]);
+		Point2f vec_v = vertical_vec(frame[2] - frame[0]);
+		Point2f p1 = cen1 + length1*vec_v;
+		Point2f p2 = cen1 - length1*vec_v;
+		if (cos_2v(p1 - cen1, frame[1] - cen1) > 0)
+		{
+			frame[1] = p1;
+			frame[3] = p2;
+		}
+		else
+		{
+			frame[1] = p2;
+			frame[3] = p1;
+		}
+		length1 = 0.5*length_2p(frame[0], frame[2]);
+		frame[1] = cen1 + length1*unit_vec(frame[1] - cen1);
+		frame[3] = cen1 + length1*unit_vec(frame[3] - cen1);
+	}
+	//for (int i = 0; i < four_edges.size(); i++)
+	//	cout << "six_edges:  " << four_edges[i] << endl;
+	//for (int i = 0; i < four_angles.size(); i++) 
+	//	cout << "four_angles: " << four_angles[i] << endl;
+	bool show = true;
+	if (show)
+	{
+		Mat draw = Mat(600, 600, CV_8UC3, Scalar(255, 255, 255));
+		for (int i = 0; i < base_points.size(); i++)
+		{
+			//cout << "base_points: " << base_points[i] << endl;
+			circle(draw, base_points[i], 3, Scalar(0, 255, 0), -1);
+			line(draw, base_points[i], base_points[(i + 1) % 4], Scalar(200, 200, 200), 2);
+			circle(draw, frame[i], 3, Scalar(0, 0, 255), -1);
+			line(draw, frame[i], frame[(i + 1) % 4], Scalar(0, 0, 0), 2);
+		}
+		imshow("base frame" + to_string(type), draw);
+	}
+	/*cout << "length: " << length_2p(base_points[0], base_points[1]) << "   " << length_2p(base_points[1], base_points[2])
+	<< "   " << length_2p(base_points[2], base_points[3]) << "   " << length_2p(base_points[3], base_points[0]) << endl;
+	cout << "angle: " << 180 / PI * acos(cos_2v(base_points[3] - base_points[0], base_points[1] - base_points[0])) << "   " << 180 / PI * acos(cos_2v(base_points[0] - base_points[1], base_points[2] - base_points[1])) << endl;*/
+	return frame;
+}
+
+//----------cross points------------
 int line_intersection(Point2f start1, Point2f end1, Point2f start2, Point2f end2, Point2f &cross_p)
 {
 	Point2f s10 = end1 - start1;
@@ -606,6 +746,55 @@ int line_intersection(Point2f start1, Point2f end1, Point2f start2, Point2f end2
 	return 1;
 }
 
+vector<Point2f> line_polygon(Point2f start1, Point2f end1, vector<Point2f> contour, bool closed)
+{
+	vector<Point2f> all_inter;
+	if (closed) contour.push_back(contour[0]);
+	int contsize = contour.size();
+	for (int i = 0; i < contsize - 1; i++)
+	{
+		Point2f cen;
+		int f = line_intersection(start1, end1, contour[i], contour[i + 1], cen);
+		if (f == 1)
+		{
+			if (all_inter.empty() || length_2p(all_inter.back(), cen)>0.01)
+				all_inter.push_back(cen);
+		}
+		else if (f == 2) all_inter.push_back(0.5 * (contour[i], contour[i + 1]));
+	}
+	//cout << "intersize :  "<<all_inter.size() << all_inter [0]<<" "<<all_inter[1]<< endl;
+	return all_inter;
+}
+
+vector<Point2f> poly_poly(vector<Point2f> contour, vector<Point2f> contour_)
+{
+	vector<Point2f> all_inter;
+	int contsize = contour.size();
+	int consize2 = contour_.size();
+	for (int i = 0; i < contsize; i++)
+	{
+		Point2f cen;
+		vector<Point2f> interp = line_polygon(contour[i], contour[(i + 1) % contsize], contour_);
+		if (!interp.empty())
+		{
+			for (int j = 0; j < interp.size(); j++)
+			{
+				int f = 0;
+				for (int t = 0; t < all_inter.size(); t++)
+				{
+					if (length_2p(all_inter[t], interp[j]) < 0.01)
+						f = 1;
+				}
+				if (f == 0)
+				{
+					all_inter.push_back(interp[j]);
+				}
+			}
+		}
+	}
+	return all_inter;
+}
+
 
 bool self_intersect(vector<Point2f> &contour_, int &first, int &second)
 {
@@ -636,6 +825,14 @@ bool self_intersect(vector<Point2f> &contour_, int &first, int &second)
 	}
 	first = -1;
 	second = -1;
+	return false;
+}
+
+bool coll_detec(vector<Point2f> contour1, vector<Point2f> contour2, int threshold)
+{
+	vector<Point2f> all_colli_points = poly_poly(contour1, contour2);
+	//cout << "all_colli_points.size: " << all_colli_points.size()<<endl;
+	if (all_colli_points.size() > threshold) return true;
 	return false;
 }
 //--------geometry tool----------
@@ -828,13 +1025,13 @@ double tar_length_2p(vector<double> &p1, vector<double> &p2)
 		cout << "point number not equal" << endl;
 		return 0;
 	}
-
+	//cout << "p1.size(): " << p1.size()<<"  "<< p2.size() << endl;
 	double result = 0;
 	for (int i = 0; i < Ts; i++)
 	{
 		result += abs(p1[i] - p2[i]);
+		//cout << "test: " << result << endl;
 	}
-	//cout << "test: "<<result << endl;
 	return result / Ts;
 }
 
@@ -904,6 +1101,7 @@ double tar_mismatch(vector<vector<double>> first_arr, vector<vector<double>> sec
 			{
 				if (distance[i][j] == 100000) continue;
 				dis[i][j] = tar_length_2p(first_arr[i], second_arr[(j + shift) % second_num]);
+				//cout << "dis[i][j] : " << dis[i][j] << endl;
 				double g1 = distance[i - 1][j] + dis[i][j];
 				double g2 = distance[i - 1][j - 1] + dis[i][j];
 				double g3 = distance[i][j - 1] + dis[i][j];
@@ -961,6 +1159,178 @@ double isoperimetric_inequality(vector<Point2f> contour)
 	double ratio = 4 * PI * contourArea(contour) / (arcl * arcl);
 	return ratio;
 }
+
+//edge evaluation and optimization
+double bound_collision(vector<Point2f> cont, vector<int> indexes, int type)
+{
+	int index_size = indexes.size();
+	int csize = cont.size();
+	vector<vector<Point2f>> four_edges;
+	FOR(i, 0, index_size - 1)
+	{
+		vector<Point2f> edge;
+		for (int j = indexes[i]; j <= indexes[i + 1]; j++)  edge.push_back(cont[j]);
+		four_edges.push_back(edge);
+	}
+	vector<Point2f> edge;
+	for (int j = indexes[index_size - 1]; j <= indexes[0] + csize; j++)  edge.push_back(cont[j%csize]);
+	four_edges.push_back(edge);
+	//提取四边
+	double score = 0;
+	double score1 = 0;
+	if (type == -1)
+	{
+		FOR(i, 0, four_edges.size())
+		{
+			score += edge_nd_degree(four_edges[i], 0);
+			score1 += edge_nd_degree(four_edges[i], 1);
+		}
+		if (score1 < score) score = score1;
+	}
+	else if (type == 0)
+	{
+		FOR(i, 0, four_edges.size()) score += edge_nd_degree(four_edges[i], 0);
+	}
+	else if (type == 1)
+	{
+		FOR(i, 0, four_edges.size()) score += edge_nd_degree(four_edges[i], 1);
+	}
+	//cout << "CCW: " << score << "   CW:" << score1 << endl;
+	return score;
+}
+
+double edge_nd_degree(vector<Point2f> edge, int type)
+{
+	int esize = edge.size();
+	if (type == 1)
+	{
+		vector<Point2f> edge_r;
+		for (int t = esize - 1; t >= 0; t--) edge_r.push_back(edge[t]);
+		edge.swap(edge_r);
+	}
+	int count = 1;
+	Point2f origin_p = edge[0];
+	Point2f end_p = edge[esize - 1];
+	vector<double> Lengths;
+	FOR(i, 0, esize)  Lengths.push_back(length_2p(origin_p, edge[i]));
+	double total_angle = 0;
+	FOR(j, 1, Lengths.size())
+	{
+		int col_flag = 0;
+		double length_ = Lengths[j];
+		for (int m = j + 1; m < Lengths.size(); m++)
+		{
+			if (Lengths[m] < length_) //计数，计算角度
+			{
+				col_flag = 1;
+				Point2f tan_unit = vertical_vec(origin_p - edge[j]);
+				Point2f vec_unit = unit_vec(edge[m] - edge[j]);
+				double cos_ = cos_2v(tan_unit, vec_unit);
+				//cout << tan_unit << "   " << vec_unit << endl;
+				if (cos_ < 0) tan_unit = -tan_unit;
+				double sin_ = sin_2v(tan_unit, vec_unit);
+				double angle_ = asin(sin_);
+				//cout << tan_unit << "   " << vec_unit <<"  "<< angle_<< endl;
+				total_angle += abs(angle_);
+				//if(sin_)
+				break;
+			}
+		}
+		if (col_flag == 1) count++;
+	}
+	//double colli_possi = count	*1.0 / (esize - 2);
+	//cout << count << endl;
+	return total_angle / (count*0.5*PI);
+}
+
+void edge_nd_opt(vector<Point2f>& edge, int type)
+{
+	int esize = edge.size();
+	if (type == 1)
+	{
+		vector<Point2f> edge_r;
+		for (int t = esize - 1; t >= 0; t--) edge_r.push_back(edge[t]);
+		edge.swap(edge_r);
+	}
+	Point2f origin_p = edge[0];
+	Point2f end_p = edge[esize - 1];
+	double edge_colli_score = edge_nd_degree(edge, type);
+	int count = 0;
+	int max_times = 10;
+	while (edge_colli_score > 0 && count<max_times)
+	{
+		count++;
+		FOR(i, 1, esize - 1)
+		{
+			double len1 = length_2p(origin_p, edge[i]);
+			FOR(j, i + 1, esize)
+			{
+				double len2 = length_2p(origin_p, edge[j]);
+				if (len2 < len1) //计算角度
+				{
+					Point2f tan_unit = vertical_vec(origin_p - edge[i]);
+					Point2f vec_unit = unit_vec(edge[j] - edge[i]);
+					double cos_ = cos_2v(tan_unit, vec_unit);
+					//cout << tan_unit << "   " << vec_unit << endl;
+					if (cos_ < 0) tan_unit = -tan_unit;
+					double sin_ = sin_2v(tan_unit, vec_unit);
+					double angle_ = asin(sin_);
+					//cout << tan_unit << "   " << vec_unit <<"  "<< angle_<< endl;
+					int win_width = 0.5*max_times + 1;
+					double max_r = 1.0 / max_times;
+					double ratio = max_r / win_width;
+					FOR(g, 0, win_width)
+					{
+						if (i - g > 0 && j + g < esize)
+						{
+							Point2f rot_center = 0.5*(edge[i - g] + edge[j + g]);
+							Mat rot_mat = cv::getRotationMatrix2D(rot_center, (max_r - ratio*g)*angle_ / PI * 180, 1.0);
+							vector<Point2f> src = { edge[i - g] ,edge[j + g] };
+							vector<Point2f> dst;
+							transform(src, dst, rot_mat);
+							edge[i - g] = dst[0];
+							edge[j + g] = dst[1];
+						}
+						//cout << "dst: " << dst.size() << "   " << dst[0] << "   " << dst[1] << endl;					
+					}
+				}
+			}
+		}
+		edge_colli_score = edge_nd_degree(edge, type);
+		//cout << "count: " << count << endl;
+	}
+}
+
+void whole_con_opt(vector<Point2f>& cont, vector<int>& indexes, int type)
+{
+	int index_size = indexes.size();
+	int csize = cont.size();
+	vector<vector<Point2f>> four_edges;
+	FOR(i, 0, index_size - 1)
+	{
+		vector<Point2f> edge;
+		for (int j = indexes[i]; j <= indexes[i + 1]; j++)  edge.push_back(cont[j]);
+		four_edges.push_back(edge);
+	}
+	vector<Point2f> edge;
+	for (int j = indexes[index_size - 1]; j <= indexes[0] + csize; j++)  edge.push_back(cont[j%csize]);
+	four_edges.push_back(edge);
+	FOR(i, 0, four_edges.size())  edge_nd_opt(four_edges[i], type);
+	vector<Point2f> new_c;
+	vector<int> new_index;
+	for (int m = 0; m < 4; m++)
+	{
+		new_index.push_back(new_c.size());
+		for (int n = 0; n < four_edges[m].size() - 1; n++)
+		{
+			new_c.push_back(four_edges[m][n]);
+		}
+	}
+	cont = new_c;
+	indexes = new_index;
+}
+
+
 
 
 
