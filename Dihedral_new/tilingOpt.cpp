@@ -55,15 +55,15 @@ namespace Tiling_tiles {
 					if (contour_2[t].type == fixed_p)
 						anc1.push_back(t);
 				}
-				vector<Point2f> frame = { contour_2[anc1[0]].point, contour_2[anc1[1]].point, contour_2[anc1[2]].point, contour_2[anc1[3]].point };
-				vector<Point2f> frame_b = base_frame(frame, 3);
-				Mat rot_mat = getPerspectiveTransform(frame, frame_b);// getAffineTransform(frame_1, frame_b_1);
-																	  //cout << rot_mat << endl;
-				vector<Point2f> contour_dst;
-				perspectiveTransform(conf_trans(contour_2), contour_dst, rot_mat);
-				
-				whole_con_opt(contour_dst, anc1, 0);
-				contour_2 = set_flags(contour_dst, contour_2);
+				//vector<Point2f> frame = { contour_2[anc1[0]].point, contour_2[anc1[1]].point, contour_2[anc1[2]].point, contour_2[anc1[3]].point };
+				//vector<Point2f> frame_b = base_frame(frame, 3);
+				//Mat rot_mat = getPerspectiveTransform(frame, frame_b);// getAffineTransform(frame_1, frame_b_1);
+				//													  //cout << rot_mat << endl;
+				//vector<Point2f> contour_dst;
+				//perspectiveTransform(conf_trans(contour_2), contour_dst, rot_mat);
+				//
+				//whole_con_opt(contour_dst, anc1, 0);
+				//contour_2 = set_flags(contour_dst, contour_2);
 
 				Mat draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
 				if (translation_placement(contour_2, con_re, anc1, anc2, draw2))
@@ -288,10 +288,14 @@ namespace Tiling_tiles {
 		//		{
 		//			for (int n = m + 1; n < ppindex; n++)
 		//			{					
-						int i = 0;
+						/*int i = 0;
 						int j = 8;
 						int m = 19;
-						int n = 29;
+						int n = 29;*/
+						int i = 6;
+						int j = 21;
+						int m = 26;
+						int n = 34;
 						times++;
 						//std::cout << i<<" "<<j<<" "<<m<<" "<<n << endl;
 						//if (abs(part_points_index[n] - part_points_index[m]) < margin) continue;

@@ -1,6 +1,5 @@
 #pragma once
 #include <opencv2/opencv.hpp>
-#include <opencv2/shape/shape_distance.hpp>
 #include <opencv2/core/utils/logger.hpp>
 #include <highgui/highgui.hpp>
 #include <imgproc/imgproc.hpp>

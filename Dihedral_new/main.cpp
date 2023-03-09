@@ -16,7 +16,7 @@ int main()
 
 	if (f == 0)
 	{
-		tiling.tiliing_generation("70");
+		tiling.tiliing_generation("44");
 
 	}
 	else if (f == 10) //save contours
