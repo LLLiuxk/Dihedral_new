@@ -22,6 +22,9 @@
 #define DefaultPath "C:/Users/liuxk/OneDrive/Recent/DualNPR/"
 #define SavePath "D:/vs2015project/Dihedral_new/result/"
 
+extern string image_id;
+
+
 using namespace cv;
 using namespace std;
 
@@ -129,7 +132,9 @@ namespace Tiling_tiles {
 		~Tiling_opt() {};
 	
 		void tiliing_generation(string nameid);
+		void tiliing_gen_specify(string nameid);
 		void load_dataset(bool input_images);
+		void load_para(string filename);
 		void RotationVis(protoTile c1, protoTile c2, int clockorder);
 
 		//tiling rules

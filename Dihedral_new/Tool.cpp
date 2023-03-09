@@ -91,6 +91,21 @@ void draw_pair(Mat &drawing_, vector<Point2f> contour1, vector<Point2f> contour2
 	}
 }
 
+void progress_bar(double index, double total)
+{
+	if (index <total - 1)
+	{
+		cout << "Loading: ";
+		int show_num = index * 20 / total;
+		for (int j = 0; j <= show_num; j++) cout << "█";
+		cout << "  " << fixed << setprecision(2) << index*100.0 / (total - 1) << "%"<<endl;
+	}
+	else
+	{
+		cout << endl << "======LOADING OVER======" << endl;
+	}
+}
+
 //geometry tool
 Point2f center_p(vector<Point2f> contour_)
 {
@@ -880,7 +895,7 @@ vector<Point2f> ima2contour(string imapath, bool show_result)
 		//用candy法由灰度图求出掩码图
 		Canny(src_gray, canny_output, thresh, thresh * 2, 3);
 		//imshow("canny_output", canny_output);
-		imwrite(imapath, src_gray);
+		//imwrite(imapath, src_gray);
 		//由掩码图求出有序轮廓点
 		findContours(canny_output, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_NONE, cv::Point(0, 0));
 		cout << "contours num:" << contours.size() <<"  1st points num:" << contours[0].size() <<endl;

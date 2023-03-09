@@ -22,7 +22,7 @@ namespace Tiling_tiles {
 			std::cout << "no right placement" << endl;
 			return;
 		}
-		FOR(i, 0, 1)
+		FOR(i, 0, 0)
 		//FOR(i, 0, all_inner_num)
 		{
 			match_candidate(i);
@@ -149,6 +149,86 @@ namespace Tiling_tiles {
 
 	}
 
+	void Tiling_opt::tiliing_gen_specify(string nameid)
+	{
+		load_dataset(false);
+		string filepath = DefaultPath;
+		filepath = filepath + "contour/" + nameid + ".txt";
+		prototile_first = protoTile(filepath);
+		string savepath = SavePath;
+		savepath += nameid;
+		const char *na = savepath.c_str();
+		if (_access(na, 0) != -1) printf("The  file/dir had been Exisit \n");
+		else	_mkdir(na);
+		vector<int> cand_points = prototile_first.getCandPoints(prototile_first.contour_f);
+		int trans = Tanslation_rule(cand_points, prototile_first.contour_f, savepath);
+		//int flips = Flipping_rule(p_p_index, cont_orig, rootname);
+		int all_inner_num = all_inner_conts.size();
+		if (all_inner_num == 0)
+		{
+			std::cout << "no right placement" << endl;
+			return;
+		}
+		FOR(i, 0, 0)
+			//FOR(i, 0, all_inner_num)
+		{
+			match_candidate(i);
+			for (int j = 0; j < 1; j++)
+			{
+				Mat draw = Mat(1000, 1000, CV_8UC3, Scalar(255, 255, 255));
+				vector<pair<int, int>> path = cand_paths[i][j];
+				vector<Point_f> contour1 = prototile_mid.contour_f;
+				vector<Point_f> contour2 = candidate_contours[i][j];
+				Point2f sh = Point2f(300, 500) - center_p(conf_trans(contour1));
+				draw_pair(draw, conf_trans(contour1), conf_trans(contour2), path, sh);
+
+				double con_sc;
+				vector<vector<double>> contour2_tar;
+				//求contour_对应的point_f和tar值
+				//contour2_tar = computeTAR(contour_, con_sc, 0.5);
+				double angle = 165;
+				double ratio_max = 100;
+				double result_score = 0;
+				double ratio = 0.5;
+				vector<Point_f> contour_2 = morphing_dir(contour1, contour2, path, ratio);
+				Point2f sh2 = Point2f(700, 500) - center_p(conf_trans(contour_2));
+				draw_contour_points(draw, conf_trans(contour_2), sh2, 3, 2);
+				imshow("correspond path", draw);
+				vector<Point_f> con_re;
+				vector<int> anc1;
+				vector<int> anc2;
+				FOR(t, 0, contour_2.size())
+				{
+					if (contour_2[t].type == fixed_p)
+						anc1.push_back(t);
+				}
+				//vector<Point2f> frame = { contour_2[anc1[0]].point, contour_2[anc1[1]].point, contour_2[anc1[2]].point, contour_2[anc1[3]].point };
+				//vector<Point2f> frame_b = base_frame(frame, 3);
+				//Mat rot_mat = getPerspectiveTransform(frame, frame_b);// getAffineTransform(frame_1, frame_b_1);
+				//													  //cout << rot_mat << endl;
+				//vector<Point2f> contour_dst;
+				//perspectiveTransform(conf_trans(contour_2), contour_dst, rot_mat);
+				//
+				//whole_con_opt(contour_dst, anc1, 0);
+				//contour_2 = set_flags(contour_dst, contour_2);
+
+				Mat draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
+				if (translation_placement(contour_2, con_re, anc1, anc2, draw2))
+				{
+					cout << "OK!" << endl;
+				}
+
+				protoTile c1, c2;
+				c1.show_contour(conf_trans(contour_2), anc1);
+				c2.show_contour(conf_trans(con_re), anc2);
+				RotationVis(c1, c2, AntiClockWise);
+
+			}
+		}
+
+
+	}
+
 	void Tiling_opt::load_dataset(bool input_images)
 	{
 		if (!contour_dataset.empty() || !all_con_tars.empty())
@@ -190,6 +270,22 @@ namespace Tiling_tiles {
 		all_types = contour_dataset.size();
 		std::cout << "All types： " << all_types << "  load over!" << endl;
 		std::cout << "All TARs of contours have been computed" << endl;
+	}
+
+	void Tiling_opt::load_para(std::string filename)
+	{
+		ifstream fin(filename);
+		if (fin.fail() == true)
+		{
+			cout << "Cannot open load_pare file." << endl;
+		}
+		string param;
+		while (fin >> param)
+		{
+			if (param == "image_id")
+				fin >> image_id;
+		}
+		cout << "Paramaters Loaded Successfully." << endl << endl;
 	}
 
 
@@ -280,22 +376,23 @@ namespace Tiling_tiles {
 		Point2f cent_cont = center_p(conf_trans(contour_s));
 		//std::cout << "contsize: " << cent_cont << endl;
 		int times = 0;
-		//for (int i = 0; i < ppindex; i++)
-		//{
-		//	for (int j = i + 1; j < ppindex; j++)
-		//	{
-		//		for (int m = j + 1; m < ppindex; m++)
-		//		{
-		//			for (int n = m + 1; n < ppindex; n++)
-		//			{					
+		for (int i = 0; i < ppindex; i++)
+		{
+			progress_bar(i, ppindex);
+			for (int j = i + 1; j < ppindex; j++)
+			{
+				for (int m = j + 1; m < ppindex; m++)
+				{
+					for (int n = m + 1; n < ppindex; n++)
+					{					
 						/*int i = 0;
 						int j = 8;
 						int m = 19;
 						int n = 29;*/
-						int i = 6;
+						/*int i = 6;
 						int j = 21;
 						int m = 26;
-						int n = 34;
+						int n = 34;*/
 						times++;
 						//std::cout << i<<" "<<j<<" "<<m<<" "<<n << endl;
 						//if (abs(part_points_index[n] - part_points_index[m]) < margin) continue;
@@ -310,11 +407,11 @@ namespace Tiling_tiles {
 
 						if (translation_placement( contour_s, inner_contour, indexes, mid_interval, drawing1))
 						{
-							std::cout << ++trans << " Translation succeed" << endl;
+							//std::cout << ++trans << " Translation succeed" << endl;
 							inPat one_situation(inner_contour, mid_interval, 0);
 							all_inner_conts.push_back(one_situation);
 
-							Point2f shift2 = Point2f(400, 600) - cent_cont;
+							Point2f shift2 = Point2f(300, 600) - cent_cont;
 							FOR(jj, 0, contsize)
 							{
 								if (contour_s[jj].type == general_p)  circle(drawing1, contour_s[jj].point+ shift2, 2, Scalar(0, 0, 0), -1);
@@ -325,10 +422,10 @@ namespace Tiling_tiles {
 							string filename = rootname + "/" + to_string(all_inner_conts.size() - 1) + "transPlacingResult.png";
 							cv::imwrite(filename, drawing1);
 						}
-		//			}
-		//		}
-		//	}
-		//}
+					}
+				}
+			}
+		}
 		std::cout << "Trans times: " << times << endl;
 		return trans;
 	}
@@ -375,7 +472,7 @@ namespace Tiling_tiles {
 		//              \  /   \  /           i从1取到3
 		//              3\/    \/3
 		//               ②    ④
-		bool test_coll = true;
+		bool test_coll = false;
 		if (test_coll)
 		{
 			Mat drawing1 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
@@ -425,7 +522,7 @@ namespace Tiling_tiles {
 		//提取后检测是否自交
 		int index_1, index_2;
 		bool self_inter = self_intersect(conf_trans(extracted), index_1, index_2);
-		Point2f shift1 = Point2f(1000, 600) - (center_p(conf_trans(contour_s)) + 0.5*(line1 + line2));
+		Point2f shift1 = Point2f(1100, 600) - (center_p(conf_trans(contour_s)) + 0.5*(line1 + line2));
 		if (!self_inter)
 		{
 			FOR(i, 0, 4) draw_poly(countname, conf_trans(four_place[i]), shift1);

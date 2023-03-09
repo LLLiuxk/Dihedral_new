@@ -143,6 +143,7 @@ namespace Tiling_tiles {
 			}
 			imshow("protofirst cand points", drawing);
 		}
+		cout << "cand points num: " << cand_index.size() << endl;
 		return cand_index;
 	}
 
