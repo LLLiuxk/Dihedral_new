@@ -78,9 +78,10 @@ void fileout(string filepath, vector<Point2f> contour_);
 vector<vector<double>> compute_TAR(vector<Point2f> &contour_, double &shape_complexity, double frac = 0.5);
 double tar_length_2p(vector<double> &p1, vector<double> &p2);
 double tar_mismatch(vector<vector<double>> first_arr, vector<vector<double>> second_arr, vector<pair<int, int>>& path, int &sec_shift, int width); //点对应匹配的筛选框宽度
-//double tar_mismatch(vector<vector<double>> first_arr, vector<vector<double>> second_arr, vector<int> first_fea, vector<int> sec_fea, vector<pair<int, int>>& path, int &sec_shift, int width); //增加特征点的权重
+double tar_mismatch_fea(vector<vector<double>> first_arr, vector<vector<double>> second_arr, vector<int> first_fea, vector<int> sec_fea, vector<pair<int, int>>& path, int &sec_shift, int width); //增加特征点的权重
 void print_TAR_Path(double d[][TAR_num], double dp[][TAR_num], int i, int j, vector<pair<int, int>>& path);
 double isoperimetric_inequality(vector<Point2f> contour);
+
 
 //edge evaluation and optimization
 double bound_collision(vector<Point2f> cont, vector<int> indexes, int type = -1);

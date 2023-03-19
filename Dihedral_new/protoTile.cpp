@@ -17,17 +17,18 @@ namespace Tiling_tiles {
 		}		
 	}
 
-	protoTile::protoTile(vector<Point2f> con)
+	protoTile::protoTile(vector<Point2f> con)  //根据初始轮廓进行初始化
 	{
 		contour = con;
 		resample(ContourNum);
 		contour_f = set_flags(contour, feature_points);
 	}
 
-	protoTile::protoTile(vector<Point_f> conf)
+	protoTile::protoTile(vector<Point_f> conf)  //已知点信息的初始化
 	{
 		contour_f = conf;
 		contour = conf_trans(contour_f);
+		feature_points = getFeatures(contour_f);
 	}
 
 
@@ -145,6 +146,20 @@ namespace Tiling_tiles {
 		}
 		cout << "cand points num: " << cand_index.size() << endl;
 		return cand_index;
+	}
+
+	vector<int> protoTile::getFeatures(vector<Point_f> &contour_f)
+	{
+		vector<int> fea_index;
+		int csize = contour_f.size();
+		FOR(i, 0, csize)
+		{
+			if (contour_f[i].type == fea_p || contour_f[i].type == fixed_p)
+			{
+				fea_index.push_back(i);
+			}
+		}
+		return fea_index;
 	}
 
 	void protoTile::show_contour(vector<Point2f> c, vector<int> anchor_p)

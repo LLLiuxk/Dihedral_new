@@ -93,14 +93,11 @@ void draw_pair(Mat &drawing_, vector<Point2f> contour1, vector<Point2f> contour2
 
 void progress_bar(double index, double total)
 {
-	if (index <total - 1)
-	{
-		cout << "Loading: ";
-		int show_num = index * 20 / total;
-		for (int j = 0; j <= show_num; j++) cout << "█";
-		cout << "  " << fixed << setprecision(2) << index*100.0 / (total - 1) << "%"<<endl;
-	}
-	else
+	cout << "Loading: ";
+	int show_num = index * 20 / total;
+	for (int j = 0; j <= show_num; j++) cout << "█";
+	cout << "  " << fixed << setprecision(2) << index*100.0 / (total - 1) << "%" << endl;
+	if (index ==total - 1)
 	{
 		cout << endl << "======LOADING OVER======" << endl;
 	}
@@ -159,7 +156,7 @@ vector<int> cal_feature(vector<Point2f> contour_, int  n_min, int n_max, double 
 	//cout << "contoursize: " << contoursize << endl;
 	//double arl = arcLength(contour_, true);
 	//cout<<"arl: "<<arl<<"  "<<dmin<<" "<<dmax<<endl;
-	int  dmid = 0.5* n_min + 0.5*n_max;
+	int  dmid = n_max;// 0.5* n_min + 0.5*n_max;
 	//cout << dmid << endl;
 	FOR(i, 0, contoursize)
 	{
@@ -256,7 +253,8 @@ vector<int> cal_feature(vector<Point2f> contour_, int  n_min, int n_max, double 
 		circle(drwa, contour_[0], 3, Scalar(0, 0, 255), -1);
 		for (int i = 0, j = 0; i < final_c_size; i++)
 		{
-			if (j < index_num.size() && i == index_num[j])
+			int insize = index_num.size();
+			if (j <insize && i == index_num[j])
 			{
 				circle(drwa, contour_[i], 2, Scalar(0, 255, 0), -1);
 				j++;
@@ -1037,7 +1035,7 @@ double tar_length_2p(vector<double> &p1, vector<double> &p2)
 	int Ts = p1.size();
 	if (Ts != p2.size())
 	{
-		cout << "point number not equal" << endl;
+		cout << "point number not equal: " <<Ts<<"   "<<p2.size()<< endl;
 		return 0;
 	}
 	//cout << "p1.size(): " << p1.size()<<"  "<< p2.size() << endl;
@@ -1132,6 +1130,7 @@ double tar_mismatch(vector<vector<double>> first_arr, vector<vector<double>> sec
 				}
 			}
 		}
+		cout << shift<<"shift  min_mis: " << distance[first_num - 1][second_num - 1] << endl;
 		if (distance[first_num - 1][second_num - 1] < min_mis)
 		{
 			path_min.swap(vector<pair<int, int>>());
@@ -1144,6 +1143,120 @@ double tar_mismatch(vector<vector<double>> first_arr, vector<vector<double>> sec
 	return min_mis;
 }
 
+double tar_mismatch_fea(vector<vector<double>> first_arr, vector<vector<double>> second_arr, vector<int> first_fea, vector<int> sec_fea, vector<pair<int, int>>& path, int &sec_shift, int width) //增加特征点的权重
+{
+	double dis[TAR_num][TAR_num];//两组点之间的坐标差异
+	double distance[TAR_num][TAR_num];
+	//int step[TAR_num][TAR_num];//记录总的步数
+	int first_num = first_arr.size();
+	int second_num = second_arr.size(); //first 作为y轴 ,second为x轴
+	double fea_ratio = 0.5;
+	double half_fea_ratio = 1;
+	double com_ratio = 1;
+	if (first_num != second_num)
+	{
+		std::cout << "The sampling points of two contours are not equal: " << first_num << " - " << second_num << endl;
+		//return 0;
+	}
+	if (first_arr[0].size() != second_arr[0].size())
+	{
+		std::cout << "The tar num of each point is not equal: " << first_arr[0].size() << " - " << second_arr[0].size() << endl;
+		return 0;
+	}
+	double min_mis = 10000;
+	vector<pair<int, int>> path_min;
+	//double distance[202][202];
+	//int step[202][202];//记录总的步数
+	//std::cout << "first: " << first_num << "   second: " << second_num << endl;
+	for (int shift = 0; shift < second_num; shift++) //将first固定，分别对齐second的起点
+	{
+		for (int i = 0; i < first_num; i++)
+		{
+			for (int j = 0; j < second_num; j++)
+			{
+				//ddd++;
+				dis[i][j] = 0;
+				if (max(0, i - width) <= j && j <= min(second_num - 1, i + width))
+				{
+					//ccc++;
+					distance[i][j] = 0;
+				}
+				else distance[i][j] = 100000;
+
+			}
+		}
+		//distance[0][0]记录的是对齐的第一个点
+		if (first_fea[0] > 1 && sec_fea[shift] > 1)
+		{
+			dis[0][0] = fea_ratio*tar_length_2p(first_arr[0], second_arr[shift]);//
+		}
+		else if (first_fea[0] > 1 || sec_fea[shift] > 1)  dis[0][0] = half_fea_ratio*tar_length_2p(first_arr[0], second_arr[shift]);
+		else dis[0][0] = com_ratio*tar_length_2p(first_arr[0], second_arr[shift]);
+
+		distance[0][0] = dis[0][0];
+		for (int i = 1; i < first_num; i++)
+		{
+			if (distance[i][0] == 100000) continue;
+			if (first_fea[i] > 1 && sec_fea[shift] > 1)
+			{
+				dis[i][0] = fea_ratio*tar_length_2p(first_arr[i], second_arr[shift]); //0;
+			}
+			else if (first_fea[i] > 1 || sec_fea[shift] > 1) dis[i][0] = half_fea_ratio* tar_length_2p(first_arr[i], second_arr[shift]);
+			else  dis[i][0] = com_ratio*tar_length_2p(first_arr[i], second_arr[shift]);
+			distance[i][0] = distance[i - 1][0] + dis[i][0];
+		}
+		for (int i = 1; i < second_num; i++)
+		{
+			if (distance[0][i] == 100000) continue;
+			if (first_fea[0] > 1 && sec_fea[(i + shift) % second_num] > 1)
+			{
+				dis[0][i] = fea_ratio*tar_length_2p(first_arr[0], second_arr[(i + shift) % second_num]); //0;
+			}
+			else if (first_fea[0] > 1 || sec_fea[(i + shift) % second_num] > 1) dis[0][i] = half_fea_ratio* tar_length_2p(first_arr[0], second_arr[(i + shift) % second_num]);
+			else	dis[0][i] = com_ratio*tar_length_2p(first_arr[0], second_arr[(i + shift) % second_num]);
+			distance[0][i] = distance[0][i - 1] + dis[0][i];
+		}
+		for (int i = 1; i < first_num; i++)
+		{
+			for (int j = 1; j < second_num; j++)
+				//(int i = istart; i <= imax; i++)
+			{
+				if (distance[i][j] == 100000) continue;
+				if (first_fea[i] > 1 && sec_fea[(j + shift) % second_num] > 1)
+				{
+					dis[i][j] = fea_ratio*tar_length_2p(first_arr[i], second_arr[(j + shift) % second_num]); //0;
+				}
+				else if (first_fea[i] > 1 || sec_fea[(j + shift) % second_num] > 1)  dis[i][j] = half_fea_ratio*tar_length_2p(first_arr[i], second_arr[(j + shift) % second_num]);
+				else dis[i][j] = com_ratio*tar_length_2p(first_arr[i], second_arr[(j + shift) % second_num]);
+				double g1 = distance[i - 1][j] + dis[i][j];
+				double g2 = distance[i - 1][j - 1] + dis[i][j];
+				double g3 = distance[i][j - 1] + dis[i][j];
+				if (g1 < g2)
+				{
+					if (g1 < g3) distance[i][j] = g1;
+					else distance[i][j] = g3;
+				}
+				else
+				{
+					if (g2 < g3) distance[i][j] = g2;
+					else distance[i][j] = g3;
+				}
+			}
+		}
+		if (distance[first_num - 1][second_num - 1] < min_mis)
+		{
+			//cout << "min_mis: " << distance[first_num - 1][second_num - 1] << endl;
+			path_min.swap(vector<pair<int, int>>());
+			min_mis = distance[first_num - 1][second_num - 1];
+			print_TAR_Path(dis, distance, first_num - 1, second_num - 1, path_min);
+			sec_shift = shift;
+		}
+	}
+	path = path_min;
+	return min_mis;
+}
+
+
 void print_TAR_Path(double d[][TAR_num], double dp[][TAR_num], int i, int j, vector<pair<int, int>>& path)
 {
 	if (i == 0 && j == 0) {
@@ -1151,18 +1264,19 @@ void print_TAR_Path(double d[][TAR_num], double dp[][TAR_num], int i, int j, vec
 		path.push_back(make_pair(i, j));
 		return;
 	}
-
-	if (abs(dp[i][j] - (dp[i - 1][j - 1] + d[i][j])) < 0.001) {
+	double thres = 0.001;
+	if (abs(dp[i][j] - (dp[i - 1][j - 1] + d[i][j])) < thres) {
 		print_TAR_Path(d, dp, i - 1, j - 1, path);
 
 	}
-	else if (abs(dp[i][j] - (dp[i][j - 1] + d[i][j])) < 0.001) {
+	else if (abs(dp[i][j] - (dp[i][j - 1] + d[i][j])) < thres) {
 		print_TAR_Path(d, dp, i, j - 1, path);
 
 	}
-	else {
+	else  if (abs(dp[i][j] - (dp[i - 1][j] + d[i][j])) < thres) {
 		print_TAR_Path(d, dp, i - 1, j, path);
 	}
+	else cout << "Out control!" << endl;
 	path.push_back(make_pair(i, j));
 }
 

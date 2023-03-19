@@ -29,9 +29,9 @@ namespace Tiling_tiles {
 			for (int j = 0; j < 1; j++)
 			{
 				Mat draw = Mat(1000, 1000, CV_8UC3, Scalar(255, 255, 255));
-				vector<pair<int, int>> path = cand_paths[i][j];
+				vector<pair<int, int>> path = cand_paths[j];
 				vector<Point_f> contour1 = prototile_mid.contour_f;
-				vector<Point_f> contour2 = candidate_contours[i][j];
+				vector<Point_f> contour2 = candidate_contours[j];
 				Point2f sh = Point2f(300, 500) - center_p(conf_trans(contour1));
 				draw_pair(draw, conf_trans(contour1), conf_trans(contour2), path, sh);
 				
@@ -149,19 +149,20 @@ namespace Tiling_tiles {
 
 	}
 
-	void Tiling_opt::tiliing_gen_specify(string nameid)
+	void Tiling_opt::tiliing_gen_specify(string nameid, vector<int> anc_points)
 	{
 		load_dataset(false);
 		string filepath = DefaultPath;
 		filepath = filepath + "contour/" + nameid + ".txt";
 		prototile_first = protoTile(filepath);
 		string savepath = SavePath;
+		savepath = savepath.substr(0, savepath.length() - 7)+"result_spe/";
 		savepath += nameid;
 		const char *na = savepath.c_str();
 		if (_access(na, 0) != -1) printf("The  file/dir had been Exisit \n");
 		else	_mkdir(na);
 		vector<int> cand_points = prototile_first.getCandPoints(prototile_first.contour_f);
-		int trans = Tanslation_rule(cand_points, prototile_first.contour_f, savepath);
+		int trans = Tanslation_rule_spec(cand_points, prototile_first.contour_f, savepath, anc_points);
 		//int flips = Flipping_rule(p_p_index, cont_orig, rootname);
 		int all_inner_num = all_inner_conts.size();
 		if (all_inner_num == 0)
@@ -169,18 +170,50 @@ namespace Tiling_tiles {
 			std::cout << "no right placement" << endl;
 			return;
 		}
-		FOR(i, 0, 0)
+		FOR(i, 0, 1)
 			//FOR(i, 0, all_inner_num)
 		{
-			match_candidate(i);
+			match_candidate_(i);
+			//feature_match();
 			for (int j = 0; j < 1; j++)
 			{
 				Mat draw = Mat(1000, 1000, CV_8UC3, Scalar(255, 255, 255));
-				vector<pair<int, int>> path = cand_paths[i][j];
+				vector<pair<int, int>> path = cand_paths[j];
+				cout << "path num: " << path.size() << endl;
 				vector<Point_f> contour1 = prototile_mid.contour_f;
-				vector<Point_f> contour2 = candidate_contours[i][j];
+				vector<Point_f> contour2 = candidate_contours[j];
+				prototile_second = protoTile(contour2);
 				Point2f sh = Point2f(300, 500) - center_p(conf_trans(contour1));
 				draw_pair(draw, conf_trans(contour1), conf_trans(contour2), path, sh);
+				imshow("pair  match", draw);
+				Point2f shh2 = sh + Point2f(400, 0);
+				Mat draw22 = Mat(1000, 1000, CV_8UC3, Scalar(255, 255, 255));
+				draw_contour_points(draw22, prototile_mid.contour, sh, 5, 2);
+				draw_contour_points(draw22, prototile_second.contour, shh2, 7, 2);
+				FOR(i, 0, prototile_mid.feature_points.size())
+					circle(draw22, prototile_mid.contour[prototile_mid.feature_points[i]]+ sh, 3, Scalar(0, 0, 255), -1);
+				FOR(i, 0, prototile_second.feature_points.size())
+					circle(draw22, prototile_second.contour[prototile_second.feature_points[i]] + shh2, 3, Scalar(0, 125, 255), -1);
+				circle(draw22, prototile_mid.contour[prototile_mid.feature_points[0]]+ sh, 5, Scalar(120, 0, 255), -1);
+				circle(draw22, prototile_second.contour[prototile_second.feature_points[0]] + shh2, 5, Scalar(0, 125, 255), -1);
+				vector<pair<int, int>> path_fea= cand_fea_paths[j];
+				/*int sec_shift = path_shift[j];
+				cout << "path_fea size: " << path_fea.size() <<"  sec_shift:"<< sec_shift<< endl;
+				FOR(i, 0, path_fea.size())
+				{
+					int tsfsize = prototile_second.feature_points.size();
+					Point2f f1 = prototile_mid.contour[prototile_mid.feature_points[path_fea[i].first]]+sh;
+					Point2f f2 = prototile_second.contour[prototile_second.feature_points[(path_fea[i].second + sec_shift) % tsfsize]] + shh2;
+					line(draw22, f1, f2, colorbar[6].second);
+				}*/
+				FOR(i, 0, path_fea.size())
+				{
+					//int tsfsize = prototile_second.feature_points.size();
+					Point2f f1 = prototile_mid.contour[path_fea[i].first] + sh;
+					Point2f f2 = prototile_second.contour[path_fea[i].second] + shh2;
+					line(draw22, f1, f2, colorbar[6].second);
+				}
+				imshow("fea match", draw22);
 
 				double con_sc;
 				vector<vector<double>> contour2_tar;
@@ -202,26 +235,38 @@ namespace Tiling_tiles {
 					if (contour_2[t].type == fixed_p)
 						anc1.push_back(t);
 				}
-				//vector<Point2f> frame = { contour_2[anc1[0]].point, contour_2[anc1[1]].point, contour_2[anc1[2]].point, contour_2[anc1[3]].point };
-				//vector<Point2f> frame_b = base_frame(frame, 3);
-				//Mat rot_mat = getPerspectiveTransform(frame, frame_b);// getAffineTransform(frame_1, frame_b_1);
-				//													  //cout << rot_mat << endl;
-				//vector<Point2f> contour_dst;
-				//perspectiveTransform(conf_trans(contour_2), contour_dst, rot_mat);
-				//
-				//whole_con_opt(contour_dst, anc1, 0);
-				//contour_2 = set_flags(contour_dst, contour_2);
-
-				Mat draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
-				if (translation_placement(contour_2, con_re, anc1, anc2, draw2))
+				vector<Point2f> contour_dst = conf_trans(contour_2);
+				bool pers_trans = 0;
+				bool deve_opt = 1;
+				if (pers_trans)
 				{
-					cout << "OK!" << endl;
+					Mat draw_ = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
+					vector<Point2f> frame = { contour_2[anc1[0]].point, contour_2[anc1[1]].point, contour_2[anc1[2]].point, contour_2[anc1[3]].point };
+					vector<Point2f> frame_b = base_frame(frame, 1);
+					Point2f sh1(0, 400);
+					draw_contour(draw_, contour_dst, sh1, 5);
+					FOR(m, 0, 4) circle(draw_, frame[m] + sh1, 3, Scalar(125, 0, 0));
+					Mat rot_mat = getPerspectiveTransform(frame, frame_b);// getAffineTransform(frame_1, frame_b_1);
+					perspectiveTransform(contour_dst, contour_dst, rot_mat);
+					draw_contour(draw_, contour_dst, sh1, 8);
+					FOR(m, 0, 4) circle(draw_, frame_b[m] + sh1, 3, Scalar(0, 255, 0));
+					imshow("123123", draw_);
 				}
-
+				if (deve_opt)
+				{
+					whole_con_opt(contour_dst, anc1, 0);
+				}
+				contour_2 = set_flags(contour_dst, contour_2);
+				Mat draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
+				if (translation_spec(contour_2, con_re, anc1, anc2, draw2))
+				{
+					cout << "OK! No intersection!" << endl;
+				}
+				else cout << "Bad result with intersection!" << endl;
 				protoTile c1, c2;
 				c1.show_contour(conf_trans(contour_2), anc1);
 				c2.show_contour(conf_trans(con_re), anc2);
-				RotationVis(c1, c2, AntiClockWise);
+				//RotationVis(c1, c2, AntiClockWise);
 
 			}
 		}
@@ -243,7 +288,7 @@ namespace Tiling_tiles {
 		{
 			//vector<int> t = { 26 };
 			//int tin = 0;
-			FOR(i, 0, AllTypes)
+			FOR(i, 189, 192)
 			{			
 				//if (i != t[tin]) continue;
 				//else tin++;
@@ -385,14 +430,6 @@ namespace Tiling_tiles {
 				{
 					for (int n = m + 1; n < ppindex; n++)
 					{					
-						/*int i = 0;
-						int j = 8;
-						int m = 19;
-						int n = 29;*/
-						/*int i = 6;
-						int j = 21;
-						int m = 26;
-						int n = 34;*/
 						times++;
 						//std::cout << i<<" "<<j<<" "<<m<<" "<<n << endl;
 						//if (abs(part_points_index[n] - part_points_index[m]) < margin) continue;
@@ -418,6 +455,7 @@ namespace Tiling_tiles {
 								else if (contour_s[jj].type != general_p)  circle(drawing1, contour_s[jj].point + shift2, 2, Scalar(0, 255, 0), -1);
 							}
 							FOR(jj, 0, 4) circle(drawing1, contour_s[indexes[jj]].point + shift2, 3, Scalar(0, 0, 255), -1);
+							circle(drawing1, contour_s[0].point + shift2, 4, Scalar(255, 0, 55), -1);
 
 							string filename = rootname + "/" + to_string(all_inner_conts.size() - 1) + "transPlacingResult.png";
 							cv::imwrite(filename, drawing1);
@@ -430,9 +468,56 @@ namespace Tiling_tiles {
 		return trans;
 	}
 
+	int Tiling_opt::Tanslation_rule_spec(vector<int> cand_points, vector<Point_f> &contour_s, string rootname, vector<int> anc_points)
+	{
+		int trans = 0;
+		int ppindex = cand_points.size();
+		int contsize = contour_s.size();
+		Point2f cent_cont = center_p(conf_trans(contour_s));
+		//std::cout << "contsize: " << cent_cont << endl;
+		int times = 0;
+		int i = anc_points[0];
+		int j = anc_points[1];
+		int m = anc_points[2];
+		int n = anc_points[3];
+		times++;
+		//std::cout << i<<" "<<j<<" "<<m<<" "<<n << endl;
+		//if (abs(part_points_index[n] - part_points_index[m]) < margin) continue;
+		vector<Point_f> inner_contour;
+		vector<int> mid_interval; //mid_interval存储的是组合成的inner 的分段连接点
+		vector<int> indexes; //1.translati on：以下所有该类摆放都以1-3,2-4为轴摆放
+		indexes.push_back(cand_points[i]);
+		indexes.push_back(cand_points[j]);
+		indexes.push_back(cand_points[m]);
+		indexes.push_back(cand_points[n]);
+		Mat drawing1 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
+
+		if (translation_placement(contour_s, inner_contour, indexes, mid_interval, drawing1))
+		{
+			//std::cout << ++trans << " Translation succeed" << endl;
+			inPat one_situation(inner_contour, mid_interval, 0);
+			all_inner_conts.push_back(one_situation);
+
+			Point2f shift2 = Point2f(300, 600) - cent_cont;
+			FOR(jj, 0, contsize)
+			{
+				if (contour_s[jj].type == general_p)  circle(drawing1, contour_s[jj].point + shift2, 2, Scalar(0, 0, 0), -1);
+				else if (contour_s[jj].type != general_p)  circle(drawing1, contour_s[jj].point + shift2, 2, Scalar(0, 255, 0), -1);
+			}
+			FOR(jj, 0, 4) circle(drawing1, contour_s[indexes[jj]].point + shift2, 3, Scalar(0, 0, 255), -1);
+			circle(drawing1, contour_s[0].point + shift2, 4, Scalar(255, 0, 55), -1);
+
+			string filename = rootname + "/" + to_string(all_inner_conts.size() - 1) + "transPlacingResult.png";
+			cv::imwrite(filename, drawing1);
+		}
+		std::cout << "Trans times: " << times << endl;
+		return trans;
+	}
+
+
 	int Tiling_opt::Flipping_rule(vector<int> part_points_index, vector<Point_f> &contour_s, string rootname)
 	{
-
+		return 0;
 	}
 
 	bool Tiling_opt::translation_placement(vector<Point_f> &contour_s, vector<Point_f> &extracted, vector<int> indexes, vector<int> &ex_indexes, Mat &countname)
@@ -531,22 +616,85 @@ namespace Tiling_tiles {
 		return !self_inter;
 	}
 
+	bool Tiling_opt::translation_spec(vector<Point_f> &contour_s, vector<Point_f> &extracted, vector<int> indexes, vector<int> &ex_indexes, Mat &countname)
+	{
+		int csize = contour_s.size();
+		Point2f line1 = contour_s[indexes[2]].point - contour_s[indexes[0]].point;
+		Point2f line2 = contour_s[indexes[3]].point - contour_s[indexes[1]].point;
+		vector<Point2f> shifting;
+		shifting.push_back(line1);
+		shifting.push_back(line2);
+		shifting.push_back(line1 + line2);
+		// 提取平移围成的轮廓
+		vector<vector<Point_f>> four_place;
+		four_place.push_back(contour_s);
+		for (int i = 0; i < 3; i++)
+		{
+			vector<Point_f> one_loca;
+			for (int j = 0; j < csize; j++)
+			{
+				one_loca.push_back(Point_f(contour_s[j].point + shifting[i], contour_s[j].type));
+			}
+			four_place.push_back(one_loca);
+		}
+
+		Point2f cent_cont = center_p(conf_trans(contour_s));
+		Point2f shift2 = Point2f(400, 600) - cent_cont;
+		draw_contour_points(countname, conf_trans(contour_s), shift2);
+		FOR(jj, 0, 4) circle(countname, contour_s[indexes[jj]].point + shift2, 3, Scalar(0, 0, 255), -1);
+		Point2f shift1 = Point2f(1000, 600) - (center_p(conf_trans(contour_s)) + 0.5*(line1 + line2));
+		FOR(i, 0, 4) draw_poly(countname, conf_trans(four_place[i]), shift1);
+		string spath = "[" + to_string(indexes[0]) + "," + to_string(indexes[1]) + "," + to_string(indexes[2]) + "," + to_string(indexes[3]) + "]_placement";
+
+		int total_num = 0;
+		ex_indexes.swap(vector<int>());
+		extracted.swap(vector<Point_f>());
+		ex_indexes.push_back(0);
+		for (int t = indexes[3]; t > indexes[2]; t--)                   //translation的提取规律为1的4-3,2的1-4,4的2-1,3的3-2
+		{
+			extracted.push_back(four_place[0][t]);
+			total_num++;
+			//circle(drawing_ttt, four_place[0][t], 2, Scalar(0, 255, 0), -1);
+		}
+		ex_indexes.push_back(total_num);
+		for (int t = indexes[0] + csize; t > indexes[3]; t--)
+		{
+			extracted.push_back(four_place[1][t % csize]);
+			total_num++;
+		}
+		ex_indexes.push_back(total_num);
+		for (int t = indexes[1]; t > indexes[0]; t--)
+		{
+			extracted.push_back(four_place[3][t]);
+			total_num++;
+		}
+		ex_indexes.push_back(total_num);
+		for (int t = indexes[2]; t > indexes[1]; t--)
+		{
+			extracted.push_back(four_place[2][t]);
+		}
+		draw_poly(countname, conf_trans(extracted), shift1, 5);
+		imshow(spath, countname);
+		//提取后检测是否自交
+		int index_1, index_2;
+		bool self_inter = self_intersect(conf_trans(extracted), index_1, index_2);
+		return !self_inter;
+	}
 
 	void Tiling_opt::match_candidate(int inner_index)
 	{
 		inPat inner= all_inner_conts[inner_index];
 		prototile_mid = protoTile(inner.in_contour);
 		int cand_num = 10;
-		vector<pair<int, bool>> candidate_patterns = compare_TAR(prototile_mid.contour, cand_num);//当前中间图案对应的候选图案
+		vector<pair<int, bool>> candidate_patterns = compare_TAR(prototile_mid.contour_f, cand_num);//当前中间图案对应的候选图案
 		cout << "This is the " << inner_index << "th inner contour" << endl <<
 			"candidate_patterns size: " << candidate_patterns.size() << endl;
-		//对中间图案采样200点并重新确认候选点坐标
-		//mid_inter = joint_relocate(all_inner_conts[Tiling_index].in_contour, all_inner_conts[Tiling_index].in_interval, num_c);
 
 		double sc_inner = 0;
 		vector<vector<double>> inner_tar = compute_TAR(prototile_mid.contour, sc_inner);
-		vector<vector<Point_f>> candidate_contour;
-		vector<vector<pair<int, int>>> cand_path;
+
+		candidate_contours.swap(vector<vector<Point_f>>());
+		cand_paths.swap(vector<vector<pair<int, int>>>());
 
 		for (int j = 0; j < cand_num; j++) //只要候选图案里的前cand_num个
 		{
@@ -565,11 +713,18 @@ namespace Tiling_tiles {
 				//std::cout << "it is not flip" << endl;
 				cand_tar = all_con_tars[candidate_patterns[j].first];
 			}
+			int cmsize = prototile_mid.contour_f.size();
+			vector<int> mid_index(cmsize, 0), sec_f(cmsize, 0);
+			FOR(n, 0, cmsize)
+			{
+				mid_index[n] = prototile_mid.contour_f[n].type;
+				sec_f[n] = prototile_second.contour_f[n].type;
+			}
 			vector<pair<int, int>> path;
 			int shift = 0;
 			int width = match_window_width; //
-			double re = tar_mismatch(inner_tar, cand_tar, path, shift, width);
-
+			double re = tar_mismatch_fea(inner_tar, cand_tar, mid_index, sec_f, path, shift, width);
+			//double re = tar_mismatch(inner_tar, cand_tar, path, shift, width);
 			vector<pair<int, int>> path_min = path;
 			/*for (int n = 0; n < path.size(); n++)
 			if (prototile_mid->contour_f[path[n].first].type>1)
@@ -654,25 +809,236 @@ namespace Tiling_tiles {
 			}
 			//cout << "angle_al: " << angl_al << "   --  " << length_min << "    sh_al: " << sh_al << endl;
 			prototile_second.contour = contour_cand;
-			candidate_contour.push_back(set_flags(contour_cand, prototile_second.contour_f));
-			cand_path.push_back(path);
+			candidate_contours.push_back(set_flags(contour_cand, prototile_second.contour_f));
+			cand_paths.push_back(path);
 		}
-		candidate_contours.push_back(candidate_contour);
-		cand_paths.push_back(cand_path);
 	}
 
+	void Tiling_opt::match_candidate_(int inner_index)
+	{
+		inPat inner = all_inner_conts[inner_index];
+		prototile_mid = protoTile(inner.in_contour);
+		int cand_num = 10;
+		vector<pair<int, bool>> candidate_patterns = compare_TAR(prototile_mid.contour_f, cand_num);//当前中间图案对应的候选图案
+		cout << "This is the " << inner_index << "th inner contour" << endl <<
+			"candidate_patterns size: " << candidate_patterns.size() << endl;
 
-	vector<pair<int, bool>> Tiling_opt::compare_TAR(vector<Point2f> contour_mid, int chosen_num, int window_width) //chosen_num  选择的最终结果的数目
+		double sc_inner = 0;
+		vector<vector<double>> inner_tar = compute_TAR(prototile_mid.contour, sc_inner);
+		//vector<vector<Point_f>> candidate_contour;
+		//vector<vector<pair<int, int>>> cand_path;
+		candidate_contours.swap(vector<vector<Point_f>>());
+		cand_paths.swap(vector<vector<pair<int, int>>>());
+		cand_fea_paths.swap(vector<vector<pair<int, int>>>());
+		path_shift.swap(vector<int>());
+
+		for (int j = 0; j < 1; j++) //只要候选图案里的前cand_num个
+		{
+			//将所有的结果保存下来
+			prototile_second = protoTile(contour_dataset[candidate_patterns[j].first]);
+			vector<vector<double>> cand_tar;
+			if (candidate_patterns[j].second)
+			{
+				//std::cout << "it is flip" << endl;
+				cand_tar = all_con_tars_flip[candidate_patterns[j].first];
+				prototile_second.Flip_contour(prototile_second.contour_f);
+				prototile_second.contour = conf_trans(prototile_second.contour_f);
+				prototile_second.feature_points = prototile_second.getFeatures(prototile_second.contour_f);
+			}
+			else
+			{
+				//std::cout << "it is not flip" << endl;
+				cand_tar = all_con_tars[candidate_patterns[j].first];
+			}
+			int cmsize = prototile_mid.contour_f.size();
+			vector<int> mid_index(cmsize, 0), sec_f(cmsize, 0);
+			FOR(n, 0, cmsize)
+			{
+				mid_index[n] = prototile_mid.contour_f[n].type;
+				sec_f[n] = prototile_second.contour_f[n].type;
+			}
+			vector<pair<int, int>> path;
+			int shift = 0;
+			int width = match_window_width; //
+			double re = tar_mismatch_fea(inner_tar, cand_tar, mid_index, sec_f, path, shift, width); 
+			vector<pair<int, int>> path_min = path;
+			vector<Point_f> contour_tem_f;
+			int c2size = prototile_second.contour_f.size();
+			//移动点顺序
+			for (int i = shift; i < shift + c2size; i++)
+			{
+				contour_tem_f.push_back(prototile_second.contour_f[i % c2size]);
+			}
+			prototile_second.contour_f = contour_tem_f;
+
+			vector<Point2f> contour_cand = conf_trans(prototile_second.contour_f);
+			//std::cout << "Mid num: "<<prototile_mid.contour.size() << "   sec num: " << c2size << "  after shifting: " << contour_cand.size() << endl;
+
+			double scale = arcLength(prototile_mid.contour, true) / arcLength(contour_cand, true);
+			//std::cout << "scale: " << scale << endl;
+			for (int i = 0; i < contour_cand.size(); i++)
+			{
+				contour_cand[i] = contour_cand[i] * scale;
+			}
+			Point2f cen1 = center_p(prototile_mid.contour);
+			Point2f cen2 = center_p(contour_cand);
+			Point2f shift2 = cen1 - cen2;
+			for (int i = 0; i < contour_cand.size(); i++)
+			{
+				contour_cand[i] = contour_cand[i] + shift2;
+			}
+			double length_min = 1000000;
+			int angle_min = 0;
+			int times = 0;
+			double angl_al = 0;
+			Point2f sh_al = Point2f(0, 0);
+			Point2f shift_t = Point2f(1000, 1000);
+			vector<Point2f> contour_tem;
+			//Point2f v0 = contour_inner[0] - cen1;
+			//Point2f v1 = contour_cand[0] - cen1;
+			//double angle1 = acos(cos_two_vector(v0, v1)) / PI * 180;
+			//if (sin_two_vector(v0, v1) < 0) angle1 = -angle1;
+
+			//cout << j << "  path_min_size:  " << path_min.size() << "  cent:" << cen2 << endl;
+			while (times < 3 || length_2p(shift_t, Point2f(0, 0)) > 100 || angle_min > 10)
+			{
+				length_min = 1000000;
+				angle_min = 0;
+				cen2 = center_p(contour_cand);
+				//找到距离最近的角度
+				for (int angle = 0; angle < 360; angle = angle + 5)
+				{
+					double leng = 0;
+					Mat rot_mat(2, 3, CV_32FC1);
+					rot_mat = getRotationMatrix2D(cen2, angle, 1);
+					cv::transform(contour_cand, contour_tem, rot_mat);
+					for (int m = 0; m < path_min.size(); m++)
+					{
+						leng += length_2p(prototile_mid.contour[path_min[m].first], contour_tem[path_min[m].second]);
+					}
+					if (leng < length_min)
+					{
+						angle_min = angle;
+						length_min = leng;
+					}
+				}
+				Mat rot_mat1(2, 3, CV_32FC1);
+				rot_mat1 = getRotationMatrix2D(cen2, angle_min, 1);
+				cv::transform(contour_cand, contour_tem, rot_mat1);
+				angl_al += angle_min;
+				//contour_cand = contour_mid;
+				//移动重心
+				shift_t = Point2f(0, 0);
+				for (int m = 0; m < path_min.size(); m++)
+				{
+					shift_t += prototile_mid.contour[path_min[m].first] - contour_tem[path_min[m].second];
+				}
+				shift_t = Point2f(shift_t.x / path_min.size(), shift_t.y / path_min.size());
+				for (int i = 0; i < contour_cand.size(); i++)
+				{
+					contour_cand[i] = contour_tem[i] + shift_t;
+				}
+				sh_al += shift_t;
+				times++;
+			}
+			//cout << "angle_al: " << angl_al << "   --  " << length_min << "    sh_al: " << sh_al << endl;
+			prototile_second.contour = contour_cand;
+			prototile_second.contour_f = set_flags(contour_cand, prototile_second.contour_f);
+			candidate_contours.push_back(prototile_second.contour_f);
+			cand_paths.push_back(path);
+
+			/*prototile_second.feature_points = prototile_second.getFeatures(prototile_second.contour_f);
+			double sc_second = 0;
+			vector<vector<double>> sec_tar = compute_TAR(prototile_second.contour, sc_second);
+			vector<pair<int, int>> path_fea;
+			int sec_shift = 0;
+			feature_match(inner_tar, sec_tar, prototile_mid.feature_points, prototile_second.feature_points, path_fea, sec_shift, 5);
+			cand_fea_paths.push_back(path_fea);
+			path_shift.push_back(sec_shift);*/
+			//filter out inappropriate matches
+			vector<pair<int, int>> path_fea;
+			int path_size = path.size();
+			int sec_size = prototile_second.contour_f.size();
+			cout << path_size << "   " << sec_size << endl;
+			FOR(m, 0, path_size)
+			{
+				int mar = 4;
+				cout << "m: " <<m<< "   " << prototile_mid.contour_f[path[m].first].type <<"  "<< prototile_second.contour_f[path[m].second].type << endl;
+				pair<int, int> one_pair = path[m];
+				int sec_index = one_pair.second;
+				if (prototile_mid.contour_f[one_pair.first].type == fixed_p || prototile_mid.contour_f[one_pair.first].type == fea_p)  //must have a match
+				{
+					vector<int> waiting_merge;
+					FOR(n, 1-mar, mar)
+					{
+						int tem_sec = (sec_index + n + sec_size) % sec_size;
+						if (prototile_second.contour_f[tem_sec].type == fea_p)
+							waiting_merge.push_back(tem_sec);
+					}
+					//if (m == 86) cout << waiting_merge.size()<<"    "<<waiting_merge[0] <<"   "<<shift << endl;
+					if (waiting_merge.empty())
+					{
+						if(prototile_mid.contour_f[one_pair.first].type == fixed_p)
+							path_fea.push_back(one_pair);
+						else continue;
+					}
+					else
+					{
+						int min_index = 0;
+						if (waiting_merge.size() != 1)
+						{
+							double min_dis_tar = 10000;
+							FOR(t, 0, waiting_merge.size())
+							{
+								//calculate the pair with less tar distance
+								int cand_index = (waiting_merge[t] + shift) % cand_tar.size();
+								double dis_tar = tar_length_2p(inner_tar[one_pair.first], cand_tar[cand_index]);
+								cout << "distar" << dis_tar << endl;
+								if (dis_tar < min_dis_tar)
+								{
+									min_dis_tar = dis_tar;
+									min_index = t;
+								}
+							}
+						}
+						if (path_fea.empty() || waiting_merge[min_index] != path_fea.back().second)//
+							path_fea.push_back(make_pair(one_pair.first, waiting_merge[min_index]));
+						else if (prototile_mid.contour_f[one_pair.first].type>prototile_mid.contour_f[path_fea.back().first].type)
+						{
+							path_fea.pop_back();
+							path_fea.push_back(make_pair(one_pair.first, waiting_merge[min_index]));
+						}
+						else if (prototile_mid.contour_f[one_pair.first].type == prototile_mid.contour_f[path_fea.back().first].type)
+						{
+							int cand_index = (waiting_merge[min_index] + shift) % cand_tar.size();
+							double one_tar = tar_length_2p(inner_tar[one_pair.first], cand_tar[cand_index]);
+							double back_tar = tar_length_2p(inner_tar[path_fea.back().first], cand_tar[cand_index]);
+							if (one_tar < back_tar)
+							{
+								path_fea.pop_back();
+								path_fea.push_back(make_pair(one_pair.first, waiting_merge[min_index]));
+							}
+						}
+					}				
+				}			
+			}
+			//FOR(mm, 0, path_fea.size()) cout << path_fea[mm].first<<"   "<< path_fea[mm].second<< endl;
+			cand_fea_paths.push_back(path_fea);
+		}
+	}
+
+	vector<pair<int, bool>> Tiling_opt::compare_TAR(vector<Point_f> contour_mid, int chosen_num, int window_width) //chosen_num  选择的最终结果的数目
 	{
 		//int all_types = 2;
 		//std::cout << "inner_c num:" << inner_c.size() << endl;
-		double iso_mid = isoperimetric_inequality(contour_mid);
+		vector<Point2f> contour_mid_ = conf_trans(contour_mid);
+		double iso_mid = isoperimetric_inequality(contour_mid_);
 		cout << "Compare with " << all_types << " types candadites." << endl;
 
 		vector<pair<int, bool>> all_final;
 		vector<double> all_result;
 		double shape_com_mid;
-		vector<vector<double>> tar_mid = compute_TAR(contour_mid, shape_com_mid);
+		vector<vector<double>> tar_mid = compute_TAR(contour_mid_, shape_com_mid);
 		std::cout << "contour_mid: " << contour_mid.size() << "  tar_mid: " << tar_mid.size() << "  each tar: "<< tar_mid[0].size()<<endl;
 		//FOR(g, 0, tar_mid[0].size()) cout << tar_mid[0][g] << endl;
 		int ttrt = 0;
@@ -686,19 +1052,29 @@ namespace Tiling_tiles {
 				ttrt++;
 				continue;
 			}
+			vector<Point_f> sec = contour_dataset[index];
 			vector<vector<double>> tar_sec = all_con_tars[index];
 			vector<vector<double>> tar_sec_f = all_con_tars_flip[index];
 			vector<pair<int, int>> path;
 			int shift = 0;
 			double dis_sc = abs(shape_com_mid - all_shape_complexity[index]);
-			//double re = tar_mismatch(tar_mid, tar_sec, mid_index, sec_f, path, shift, window_width);
-			double re = tar_mismatch(tar_mid, tar_sec, path, shift, window_width);
+			int cmsize = contour_mid.size();
+			vector<int> mid_index(cmsize,0), sec_f(cmsize,0), sec_fflip(cmsize, 0);
+			FOR(n, 0, cmsize)
+			{
+				mid_index[n]= contour_mid[n].type;
+				sec_f[n] = sec[n].type;
+				sec_fflip[n] = sec[cmsize - 1 - n].type;
+				//cout << n << "   " << mid_index[n] << "    " << sec_f[n] << "     " << sec_fflip[n] << endl;
+			}
+			double re = tar_mismatch_fea(tar_mid, tar_sec, mid_index, sec_f, path, shift, window_width);
+			//double re = tar_mismatch(tar_mid, tar_sec, path, shift, window_width);
 			//re = re / (1 + shape_com_mid + all_shape_complexity[index]);  //ori
 			re = re / (1 + shape_com_mid + all_shape_complexity[index] - 5 * dis_sc - 2 * diss);
 			re = 1 - 0.5*re / path.size();
 			//cout << "re: " << re << endl;
-			//double re2 = tar_mismatch(tar_mid, tar_sec_f, mid_index, sec_fflip, path, shift, window_width);
-			double re2 = tar_mismatch(tar_mid, tar_sec_f, path, shift, window_width);
+			double re2 = tar_mismatch_fea(tar_mid, tar_sec_f, mid_index, sec_fflip, path, shift, window_width);
+			//double re2 = tar_mismatch(tar_mid, tar_sec_f, path, shift, window_width);
 			//re2 = re2 / (1 + shape_com_mid + all_shape_complexity[index]);
 			re2 = re2 / (1 + shape_com_mid + all_shape_complexity[index] - 5 * dis_sc - 2 * diss);
 			re2 = 1 - 0.5*re2 / path.size();
@@ -742,8 +1118,80 @@ namespace Tiling_tiles {
 			all_total_mid.push_back(all_final[t]);
 			std::cout << "order: " << all_final[t].first << "  flip: " << all_final[t].second << " value: " << all_result[t] << " complxeity: " << all_shape_complexity[all_final[t].first] << "     mid sc:" << shape_com_mid << endl;
 		}
-		cout << "The num of ones byeond ShapeComplexity DisThres: " << ttrt << endl;
+		cout << "The num of ones beyond ShapeComplexity DisThres: " << ttrt << endl;
 		return all_total_mid;
+	}
+
+	void Tiling_opt::feature_match(vector<vector<double>> first_arr, vector<vector<double>> second_arr, vector<int> first_fea, vector<int> sec_fea, vector<pair<int, int>>& path, int &sec_shift, int width)
+	{
+		vector<vector<double>> first_fea_arr;
+		vector<vector<double>> second_fea_arr;
+		int fsize = first_fea.size();
+		int ssize = sec_fea.size();
+		FOR(i, 0, fsize)
+		{
+			first_fea_arr.push_back(first_arr[first_fea[i]]);
+		}
+		FOR(i, 0, ssize)
+		{
+			second_fea_arr.push_back(second_arr[sec_fea[i]]);
+		}
+		double re = tar_mismatch(first_fea_arr, second_fea_arr, path, sec_shift, width);
+		vector<int> sec_fea2;
+		vector<vector<double>> second_fea_arr2;
+		FOR(i, 0, ssize)
+		{
+			sec_fea2.push_back(sec_fea[(i + sec_shift)% ssize]);
+			second_fea_arr2.push_back(second_fea_arr[(i + sec_shift) % ssize]);
+		}
+		sec_fea = sec_fea2;
+		vector<pair<int, int>> waiting_merge;
+		vector<pair<int, int>> path_new;
+		FOR(i, 0, path.size())
+		{
+			if(waiting_merge.empty()) 
+				waiting_merge.push_back(path[i]);
+			else
+			{
+				if (path[i].first == waiting_merge[0].first || path[i].second == waiting_merge[0].second)
+				{
+					waiting_merge.push_back(path[i]);
+				}
+				else
+				{
+					int min_index = 0;
+					double min_dis_tar = 10000;
+					FOR(j, 0, waiting_merge.size())
+					{
+						//calculate the pair with less tar distance
+						double dis_tar= tar_length_2p(first_fea_arr[waiting_merge[j].first], second_fea_arr2[waiting_merge[j].second]);
+						if (dis_tar < min_dis_tar)
+						{
+							min_dis_tar = dis_tar;
+							min_index = j;
+						}
+					}
+					path_new.push_back(waiting_merge[min_index]);
+					waiting_merge.swap(vector<pair<int, int>>());
+					waiting_merge.push_back(path[i]);
+				}
+			}
+		}
+		//处理waiting_merge中剩下的pair
+		int min_index = 0;
+		double min_dis_tar = 10000;
+		FOR(j, 0, waiting_merge.size())
+		{
+			//calculate the pair with less tar distance
+			double dis_tar = tar_length_2p(first_fea_arr[waiting_merge[j].first], second_fea_arr2[waiting_merge[j].second]);
+			if (dis_tar < min_dis_tar)
+			{
+				min_dis_tar = dis_tar;
+				min_index = j;
+			}
+		}
+		path_new.push_back(waiting_merge[min_index]);
+		path = path_new;
 	}
 
 	vector<Point_f> Tiling_opt::morphing(vector<Point_f> contour1, vector<Point_f> contour2, vector<pair<int, int>> path, double ratio)
