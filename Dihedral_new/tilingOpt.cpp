@@ -196,16 +196,10 @@ namespace Tiling_tiles {
 					circle(draw22, prototile_second.contour[prototile_second.feature_points[i]] + shh2, 3, Scalar(0, 125, 255), -1);
 				circle(draw22, prototile_mid.contour[prototile_mid.feature_points[0]]+ sh, 5, Scalar(120, 0, 255), -1);
 				circle(draw22, prototile_second.contour[prototile_second.feature_points[0]] + shh2, 5, Scalar(0, 125, 255), -1);
+				circle(draw22, prototile_mid.contour[0] + sh, 6, Scalar(25, 200, 25), 2);
+				circle(draw22, prototile_second.contour[0] + shh2, 6, Scalar(25, 200, 25), 2);
 				vector<pair<int, int>> path_fea= cand_fea_paths[j];
-				/*int sec_shift = path_shift[j];
-				cout << "path_fea size: " << path_fea.size() <<"  sec_shift:"<< sec_shift<< endl;
-				FOR(i, 0, path_fea.size())
-				{
-					int tsfsize = prototile_second.feature_points.size();
-					Point2f f1 = prototile_mid.contour[prototile_mid.feature_points[path_fea[i].first]]+sh;
-					Point2f f2 = prototile_second.contour[prototile_second.feature_points[(path_fea[i].second + sec_shift) % tsfsize]] + shh2;
-					line(draw22, f1, f2, colorbar[6].second);
-				}*/
+
 				FOR(i, 0, path_fea.size())
 				{
 					//int tsfsize = prototile_second.feature_points.size();
@@ -223,7 +217,10 @@ namespace Tiling_tiles {
 				double ratio_max = 100;
 				double result_score = 0;
 				double ratio = 0.5;
-				vector<Point_f> contour_2 = morphing_dir(contour1, contour2, path, ratio);
+				vector<Point_f> contour_2 = morphing(contour1, contour2, path_fea, ratio);
+				cout << "contour_2.size:  " << contour_2.size() << "   " << contour1.size() << endl;
+				FOR(mm, 0, contour_2.size()) cout << contour_2[mm].type << "   " << contour1[mm].type << endl;
+				//vector<Point_f> contour_2 = morphing_dir(contour1, contour2, path, ratio);
 				Point2f sh2 = Point2f(700, 500) - center_p(conf_trans(contour_2));
 				draw_contour_points(draw, conf_trans(contour_2), sh2, 3, 2);
 				imshow("correspond path", draw);
@@ -236,13 +233,13 @@ namespace Tiling_tiles {
 						anc1.push_back(t);
 				}
 				vector<Point2f> contour_dst = conf_trans(contour_2);
-				bool pers_trans = 0;
+				bool pers_trans = 1;
 				bool deve_opt = 1;
 				if (pers_trans)
 				{
 					Mat draw_ = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
 					vector<Point2f> frame = { contour_2[anc1[0]].point, contour_2[anc1[1]].point, contour_2[anc1[2]].point, contour_2[anc1[3]].point };
-					vector<Point2f> frame_b = base_frame(frame, 1);
+					vector<Point2f> frame_b = base_frame(frame, 0);
 					Point2f sh1(0, 400);
 					draw_contour(draw_, contour_dst, sh1, 5);
 					FOR(m, 0, 4) circle(draw_, frame[m] + sh1, 3, Scalar(125, 0, 0));
@@ -266,7 +263,7 @@ namespace Tiling_tiles {
 				protoTile c1, c2;
 				c1.show_contour(conf_trans(contour_2), anc1);
 				c2.show_contour(conf_trans(con_re), anc2);
-				//RotationVis(c1, c2, AntiClockWise);
+				RotationVis(c1, c2, AntiClockWise);
 
 			}
 		}
@@ -302,7 +299,7 @@ namespace Tiling_tiles {
 			string filepath = DefaultPath;
 			filepath = filepath + "contour/" + to_string(i) + ".txt";
 			cout << "Image " << to_string(i) << endl;
-			protoTile read_tile(filepath);
+			protoTile read_tile(filepath, false);
 			if (read_tile.contour.empty()) continue;
 			contour_dataset.push_back(read_tile.contour_f);
 			double shape_com;
@@ -963,7 +960,7 @@ namespace Tiling_tiles {
 			FOR(m, 0, path_size)
 			{
 				int mar = 4;
-				cout << "m: " <<m<< "   " << prototile_mid.contour_f[path[m].first].type <<"  "<< prototile_second.contour_f[path[m].second].type << endl;
+				//cout << "m: " <<m<< "   " << prototile_mid.contour_f[path[m].first].type <<"  "<< prototile_second.contour_f[path[m].second].type << endl;
 				pair<int, int> one_pair = path[m];
 				int sec_index = one_pair.second;
 				if (prototile_mid.contour_f[one_pair.first].type == fixed_p || prototile_mid.contour_f[one_pair.first].type == fea_p)  //must have a match
@@ -993,7 +990,7 @@ namespace Tiling_tiles {
 								//calculate the pair with less tar distance
 								int cand_index = (waiting_merge[t] + shift) % cand_tar.size();
 								double dis_tar = tar_length_2p(inner_tar[one_pair.first], cand_tar[cand_index]);
-								cout << "distar" << dis_tar << endl;
+								//cout << "distar" << dis_tar << endl;
 								if (dis_tar < min_dis_tar)
 								{
 									min_dis_tar = dis_tar;
@@ -1022,7 +1019,7 @@ namespace Tiling_tiles {
 					}				
 				}			
 			}
-			//FOR(mm, 0, path_fea.size()) cout << path_fea[mm].first<<"   "<< path_fea[mm].second<< endl;
+			FOR(mm, 0, path_fea.size()) cout << path_fea[mm].first<<"   "<< path_fea[mm].second<< endl;
 			cand_fea_paths.push_back(path_fea);
 		}
 	}
@@ -1194,247 +1191,96 @@ namespace Tiling_tiles {
 		path = path_new;
 	}
 
-	vector<Point_f> Tiling_opt::morphing(vector<Point_f> contour1, vector<Point_f> contour2, vector<pair<int, int>> path, double ratio)
+	vector<Point_f> Tiling_opt::morphing(vector<Point_f> contour1, vector<Point_f> contour2, vector<pair<int, int>> final_pair, double ratio)
 	{
-		//vector<Point2f> final_pettern;
+		int fpsize = final_pair.size();
 		int cnum1 = contour1.size();
 		int cnum2 = contour2.size();
-		int psize = path.size();
-		//确定以下筛选原则：1.双边选择如果一方有>2的点，则将双方坐标记录下来
-		//2.对于多对1的情况：i.如果对面没有>2的，则选择距离最短的点; 2.如果对面有多个，则选择距离最短的; 3如果对面有一个，则选这一个		
-		vector<pair<int, int>> final_pair;
-		int lock_l = -1;
-		int lock_r = -1;  //被锁上的序号不会被再次使用
-		for (int j = 0; j < psize - 1; j++)
-		{
-			//cout << j << "--" << path[j].first << " : " << contour1[path[j].first].type << "    " << path[j].second << " : " << contour2[path[j].second].type << endl;
-			if (path[j].first == lock_l || path[j].second == lock_r) continue; //把锁住的情况跳过
-			if (contour1[path[j].first].type > 1 || contour2[path[j].second].type > 1)
-			{
-				int t = j + 1;    //t是下一点
-				if (path[t].first != path[j].first && path[t].second != path[j].second)  //两边都没有多对一
-				{
-					//if (contour1[path[j].first].type > 1) contour2[path[j].second].type = contour1[path[j].first].type;
-					//else contour1[path[j].first].type = contour2[path[j].second].type;
-					lock_l = path[j].first;
-					lock_r = path[j].second;
-				}
-				else if (path[t].first == path[j].first && path[t].second != path[j].second)  //左边一对多
-				{
-					double length_min = length_2p(contour1[path[j].first].point, contour2[path[j].second].point);
-					int type_max = contour2[path[j].second].type;
-					int index = j;
-					while (path[t].first == path[j].first)
-					{
-						if (contour2[path[t].second].type > type_max || (contour2[path[t].second].type == type_max && length_2p(contour1[path[t].first].point, contour2[path[t].second].point) < length_min))
-						{
-							length_min = length_2p(contour1[path[t].first].point, contour2[path[t].second].point);
-							type_max = contour2[path[t].second].type;
-							index = t;
-						}
-						t++;
-						if (t == psize) break;
-					}
-					//lock
-					lock_l = path[j].first;
-					lock_r = path[index].second;
-					j = t - 1;
-				}
-				else if (path[t].first != path[j].first && path[t].second == path[j].second)  //右边一对多
-				{
-					double length_min = length_2p(contour1[path[j].first].point, contour2[path[j].second].point);
-					int type_max = contour1[path[j].first].type;
-					int index = j;
-					while (path[t].second == path[j].second)
-					{
-						if (contour1[path[t].first].type > type_max || (contour1[path[t].first].type == type_max && length_2p(contour1[path[t].first].point, contour2[path[t].second].point) < length_min))
-						{
-							length_min = length_2p(contour1[path[t].first].point, contour2[path[t].second].point);
-							type_max = contour1[path[t].first].type;
-							index = t;
-						}
-						t++;
-						if (t == psize) break;
-					}
-					//lock
-					lock_l = path[index].first;
-					lock_r = path[j].second;
-					j = t - 1;
-				}
-				if (lock_l != -1 && lock_r != -1) final_pair.push_back(make_pair(lock_l, lock_r));
-			}
-		}
-		int final_pair_size = final_pair.size();
-
-		//设置tolerance，将距离过近的情况合并
-		vector<int> de_index;
-		for (int mn = 0; mn < final_pair_size; mn++)
-		{
-			int f_d = 0;
-			if (abs((final_pair[mn].first - final_pair[(mn + 1) % final_pair_size].first)) <= tolerance
-				|| abs((final_pair[mn].second - final_pair[(mn + 1) % final_pair_size].second)) <= tolerance)
-			{
-				f_d = 2;
-				if (contour1[final_pair[mn].first].type > contour1[final_pair[(mn + 1) % final_pair_size].first].type)
-					f_d++;
-				else if (contour1[final_pair[mn].first].type < contour1[final_pair[(mn + 1) % final_pair_size].first].type)
-					f_d--;
-			}
-			if (f_d == 3) de_index.push_back((1 + mn++) % final_pair_size);
-			if (f_d == 1) de_index.push_back(mn);
-			if (f_d == 2 && contour1[final_pair[mn].first].type != 3) de_index.push_back(mn);
-
-		}
-		for (int mn = de_index.size() - 1; mn >= 0; mn--)
-		{
-			pair<int, int> de = delete_vector(final_pair, de_index[mn]);
-			cout << de_index[mn] << "  " << de.first << " : " << de.second << endl;
-		}
-		final_pair_size = final_pair.size();
-		cout << "Matched feature point pair : " << final_pair_size << endl;
+		Point2f cen1 = center_p(conf_trans(contour1));
+		cout << "Matched feature point pair : " << fpsize << endl;
 		//将两个轮廓分段存储
 		vector<vector<Point_f>> contour1_seg;
 		vector<vector<Point_f>> contour2_seg;
-
-		vector<Point_f> c_seg1;
-		vector<Point_f> c_seg2;
-		for (int g = 0; g < final_pair_size - 1; g++)
+		vector<Point_f> final_con;
+		for (int g = 0; g < fpsize; g++)
 		{
+			vector<Point_f> c_seg1;
+			vector<Point_f> c_seg2;
 			//cout << final_pair[g].first << "  :  " << final_pair[g].second << endl;
-			for (int n = final_pair[g].first; n <= final_pair[g + 1].first; n++)
-				c_seg1.push_back(contour1[n]);
-			for (int n = final_pair[g].second; n <= final_pair[g + 1].second; n++)
-				c_seg2.push_back(contour2[n]);
+			int s_index1 = final_pair[g].first;
+			int e_index1 = final_pair[(g + 1) % fpsize].first;
+			e_index1 > s_index1 ? e_index1 : e_index1 += cnum1;
+			//e_index1 = e_index1 + (e_index1 > s_index1 ? 0 : cnum1);
+			int s_index2 = final_pair[g].second;
+			int e_index2 = final_pair[(g + 1) % fpsize].second;
+
+			e_index2> s_index2 ? e_index2 : e_index2 += cnum2;
+			for (int n = s_index1; n <= e_index1; n++)
+				c_seg1.push_back(contour1[n%cnum1]);
+			for (int n = s_index2; n <= e_index2; n++)
+				c_seg2.push_back(contour2[n%cnum2]);
 			contour1_seg.push_back(c_seg1);
 			contour2_seg.push_back(c_seg2);
-			c_seg1.swap(vector<Point_f>());
-			c_seg2.swap(vector<Point_f>());
 		}
-		for (int n = final_pair[final_pair_size - 1].first; n <= final_pair[0].first + cnum1; n++)
-			c_seg1.push_back(contour1[n % cnum1]);
-		for (int n = final_pair[final_pair_size - 1].second; n <= final_pair[0].second + cnum2; n++)
-			c_seg2.push_back(contour2[n % cnum2]);
-		contour1_seg.push_back(c_seg1);
-		contour2_seg.push_back(c_seg2);
 
 		//cout << "contour1_seg:  " << contour1_seg.size() << "    contour2_seg:  " << contour2_seg.size() << endl;
 		//	<< contour1_seg.back().back().point << "   " << contour1_seg.back().back().type << endl;
-		vector<Point_f> contour_fin;
-		int ttt = 0;
-		contour_fin = morph_segment(contour1_seg[ttt], contour2_seg[ttt], contour1_seg[ttt][0], ratio);
-		Mat drawing31 = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
-		Point2f shhh = Point2f(600, 600) - contour_fin[0].point;
-		line(drawing31, Point2f(600, 600), contour_fin.back().point + shhh, Scalar(50,225,50), 2);
-		//for (int nm = 0; nm < contour1_seg[ttt].size(); nm++)
-		//	cout << "contour1_seg[g]:" <<contour1_seg[ttt][nm].point << endl;
-		//for (int nm = 0; nm < contour2_seg[ttt].size(); nm++)
-		//	cout << "contour2_seg[g]:" << contour2_seg[ttt][nm].point << endl;
-		//for (int g = 0; g < contour_fin.size(); g++)
-		//{
-		//	cout << "contour_fin: " << contour_fin[g].point << endl;
-		//}
-		for (int g = 1; g < contour1_seg.size(); g++)//contour1_seg.size()
+		Mat draw_seg = Mat(600, 600, CV_8UC3, Scalar(255, 255, 255));
+		Point2f shift_seg = Point2f(0.5*draw_seg.cols, 0.5*draw_seg.rows) - cen1;
+		Point_f start_new = Point_f(ratio*contour1_seg[0][0].point + (1 - ratio)*contour2_seg[0][0].point, contour1_seg[0][0].type);
+		double num_e = 0;
+		FOR(seg_index, 0, fpsize)
 		{
-			cout << contour1_seg[g].size() << "   :  " << contour2_seg[g].size() << endl << "start before: " << contour_fin.back().point << endl;
-			vector<Point_f> contour_tem = morph_segment(contour1_seg[g], contour2_seg[g], contour_fin.back(), ratio);
-			line(drawing31, contour_tem[0].point + shhh, contour_tem.back().point + shhh, Scalar(50, 225, 50), 2);
-			//for (int nm = 0; nm < contour_tem.size(); nm++)
-			//	cout << "contour1_seg[g]:" << contour_tem[nm].point << endl;
-			//cout << "end and start : " << contour_tem[0].point << "   :   " << contour_tem.back().point << endl;
-			contour_fin.pop_back();
-			contour_fin.insert(contour_fin.end(), contour_tem.begin(), contour_tem.end());
+			if (seg_index == fpsize - 1) contour1_seg[seg_index].back().type = 4;
+			vector<Point_f> morph_seg = morph_segment(contour1_seg[seg_index], contour2_seg[seg_index], start_new, ratio, num_e);
+			final_con.insert(final_con.end(), morph_seg.begin(), morph_seg.end() - 1);
+			start_new = morph_seg.back();
+
+			/*if (seg_index == 10)
+			{
+				FOR(TT, 0, contour1_seg[seg_index].size())  cout << TT << "   " << contour1_seg[seg_index][TT].point << endl;
+				FOR(TT, 0, contour2_seg[seg_index].size())  cout << TT << "   " << contour2_seg[seg_index][TT].point << endl;
+			}*/
+				//FOR(TT, 0, morph_seg.size())  cout << TT << "   " << morph_seg[TT].point << endl;
+			line(draw_seg, morph_seg[0].point + shift_seg, morph_seg.back().point + shift_seg, Scalar(50, 225, 50), 1);
+			//cout << morph_seg.size()<<"   "<< morph_seg[0].point << "   " << morph_seg.back().point << endl;
+			draw_contour_points(draw_seg, conf_trans(contour1_seg[seg_index]), shift_seg, 5, 2);
+			draw_contour_points(draw_seg, conf_trans(contour2_seg[seg_index]), shift_seg+(contour1_seg[seg_index][0].point- contour2_seg[seg_index][0].point), 7, 2);
+			
+			//cout << morph_seg.size() << "   "<< morph_seg[0].point<< morph_seg[1].point<< morph_seg[2].point<<endl<<final_con.size() << final_con[0].point<< final_con[1].point<<endl;
 		}
+		cout << "contour1:  " << cnum1 << "    contour2:  " << cnum2 <<"   final: "<< final_con.size()<< endl;
+		FOR(j, 0, final_con.size()) cout << final_con[j].point << endl;
 		string save = SavePath;
-		imwrite(save+"frame.png", drawing31);
-		contour_fin.pop_back();
+		imshow("frame.png", draw_seg);
+		
 
-		//final_pettern = p_f2p2f(contour_fin);
-		Point2f cen1 = center_p(conf_trans(contour1));
-		Point2f cen2 = center_p(conf_trans(contour2));
-		//cout << "cen1:  "<<cen1<<"   cen2"<<cen2<<endl;
-		//cout << "cnum1:  " << cnum1 << "   cnum2" << cnum1 << "  psize:" << psize<<endl;
-		Point2f shift1 = Point2f(400, 400) - cen1;
-
-		Mat drawing3 = Mat(800, 800, CV_8UC3, Scalar(255, 255, 255));
+		Mat draw_result = Mat(600, 600, CV_8UC3, Scalar(255, 255, 255));
+		Point2f shift1 = Point2f(0.5*draw_result.cols, 0.5*draw_result.rows) - cen1;
 		int dd = 0;
-		for (int tt = 0; tt < contour1_seg.size(); tt++)//contour1_seg.size()
+		FOR(tt, 0, contour1_seg.size())
 		{
-			//if (tt == 1) continue;
-			for (int i = 0; i <contour1_seg[tt].size(); i++)
-			{
-				//cout << "contour1_seg: "<<contour1_seg[0][i].point + shift1 << endl;
-				circle(drawing3, contour1_seg[tt][i].point + shift1, 3, Scalar(255, 0, 0), -1);
-
-				//circle(drawing3, contour_fin[i].point + shift1, 3, Scalar(0, 0, 255), -1);
-			}
-			for (int i = 0; i <contour2_seg[tt].size(); i++)
-			{
-				//cout << "contour2_seg: " << contour2_seg[0][i].point + shift1 << endl;
-				circle(drawing3, contour2_seg[tt][i].point + shift1, 3, Scalar(0, 255, 0), -1);
-			}
+			FOR(i, 0, contour1_seg[tt].size()) 				
+				circle(draw_result, contour1_seg[tt][i].point + shift1, 2, Scalar(255, 0, 0), -1);
+			FOR(i, 0, contour2_seg[tt].size())
+				circle(draw_result, contour2_seg[tt][i].point + shift1, 2, Scalar(0, 255, 0), -1);
 		}
-		//for (int i = 0; i <contour1_seg[1].size(); i++)
-		//{
-		//	//cout << "contour1_seg: "<<contour1_seg[0][i].point + shift1 << endl;
-		//	circle(drawing3, contour1_seg[1][i].point + shift1, 3, Scalar(155, 120, 0), -1);
+		FOR(i, 0, final_con.size())
+			circle(draw_result, final_con[i].point + shift1, 2, Scalar(0, 0, 255), -1);
+		imshow("morphing result show", draw_result);
 
-		//}
-		//for (int i = 0; i <contour2_seg[1].size(); i++)
-		//{
-		//	//cout << "contour2_seg: " << contour2_seg[0][i].point + shift1 << endl;
-		//	circle(drawing3, contour2_seg[1][i].point + shift1, 3, Scalar(0, 155, 120), -1);
-		//}
-		//MyLine(drawing3, contour1_seg[1][0].point + shift1, contour1_seg[1][0].point + 2*(contour1_seg[1][1].point - contour1_seg[1][0].point) + shift1, "cyan");
-		for (int i = 0; i <contour_fin.size(); i++)
-		{
-			//cout << "contour_fin: " << contour_fin[i].point + shift1 << endl;
-			circle(drawing3, contour_fin[i].point + shift1, 3, Scalar(0, 0, 255), -1);
-		}
-		//MyLine(drawing3, contour2_seg[1][0].point + shift1, contour2_seg[1][0].point + 2 * (contour2_seg[1][1].point - contour2_seg[1][0].point )+ shift1, "cyan");
-		imshow("morphing show", drawing3);
-
-		Mat drawing1 = Mat(800, 800, CV_8UC3, Scalar(255, 255, 255));
-		for (int i = 0; i <cnum1; i++)
-		{
-			if (contour1[i].type == 0)
-			{
-				circle(drawing1, contour1[i].point + shift1, 3, Scalar(255, 0, 0), -1);
-				circle(drawing1, contour2[i].point + shift1, 3, Scalar(255, 125, 0), -1);
-			}
-			else
-			{
-				circle(drawing1, contour1[i].point + shift1, 3, Scalar(255, 0, 0), -1);
-				circle(drawing1, contour2[i].point + shift1, 3, Scalar(255, 125, 0), -1);
-				//circle(drawing1, contour1[i].point + shift1, 5, Scalar(0, 255, 0), -1);
-				//circle(drawing1, contour2[i].point + shift1, 5, Scalar(125, 255, 0), -1);
-			}
-		}
-		//MyLine(drawing1, cen1 + shift1, contour1[path[0].first].point + shift1, "red");
-		double length = 0;
-		for (int j = 0; j < psize; j++)
-		{
-			if (contour1[path[j].first].type>1)	
-				line(drawing1, contour1[path[j].first].point + shift1, contour2[path[j].second].point + shift1, Scalar(100, 100, 100), 2);
-			//length += length_two_point2f(contour1[path[j].first].point, contour2[path[j].second].point);
-			//cout << path[j].first << " : " << contour1[path[j].first].type << "    " << path[j].second <<" : "<< contour2[path[j].second].type << endl;
-			//MyLine(drawing1, contour1[path[j].first].point + shift1, contour2[path[j].second].point + shift1, "gray");
-		}
-
-		//cout << "path length: " << length<<endl;
-		imshow("path show", drawing1);
-
-		return contour_fin;
+		return final_con;
 
 	}
 
-	vector<Point_f> Tiling_opt::morph_segment(vector<Point_f> seg1, vector<Point_f> seg2, Point_f start, double ratio) //start 是上一个的尾端，是固定的
+	vector<Point_f> Tiling_opt::morph_segment(vector<Point_f> seg1, vector<Point_f> seg2, Point_f start, double ratio, double &num_error) //start 是上一个的尾端，是固定的
 	{
-		Point_f end = seg1.back();  //如果end.type==3, end 不需要变
+		Point_f end = Point_f(ratio*seg1.back().point + (1- ratio)*seg2.back().point, seg1.back().type);//seg1.back();  //如果end.type==3, end 不需要变
 		double length_ave = length_2p(start.point, end.point);
 		double angle_ave;
-		//cout << "1----start: " << start.point << "     --end: " << end.point << endl;
+		cout << "1----start: " << start.point << "     --end: " << end.point <<"  type:"<< end.type<< endl;
 		//确定框架的参数 
-		if (end.type != 3) // 确定新的end点 
+		if (end.type < 4) // 确定新的end点 
 		{
 			double angle1 = cos_2v(Point2f(1, 0), seg1.back().point - seg1[0].point);
 			angle1 = (angle1 > 0.999) ? 0.999 : (angle1 < -0.999) ? -0.999 : angle1; //防止出现acos(1)的情况，会返回错误值
@@ -1447,13 +1293,13 @@ namespace Tiling_tiles {
 			angle_ave = angle1 + (1 - ratio)*angle_12;
 			//angle_ave = angle1 + 0.5*angle_12;
 			length_ave = ratio*length_2p(seg1.back().point, seg1[0].point) + (1 - ratio)* length_2p(seg2.back().point, seg2[0].point);
-			//cout << "angle1: " << angle1 << " angle_12 " << angle_12 << " length: " << length_ave<<endl;
+			cout << "angle1: " << angle1 << " angle_12: " << angle_12 << " length: " << length_2p(seg1.back().point, seg1[0].point)<<"   "<< length_2p(seg2.back().point, seg2[0].point)<<"  "<< length_ave<<endl;
 			Point2f vec_fin = Point2f(cos(angle_ave), sin(angle_ave));
 			end.point = start.point + length_ave*vec_fin;
-			//end.point = start.point + length_ave*unit_vec(end.point - start.point);
-			//end.point = start.point + length_ave*unit_vec(seg1.back().point - seg1[0].point);
+			cout << start.point << "   " << length_ave << "    " << vec_fin << endl;;
+
 		}
-		//cout << "2----start: " << start.point << "     --end: " << end.point << endl;
+		cout << "2----start: " << start.point << "     --end: " << end.point << endl;
 		Point2f mid_des = start.point + 0.5*length_ave * vertical_vec(end.point - start.point);
 		vector<Point2f> aff_des;
 		aff_des.push_back(start.point);
@@ -1461,6 +1307,13 @@ namespace Tiling_tiles {
 		aff_des.push_back(mid_des);
 
 		int number_new = 0.5*(seg1.size() + seg2.size());
+		double diff = 0.5*(seg1.size() + seg2.size()) - number_new;
+		if (diff == num_error)
+		{
+			number_new += (int) (diff + num_error);
+			num_error = 0;
+		}
+		else if (diff > num_error) num_error = diff;
 		//按照number_new进行重采样,这里我们在原样的基础上进行变形
 		vector<Point2f> seg_sam1 = sampling_seg(conf_trans(seg1), number_new);
 		vector<Point2f> seg_sam2 = sampling_seg(conf_trans(seg2), number_new);
@@ -1515,6 +1368,7 @@ namespace Tiling_tiles {
 		contour_final_[0].type = seg1[0].type;
 		contour_final_.back().type = seg1.back().type;
 
+		//cout << "Points num of each seg: " << seg1.size() << "  " << seg2.size() << "   " << contour_final_.size() << endl;
 		return contour_final_;
 
 	}

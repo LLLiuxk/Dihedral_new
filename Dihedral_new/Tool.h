@@ -57,6 +57,8 @@ double cross(Point2f a, Point2f b, Point2f c); //三点叉积(a-c)*(b-c)
 Point2f unit_vec(Point2f vec);
 Point2f vertical_vec(Point2f vec);
 vector<Point2f> base_frame(vector<Point2f> frame, int type);  //two fixed point
+vector<Point2f> base_frame2(vector<Point2f> frame, int type); //one fixed point
+Point2f Polar_Car(Point2f origin, Point2f axis_p, double angle, double length);
 
 //----------cross points------------
 //Point2f intersection(Point2f a, Point2f b, Point2f c, Point2f d); //两条直线的交点

@@ -248,20 +248,21 @@ vector<int> cal_feature(vector<Point2f> contour_, int  n_min, int n_max, double 
 	cout << "Feature points:" << index_num.size() << endl;
 	if (show_result)
 	{
+		Point2f shift_ = Point2f(300, 300) - center_p(contour_);
 		Mat drwa = Mat::zeros(600, 600, CV_8UC3);
 		int final_c_size = contour_.size();
-		circle(drwa, contour_[0], 3, Scalar(0, 0, 255), -1);
+		circle(drwa, contour_[0]+ shift_, 3, Scalar(0, 0, 255), -1);
 		for (int i = 0, j = 0; i < final_c_size; i++)
 		{
 			int insize = index_num.size();
 			if (j <insize && i == index_num[j])
 			{
-				circle(drwa, contour_[i], 2, Scalar(0, 255, 0), -1);
+				circle(drwa, contour_[i]+ shift_, 2, Scalar(0, 255, 0), -1);
 				j++;
 				//cout << "j: " << i<<"  "<<j << endl;
 			}
 			else
-				circle(drwa, contour_[i], 1, Scalar(255, 0, 0), -1);
+				circle(drwa, contour_[i]+ shift_, 1, Scalar(255, 0, 0), -1);
 		}
 
 		imshow("feature test", drwa);
@@ -424,17 +425,18 @@ vector<Point2f> con_sample(vector<Point2f> contour_, vector<int> &feature_, int 
 	//show feature points
 	if (show_result)
 	{
+		Point2f shift_ = Point2f(300, 300) - center_p(contour_sam);
 		Mat drwa = Mat(600, 600, CV_8UC3, Scalar(255, 255, 255));
 		Mat drwa2 = Mat(600, 600, CV_8UC3, Scalar(255, 255, 255));
-		FOR(i, 0, csize) circle(drwa, contour_[i], 2, Scalar(255, 0, 0), -1);
+		FOR(i, 0, csize) circle(drwa, contour_[i]+ shift_, 2, Scalar(255, 0, 0), -1);
 		FOR(i, 0, final_c_size)
 		{
-			circle(drwa, contour_sam[i], 2, Scalar(0, 0, 255), -1);
-			circle(drwa2, contour_sam[i], 2, Scalar(0, 0, 0), -1);
+			circle(drwa, contour_sam[i]+ shift_, 2, Scalar(0, 0, 255), -1);
+			circle(drwa2, contour_sam[i]+ shift_, 2, Scalar(0, 0, 0), -1);
 		}
-		FOR(i, 0, feature_.size()) circle(drwa2, contour_sam[feature_[i]], 2, Scalar(200, 200, 0), -1);
-		circle(drwa, contour_sam[0], 3, Scalar(0, 255, 0), -1);
-		circle(drwa2, contour_sam[0], 3, Scalar(0, 255, 0), -1);
+		FOR(i, 0, feature_.size()) circle(drwa2, contour_sam[feature_[i]]+ shift_, 2, Scalar(200, 200, 0), -1);
+		circle(drwa, contour_sam[0]+ shift_, 3, Scalar(0, 255, 0), -1);
+		circle(drwa2, contour_sam[0]+ shift_, 3, Scalar(0, 255, 0), -1);
 		imshow("sample test", drwa);
 		imshow("sample test2", drwa2);
 	}
@@ -711,6 +713,92 @@ vector<Point2f> base_frame(vector<Point2f> frame, int type)  //two fixed point
 	<< "   " << length_2p(base_points[2], base_points[3]) << "   " << length_2p(base_points[3], base_points[0]) << endl;
 	cout << "angle: " << 180 / PI * acos(cos_2v(base_points[3] - base_points[0], base_points[1] - base_points[0])) << "   " << 180 / PI * acos(cos_2v(base_points[0] - base_points[1], base_points[2] - base_points[1])) << endl;*/
 	return frame;
+}
+
+vector<Point2f> base_frame2(vector<Point2f> frame, int type) //one fixed point
+{
+	vector<Point2f> base_points;
+	vector<double> four_edges = { length_2p(frame[0],frame[1]), length_2p(frame[1],frame[2]), length_2p(frame[2],frame[3]), length_2p(frame[3],frame[0]) };
+	vector<double> four_angles = { acos(cos_2v(frame[3] - frame[0], frame[1] - frame[0])), acos(cos_2v(frame[0] - frame[1], frame[2] - frame[1])),
+		acos(cos_2v(frame[1] - frame[2], frame[3] - frame[2])), acos(cos_2v(frame[2] - frame[3], frame[0] - frame[3])) };
+	if (type == 0) // parallelogram
+	{
+		double length1 = (four_edges[0] + four_edges[2]) / 2;
+		double length2 = (four_edges[1] + four_edges[3]) / 2;
+		double angle1 = (four_angles[0] + four_angles[2]) / 2;
+		double angle2 = (four_angles[1] + four_angles[3]) / 2;
+		base_points.push_back(frame[0]);
+		base_points.push_back(frame[0] + length1*unit_vec(frame[1] - frame[0]));
+		base_points.push_back(Polar_Car(base_points[1], base_points[0], angle2, length2));
+		base_points.push_back(Polar_Car(base_points[2], base_points[1], angle1, length1));
+	}
+	else if (type == 1) //rhombus
+	{
+		double length1 = (four_edges[0] + four_edges[1] + four_edges[2] + four_edges[3]) / 4;
+		double angle1 = (four_angles[0] + four_angles[2]) / 2;
+		double angle2 = (four_angles[1] + four_angles[3]) / 2;
+		base_points.push_back(frame[0]);
+		base_points.push_back(frame[0] + length1*unit_vec(frame[1] - frame[0]));
+		base_points.push_back(Polar_Car(base_points[1], base_points[0], angle2, length1));
+		base_points.push_back(Polar_Car(base_points[2], base_points[1], angle1, length1));
+	}
+	else if (type == 2) //rectangle
+	{
+		double length1 = (four_edges[0] + four_edges[2]) / 2;
+		double length2 = (four_edges[1] + four_edges[3]) / 2;
+		double angle1 = acos(0);
+		base_points.push_back(frame[0]);
+		base_points.push_back(frame[0] + length1*unit_vec(frame[1] - frame[0]));
+		base_points.push_back(Polar_Car(base_points[1], base_points[0], angle1, length2));
+		base_points.push_back(Polar_Car(base_points[2], base_points[1], angle1, length1));
+	}
+	else if (type == 3) //square
+	{
+		double length1 = (four_edges[0] + four_edges[1] + four_edges[2] + four_edges[3]) / 4;
+		double angle1 = acos(0);
+		base_points.push_back(frame[0]);
+		base_points.push_back(frame[0] + length1*unit_vec(frame[1] - frame[0]));
+		base_points.push_back(Polar_Car(base_points[1], base_points[0], angle1, length1));
+		base_points.push_back(Polar_Car(base_points[2], base_points[1], angle1, length1));
+	}
+	//for (int i = 0; i < four_edges.size(); i++)
+	//	cout << "six_edges:  " << four_edges[i] << endl;
+	//for (int i = 0; i < four_angles.size(); i++) 
+	//	cout << "four_angles: " << four_angles[i] << endl;
+
+	bool show = true;
+	if (show)
+	{
+		Mat draw = Mat(600, 600, CV_8UC3, Scalar(255, 255, 255));
+		for (int i = 0; i < base_points.size(); i++)
+		{
+			//cout << "base_points: " << base_points[i] << endl;
+			circle(draw, base_points[i], 3, Scalar(0, 0, 255), -1);
+			line(draw, base_points[i], base_points[(i + 1) % 4], Scalar(0, 0, 0), 2);
+			circle(draw, frame[i], 3, Scalar(0, 255, 0), -1);
+			line(draw, frame[i], frame[(i + 1) % 4], Scalar(200, 200, 200), 2);
+		}
+		imshow("base frame" + to_string(type), draw);
+	}
+	/*cout << "length: " << length_2p(base_points[0], base_points[1]) << "   " << length_2p(base_points[1], base_points[2])
+	<< "   " << length_2p(base_points[2], base_points[3]) << "   " << length_2p(base_points[3], base_points[0]) << endl;
+	cout << "angle: " << 180 / PI * acos(cos_2v(base_points[3] - base_points[0], base_points[1] - base_points[0])) << "   " << 180 / PI * acos(cos_2v(base_points[0] - base_points[1], base_points[2] - base_points[1])) << endl;*/
+	return base_points;
+}
+
+Point2f Polar_Car(Point2f origin, Point2f axis_p, double angle, double length)
+{
+	double angle_ori;
+	Point2f axis = axis_p - origin;
+	double angle_o_cos = cos_2v(Point2f(1, 0), axis);
+	double angle_o_sin = sin_2v(Point2f(1, 0), axis);
+	//cout << "axis:  "<<axis << "   " << angle_o_cos << "   " << angle_o_sin << endl;
+	if (angle_o_sin > 0) angle_ori = acos(angle_o_cos);
+	else angle_ori = -acos(angle_o_cos);
+	//cout << angle_ori << endl;
+	Point2f target = Point2f(cos(angle_ori + angle), sin(angle_ori + angle));
+	target = length*  target + origin;
+	return target;
 }
 
 //----------cross points------------

@@ -99,15 +99,15 @@ namespace Tiling_tiles {
 
 	public:
 		protoTile() {};
-		protoTile(string filepath);
+		protoTile(string filepath, bool show=true);
 		protoTile(vector<Point2f> con);
 		protoTile(vector<Point_f> conf);
 	
 		//void set_contour(vector<Point2f> c); // 给定轮廓并重采样
 		//void set_anchors(vector<int> anchor_p);
 		//void show_contour(vector<Point2f> c, vector<int> anchor_p);
-		void feature(int  n_min, int n_max, double angle_cos);
-		void resample(int sam_num);
+		void feature(int  n_min, int n_max, double angle_cos, bool show = true);
+		void resample(int sam_num, bool show = true);
 		void scale(double scale);
 		vector<Point_f>  set_flags(vector<Point2f> con, vector<int> fea);
 
@@ -150,8 +150,8 @@ namespace Tiling_tiles {
 
 		vector<pair<int, bool>> compare_TAR(vector<Point_f> contour_mid, int chosen_num, int window_width = WindowsWidth); //chosen_num  选择的最终结果的数目
 		void feature_match(vector<vector<double>> first_arr, vector<vector<double>> second_arr, vector<int> first_fea, vector<int> sec_fea, vector<pair<int, int>>& path, int &sec_shift, int width);
-		vector<Point_f> morphing(vector<Point_f> contour1, vector<Point_f> contour2, vector<pair<int, int>> path, double ratio);
-		vector<Point_f> morph_segment(vector<Point_f> seg1, vector<Point_f> seg2, Point_f start, double ratio); //start 是上一个的尾端，是固定的
+		vector<Point_f> morphing(vector<Point_f> contour1, vector<Point_f> contour2, vector<pair<int, int>> final_pair, double ratio);
+		vector<Point_f> morph_segment(vector<Point_f> seg1, vector<Point_f> seg2, Point_f start, double ratio, double &num_error); //start 是上一个的尾端，是固定的
 		vector<Point_f> morphing_dir(vector<Point_f> c_mid, vector<Point_f> c_cand, vector<pair<int, int>> path, double ratio);
 
 	public:

@@ -2,7 +2,7 @@
 
 namespace Tiling_tiles {
 
-	protoTile::protoTile(string filepath)
+	protoTile::protoTile(string filepath, bool show)
 	{
 		contour = load_point_file(filepath);
 		if (contour.empty())
@@ -12,7 +12,7 @@ namespace Tiling_tiles {
 		else
 		{
 			//cout << "hahahah:" << csize << endl;
-			resample(ContourNum);
+			resample(ContourNum, show);
 			contour_f = set_flags(contour, feature_points);
 		}		
 	}
@@ -32,17 +32,17 @@ namespace Tiling_tiles {
 	}
 
 
-	void protoTile::feature(int  n_min, int n_max, double angle_cos)
+	void protoTile::feature(int  n_min, int n_max, double angle_cos, bool show)
 	{
-		feature_points = cal_feature(contour, n_min, n_max, angle_cos, true);
+		feature_points = cal_feature(contour, n_min, n_max, angle_cos, show);
 	}
 
 
-	void protoTile::resample(int sam_num)
+	void protoTile::resample(int sam_num, bool show)
 	{
 		int csize = contour.size();
-		feature(1, 0.02*csize, cos(PI * AngleThres / 180));
-		contour = con_sample(contour, feature_points, sam_num, true);
+		feature(1, 0.02*csize, cos(PI * AngleThres / 180), show);
+		contour = con_sample(contour, feature_points, sam_num, show);
 	}
 
 

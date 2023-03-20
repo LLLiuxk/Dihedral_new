@@ -69,8 +69,13 @@ int main()
 	}
 	else if (f == 10) //save contours
 	{
-		tiling.load_dataset(false);
+		//tiling.load_dataset(false);
+		//int t = 9.5 + 0.5;
+		int t(6.5);
+		cout << t << endl;
 	}
 
+	finish = clock();
+	cout << endl << "All time consumption: " << (double)(finish - start) / CLOCKS_PER_SEC << " s " << endl;
 	waitKey(0);
 }
