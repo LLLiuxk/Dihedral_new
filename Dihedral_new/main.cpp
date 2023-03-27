@@ -75,12 +75,12 @@ int main()
 		tiling.prototile_first = protoTile(filepath1);
 		MatrixXd V;
 		MatrixXi F;
-		vector<Point2f> con = { Point2f(100,100),Point2f(200,100),Point2f(150,200) };// tiling.prototile_first.contour;
+		vector<Point2f> con = tiling.prototile_first.contour;//{ Point2f(100,100),Point2f(200,100),Point2f(150,200) };// 
 		//int index_ = add_points(con, 0.1);
 
 		//FOR(m, 0, 5) con.push_back(Point2f(300 + 20 * m, 300 + 15 * m));
 		triangulateContour(con,V,F);
-		cout << "new V size:  "<< V.size()<<"  new F size: " << F.size() / 3 << endl;
+		cout << "new V size:  "<< V.size()<<"  new F size: " << F.size() << endl;
 		Mat image = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
 
 		for (size_t i = 0; i < F.rows(); i++)
@@ -88,7 +88,8 @@ int main()
 			Point pt1(V.row(F(i, 0)).x(), V.row(F(i, 0)).y());
 			Point pt2(V.row(F(i, 1)).x(), V.row(F(i, 1)).y());
 			Point pt3(V.row(F(i, 2)).x(), V.row(F(i, 2)).y());
-			//cout << pt1 << "    " << pt2 << endl;
+			cout << F(i, 0) << "   " << F(i, 1) << "   " << F(i, 2) << endl;
+			cout << pt1 << "    " << pt2 <<"   "<<pt3<< endl;
 			line(image, pt1, pt2, Scalar(0, 255, 0), 1, LINE_AA);
 			line(image, pt2, pt3, Scalar(0, 255, 0), 1, LINE_AA);
 			line(image, pt3, pt1, Scalar(0, 255, 0), 1, LINE_AA);
