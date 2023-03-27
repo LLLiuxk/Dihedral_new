@@ -8,6 +8,8 @@
 #include <string>
 #include <set>
 #include <fstream>
+#include <Eigen/Dense>
+
 
 #define INF 1e20
 #define eps 1e-8
@@ -18,6 +20,7 @@
 
 using namespace std;
 using namespace cv;
+using namespace Eigen;
 
 extern vector<pair<string, Scalar>> colorbar;
 
@@ -92,6 +95,8 @@ double edge_nd_degree(vector<Point2f> edge, int type); // non-developable degree
 void edge_nd_opt(vector<Point2f>& edge, int type);
 void whole_con_opt(vector<Point2f> &cont, vector<int> &indexes, int type);
 
+void triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F);
+int add_points(vector<Point2f>& contour, double sparse_ratio);
 
 template<typename T>
 T delete_vector(vector<T> &vec, int index_p)
@@ -111,3 +116,4 @@ T delete_vector(vector<T> &vec, int index_p)
 	vec = vec1;
 	return delete_p;
 }
+

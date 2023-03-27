@@ -1547,6 +1547,93 @@ void whole_con_opt(vector<Point2f>& cont, vector<int>& indexes, int type)
 	indexes = new_index;
 }
 
+void triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F)
+{
+	vector<Point2f> con_ori = contour;
+	int ori_num = add_points(contour, 0.05);
+	//contour.push_back(Point2f(300, 300));
+	// create a Subdiv2D object from the contour
+	cv::Subdiv2D subdiv(Rect(0, 0, 1000, 1000)); // change the rectangle size according to your contour
+	for (int i = 0; i < contour.size(); i++) {
+		subdiv.insert(contour[i]);
+	}
+
+	// get the triangle list
+	std::vector<Vec6f> triangleList;
+	subdiv.getTriangleList(triangleList);
+
+	// convert the triangle list to vertex and face matrices
+	V.resize(3 * triangleList.size(), 2);
+	F.resize(triangleList.size(), 3);
+	int i = 0;
+	for (auto& t : triangleList) {
+		V.row(3 * i) << t[0], t[1];
+		V.row(3 * i + 1) << t[2], t[3];
+		V.row(3 * i + 2) << t[4], t[5];
+		F.row(i) << 3 * i, 3 * i + 1, 3 * i + 2;
+		i++;
+	}
+	//cout << "triangleList.size(): " << triangleList.size() << "   " << F.size() << endl;
+	// remove triangles outside the contour
+	std::vector<bool> keep(F.rows(), false);
+	for (int i = 0; i < F.rows(); i++) {
+		Vector2d p1 = V.row(F(i, 0));
+		Vector2d p2 = V.row(F(i, 1));
+		Vector2d p3 = V.row(F(i, 2));
+		if (pointPolygonTest(con_ori, 1.0 / 3 * (Point2f(p1[0], p1[1]) + Point2f(p2[0], p2[1]) + Point2f(p3[0], p3[1])), false) >= 0) {
+			/*	if (pointPolygonTest(contour, 0.5*(Point2f(p1[0], p1[1]) + Point2f(p2[0], p2[1])), false) >= 0 &&
+			pointPolygonTest(contour, 0.5*(Point2f(p2[0], p2[1]) + Point2f(p3[0], p3[1])), false) >= 0 &&
+			pointPolygonTest(contour, 0.5*(Point2f(p3[0], p3[1]) + Point2f(p1[0], p1[1])), false) >= 0) {*/
+			keep[i] = true;
+		}
+		//if (keep[i]) cout << "true!" << endl;
+	}
+	int numFaces = keep.size() - count(keep.begin(), keep.end(), false);
+	MatrixXi newF(numFaces, 3);
+	int j = 0;
+	for (int i = 0; i < F.rows(); i++) {
+		if (keep[i]) {
+			newF.row(j) = F.row(i);
+			j++;
+		}
+	}
+	F = newF;
+	V.conservativeResize(F.maxCoeff() + 1, 2);
+}
+
+int add_points(vector<Point2f>& contour, double sparse_ratio)
+{
+	int add_index = contour.size();
+	vector<Point2f> bbx_p = bbx(contour);
+	double minx = bbx_p[1].x;
+	double miny = bbx_p[1].y;
+	double maxx = bbx_p[3].x;
+	double maxy = bbx_p[3].y;
+	double interval_x = sparse_ratio*(maxx - minx);
+	double interval_y = sparse_ratio*(maxy - miny);
+	double margin = 0.5*(interval_x + interval_y);
+	for (double nx = minx + interval_x; nx < maxx; nx += interval_x)
+	{
+		for (double ny = miny + interval_y; ny < maxy; ny += interval_y)
+		{
+			Point2f new_p(nx, ny);
+			double min_dis = pointPolygonTest(contour, new_p, true);
+			if (min_dis > margin)
+			{
+				contour.push_back(new_p);
+			}
+		}
+	}
+	bool show = true;
+	if (show)
+	{
+		Mat image_o = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
+		draw_contour_points(image_o, contour, OP, 5, 2);
+		imshow("add points: ", image_o);
+		cout << "Add " << contour.size() - add_index << " new points!" << endl;
+	}
+	return add_index;
+}
 
 
 

@@ -18,15 +18,15 @@ int main()
 
 	if (f == 0)
 	{
-		bool control_parameter = false;
+		bool control_parameter = true;
 		if (control_parameter)  tiling.load_para("para.txt");
-		else image_id = "44";
+		else image_id = "201";
 		tiling.tiliing_generation(image_id);
 
 	}
 	if (f == 1) //specify
 	{
-		vector<int> anc_points = {6,19,24,31};
+		vector<int> anc_points = { 6,19,24,31 }; // 6,19,24,31
 		tiling.tiliing_gen_specify("44", anc_points);
 
 
@@ -70,9 +70,34 @@ int main()
 	else if (f == 10) //save contours
 	{
 		//tiling.load_dataset(false);
-		//int t = 9.5 + 0.5;
-		int t(6.5);
-		cout << t << endl;
+		string filepath = DefaultPath;
+		string filepath1 = filepath + "contour/189.txt";
+		tiling.prototile_first = protoTile(filepath1);
+		MatrixXd V;
+		MatrixXi F;
+		vector<Point2f> con = tiling.prototile_first.contour;
+		//int index_ = add_points(con, 0.1);
+
+		//FOR(m, 0, 5) con.push_back(Point2f(300 + 20 * m, 300 + 15 * m));
+		triangulateContour(con,V,F);
+		cout << "new F size: " << F.size() / 3 << endl;
+		Mat image = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
+
+		for (size_t i = 0; i < F.rows(); i++)
+		{
+			Point pt1(V.row(F(i, 0)).x(), V.row(F(i, 0)).y());
+			Point pt2(V.row(F(i, 1)).x(), V.row(F(i, 1)).y());
+			Point pt3(V.row(F(i, 2)).x(), V.row(F(i, 2)).y());
+			cout << pt1 << "    " << pt2 << endl;
+			line(image, pt1, pt2, Scalar(0, 255, 0), 1, LINE_AA);
+			line(image, pt2, pt3, Scalar(0, 255, 0), 1, LINE_AA);
+			line(image, pt3, pt1, Scalar(0, 255, 0), 1, LINE_AA);
+		}
+		//imwrite("Triangulation.png", image);
+		imshow("Triangulation", image);
+
+
+
 	}
 
 	finish = clock();
