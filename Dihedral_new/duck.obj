@@ -1,0 +1,7 @@
+#List of geometric vertices, with (x,y,z) coordinates
+v 100 100 0
+v 200 100 0
+v 154 136 0
+v 150 200 0
+f 2 3 4
+f 4 1 3

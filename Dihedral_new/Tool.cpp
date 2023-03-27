@@ -1075,6 +1075,65 @@ void fileout(string filepath, vector<Point2f> contour_)
 	out.close();
 }
 
+//将tile保存为svg格式
+void save_svg(string svg_path, vector<Point2f> contour, Scalar color, Point2f shift, double zoom_scale)
+{
+	//write head
+	if (_access(svg_path.c_str(), 0) == -1) return;
+	ofstream outfile(svg_path);
+	outfile << "<?xml version=\"1.0\" standalone=\"no\"?>" << endl
+		<< "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\"" << endl
+		<< "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">" << endl << endl;
+	outfile << "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">" << endl;
+
+	//write body
+	outfile << " <polygon points=\" ";
+	//cout << " polygon points: " << contour[0] << endl;
+	for (int i = 0; i < contour.size(); i++)
+	{
+		Point2f one = zoom_scale * contour[i] + shift;
+		outfile << one.x << "," << one.y << " ";
+	}
+	outfile << "\"" << endl << "style=\"fill:rgb(" << to_string(int(color[2])) << "," << to_string(int(color[1])) << "," << to_string(int(color[0])) << ")\"/>" << endl;
+	//write tail
+	outfile << "</svg>" << endl;
+	outfile.close();
+}
+
+void write_obj(string filepath, MatrixXd V, MatrixXi F)
+{
+	ofstream outfile(filepath, ios::out);
+	//注意在生成.obj文件的时候，面的信息是由顶点下标+1组成的，是从1开始的！！！并不是由0开始！！！
+	if (!outfile.is_open())
+	{
+		cerr << "open error";
+		exit(1);
+	}
+
+	outfile << "#List of geometric vertices, with (x,y,z) coordinates" << endl;
+	if (V.cols() == 2)
+	{
+		for (int i = 0; i < V.rows(); ++i) {
+			outfile << "v " << V(i, 0) << " " << V(i, 1) << " " << 0.0 << endl;
+		}
+	}
+	else if (V.cols() == 3)
+	{
+		for (int i = 0; i < V.rows(); ++i) {
+			outfile << "v " << V(i, 0) << " " << V(i, 1) << " " << V(i, 2) << endl;
+		}
+	}
+
+
+	for (int i = 0; i < F.rows(); ++i) {
+		outfile << "f " << F(i, 0) + 1 << " " << F(i, 1) + 1 << " " << F(i, 2) + 1 << endl;
+
+	}
+
+	outfile.close();
+}
+
+
 //compare two contours by TAR
 vector<vector<double>> compute_TAR(vector<Point2f> &contour_, double &shape_complexity, double frac)
 {
@@ -1550,7 +1609,7 @@ void whole_con_opt(vector<Point2f>& cont, vector<int>& indexes, int type)
 void triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F)
 {
 	vector<Point2f> con_ori = contour;
-	int ori_num = add_points(contour, 0.05);
+	int ori_num = add_points(contour, 0.18);
 	//contour.push_back(Point2f(300, 300));
 	// create a Subdiv2D object from the contour
 	cv::Subdiv2D subdiv(Rect(0, 0, 1000, 1000)); // change the rectangle size according to your contour
@@ -1561,18 +1620,42 @@ void triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F)
 	// get the triangle list
 	std::vector<Vec6f> triangleList;
 	subdiv.getTriangleList(triangleList);
-
 	// convert the triangle list to vertex and face matrices
 	V.resize(3 * triangleList.size(), 2);
 	F.resize(triangleList.size(), 3);
+	vector<Vector2f> vertexs;
 	int i = 0;
 	for (auto& t : triangleList) {
-		V.row(3 * i) << t[0], t[1];
-		V.row(3 * i + 1) << t[2], t[3];
-		V.row(3 * i + 2) << t[4], t[5];
-		F.row(i) << 3 * i, 3 * i + 1, 3 * i + 2;
+		for (int j = 0; j < 3; j++)
+		{
+			Vector2f p(t[2 * j], t[2 * j + 1]);
+			//uset.emplace(p);
+			auto it = find(vertexs.begin(), vertexs.end(), p);//vertexs.find(p);
+			if (it != vertexs.end()) {
+				//V.row(3 * i + j) << t[2 * j], t[2 * j + 1];
+				F(i, j) = distance(vertexs.begin(), it);
+			}
+			else
+			{
+				vertexs.push_back(p);
+				//V.row(3 * i + j) << t[2 * j], t[2 * j + 1];
+				F(i, j) = vertexs.size();
+			}
+			//if (it == uset.end())
+			//	V.row(3 * i + j) << t[2 * j], t[2 * j + 1];
+			//F(i, j) = distance(uset.begin(), it);
+		}
+		//V.row(3 * i) << t[0], t[1];
+		//V.row(3 * i + 1) << t[2], t[3];
+		//V.row(3 * i + 2) << t[4], t[5];
+		//F.row(i) << 3 * i, 3 * i + 1, 3 * i + 2;
 		i++;
 	}
+	V.resize(vertexs.size(), 2);
+	for (int m = 0; m < vertexs.size(); m++)
+		V.row(m) << vertexs[m].x(), vertexs[m].y();
+	cout << "contour.size " << contour.size() << "   triangleList.size " << triangleList.size() << "  V and F: " << V.size() << "  " << F.size() << endl;
+
 	//cout << "triangleList.size(): " << triangleList.size() << "   " << F.size() << endl;
 	// remove triangles outside the contour
 	std::vector<bool> keep(F.rows(), false);
@@ -1611,7 +1694,9 @@ int add_points(vector<Point2f>& contour, double sparse_ratio)
 	double maxy = bbx_p[3].y;
 	double interval_x = sparse_ratio*(maxx - minx);
 	double interval_y = sparse_ratio*(maxy - miny);
-	double margin = 0.5*(interval_x + interval_y);
+	cout << interval_x << "   " << interval_y << endl;
+	double margin = min(interval_x, interval_y);
+	vector<Point2f> new_con;
 	for (double nx = minx + interval_x; nx < maxx; nx += interval_x)
 	{
 		for (double ny = miny + interval_y; ny < maxy; ny += interval_y)
@@ -1620,10 +1705,11 @@ int add_points(vector<Point2f>& contour, double sparse_ratio)
 			double min_dis = pointPolygonTest(contour, new_p, true);
 			if (min_dis > margin)
 			{
-				contour.push_back(new_p);
+				new_con.push_back(new_p);
 			}
 		}
 	}
+	contour.insert(contour.end(), new_con.begin(), new_con.end());
 	bool show = true;
 	if (show)
 	{
@@ -1634,6 +1720,8 @@ int add_points(vector<Point2f>& contour, double sparse_ratio)
 	}
 	return add_index;
 }
+
+
 
 
 
