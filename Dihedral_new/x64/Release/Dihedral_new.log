@@ -53,9 +53,17 @@ Tool.cpp(1669): warning C4244: “参数”: 从“double”转换到“float”
 Tool.cpp(1677): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
 Tool.cpp(1697): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
 Tool.cpp(1712): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+  main.cpp
+d:\vs2015project\dihedral_new\dihedral_new\tilingOpt.h(69): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+main.cpp(63): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+main.cpp(86): warning C4018: “<”: 有符号/无符号不匹配
+main.cpp(88): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+main.cpp(89): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+main.cpp(90): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+main.cpp(13): warning C4101: “midtime”: 未引用的局部变量
   正在生成代码
-  1 of 2682 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+  0 of 2682 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    1 functions had inline decision re-evaluated but remain unchanged
+    0 functions had inline decision re-evaluated but remain unchanged
   已完成代码的生成
   Dihedral_new.vcxproj -> D:\vs2015project\Dihedral_new\x64\Release\Dihedral_new.exe
