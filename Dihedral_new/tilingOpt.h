@@ -21,6 +21,7 @@
 #define WindowsWidth 10
 #define DefaultPath "C:/Users/liuxk/OneDrive/Recent/DualNPR/"
 #define SavePath "D:/vs2015project/Dihedral_new/result/"
+#define ParaPath "D:/vs2015project/Dihedral_new/Dihedral_new/"
 
 extern string image_id;
 

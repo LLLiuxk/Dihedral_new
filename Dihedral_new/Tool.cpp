@@ -1124,15 +1124,32 @@ void write_obj(string filepath, MatrixXd V, MatrixXi F)
 		}
 	}
 
-
 	for (int i = 0; i < F.rows(); ++i) {
 		outfile << "f " << F(i, 0) + 1 << " " << F(i, 1) + 1 << " " << F(i, 2) + 1 << endl;
 
 	}
-
 	outfile.close();
 }
 
+void write_para(string filepath, vector<int> indexs, vector<Point2f> new_places)
+{
+	//para 文件的格式为：第一行 锚点个数，第二行锚点的下标，之后每行为每个锚点的目标坐标 
+	ofstream outfile(filepath, ios::out);
+	if (!outfile.is_open())
+	{
+		cerr << "open error";
+		exit(1);
+	}
+	int anc_num = indexs.size();
+	outfile << anc_num << endl;
+	FOR(i,0, anc_num)
+		outfile << indexs[i] << " ";
+	outfile << endl;
+	FOR(i, 0, anc_num)
+		outfile << new_places[i].x<<" " << new_places[i].y << " " <<0.0<< endl;
+	outfile.close();
+
+}
 
 //compare two contours by TAR
 vector<vector<double>> compute_TAR(vector<Point2f> &contour_, double &shape_complexity, double frac)
@@ -1606,7 +1623,7 @@ void whole_con_opt(vector<Point2f>& cont, vector<int>& indexes, int type)
 	indexes = new_index;
 }
 
-void triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F)
+int triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F)
 {
 	vector<Point2f> con_ori = contour;
 	int ori_num = add_points(contour, 0.08);
@@ -1621,7 +1638,7 @@ void triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F)
 	for (int m = 0; m < contour.size(); m++)
 	{
 		V.row(m) << contour[m].x, contour[m].y;
-		cout << "rest: " << V.row(m) << endl;
+		//cout << "rest: " << V.row(m) << endl;
 	}
 
 	// get the triangle list
@@ -1647,18 +1664,11 @@ void triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F)
 				//V.row(3 * i + j) << t[2 * j], t[2 * j + 1];
 				F(i, j) = contour.size() - 1;
 			}
-			//if (it == uset.end())
-			//	V.row(3 * i + j) << t[2 * j], t[2 * j + 1];
-			//F(i, j) = distance(uset.begin(), it);
 		}
-		//V.row(3 * i) << t[0], t[1];
-		//V.row(3 * i + 1) << t[2], t[3];
-		//V.row(3 * i + 2) << t[4], t[5];
-		//F.row(i) << 3 * i, 3 * i + 1, 3 * i + 2;
 		i++;
 	}
 	cout << "contour.size " << contour.size() << "   triangleList.size " << triangleList.size() << "  V and F: " << V.size() << "  " << F.size() << endl;
-	for (int n = 0; n < F.size() / 3; n++) cout << "n row: "<<F.row(n) << endl;
+	//for (int n = 0; n < F.size() / 3; n++) cout << "n row: "<<F.row(n) << endl;
 	//cout << "triangleList.size(): " << triangleList.size() << "   " << F.size() << endl;
 	// remove triangles outside the contour
 	std::vector<bool> keep(F.rows(), false);
@@ -1667,9 +1677,6 @@ void triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F)
 		Vector2d p2 = V.row(F(i, 1));
 		Vector2d p3 = V.row(F(i, 2));
 		if (pointPolygonTest(con_ori, 1.0 / 3 * (Point2f(p1[0], p1[1]) + Point2f(p2[0], p2[1]) + Point2f(p3[0], p3[1])), false) >= 0) {
-			/*	if (pointPolygonTest(contour, 0.5*(Point2f(p1[0], p1[1]) + Point2f(p2[0], p2[1])), false) >= 0 &&
-			pointPolygonTest(contour, 0.5*(Point2f(p2[0], p2[1]) + Point2f(p3[0], p3[1])), false) >= 0 &&
-			pointPolygonTest(contour, 0.5*(Point2f(p3[0], p3[1]) + Point2f(p1[0], p1[1])), false) >= 0) {*/
 			keep[i] = true;
 		}
 		//if (keep[i]) cout << "true!" << endl;
@@ -1686,10 +1693,10 @@ void triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F)
 	}
 	F = newF;
 	//V.conservativeResize(F.maxCoeff() + 1, 2);
-	cout << "  V : " << V.size() << "  F: " << F.size() << endl;
+	/*cout << "  V : " << V.size() << "  F: " << F.size() << endl;
 	for (int n = 0; n < V.rows(); n++) cout << n << " V row: " << V.row(n) << endl;
-
-	for (int n = 0; n < F.rows(); n++) cout << n << " F row: " << F.row(n) << endl;
+	for (int n = 0; n < F.rows(); n++) cout << n << " F row: " << F.row(n) << endl;*/
+	return ori_num;
 }
 
 int add_points(vector<Point2f>& contour, double sparse_ratio)

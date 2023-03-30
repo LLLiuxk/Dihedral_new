@@ -233,8 +233,8 @@ namespace Tiling_tiles {
 						anc1.push_back(t);
 				}
 				vector<Point2f> contour_dst = conf_trans(contour_2);
-				bool pers_trans = 0;
-				bool deve_opt = 0;
+				bool pers_trans = 1;
+				bool deve_opt = 1;
 				if (pers_trans)
 				{
 					Mat draw_ = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
@@ -243,11 +243,43 @@ namespace Tiling_tiles {
 					Point2f sh1(0, 400);
 					draw_contour(draw_, contour_dst, sh1, 5);
 					FOR(m, 0, 4) circle(draw_, frame[m] + sh1, 3, Scalar(125, 0, 0));
-					Mat rot_mat = getPerspectiveTransform(frame, frame_b);// getAffineTransform(frame_1, frame_b_1);
-					perspectiveTransform(contour_dst, contour_dst, rot_mat);
+					
+					MatrixXd V;
+					MatrixXi F;
+					vector<Point2f> con = contour_dst;
+					int consize = con.size();
+					triangulateContour(con, V, F);
+
+					string parap = ParaPath;
+					string obj_path = parap +"mid_result.obj";
+					string para_path = parap + "deform_para.txt";
+					string deformed_c = parap + "deformed_c.txt";
+					write_obj(obj_path, V, F);
+					write_para(para_path, anc1, frame_b);
+					string command = "D:/vs2015project/Dihedral_new/Dihedral_new/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c; 
+					//string command = "D:/vs2015project/ARAP_Deform/x64/Debug/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c;
+					//cout << command << endl;
+					system(command.c_str());
+					contour_dst = load_point_file(deformed_c);
+					vector<Point2f> con_tem;
+					FOR(m, 0, consize) con_tem.push_back(contour_dst[m]);
+					contour_dst = con_tem;
+
 					draw_contour(draw_, contour_dst, sh1, 8);
 					FOR(m, 0, 4) circle(draw_, frame_b[m] + sh1, 3, Scalar(0, 255, 0));
 					imshow("123123", draw_);
+
+					//Mat draw_ = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
+					//vector<Point2f> frame = { contour_2[anc1[0]].point, contour_2[anc1[1]].point, contour_2[anc1[2]].point, contour_2[anc1[3]].point };
+					//vector<Point2f> frame_b = base_frame(frame, 0);
+					//Point2f sh1(0, 400);
+					//draw_contour(draw_, contour_dst, sh1, 5);
+					//FOR(m, 0, 4) circle(draw_, frame[m] + sh1, 3, Scalar(125, 0, 0));
+					//Mat rot_mat = getPerspectiveTransform(frame, frame_b);// getAffineTransform(frame_1, frame_b_1);
+					//perspectiveTransform(contour_dst, contour_dst, rot_mat);
+					//draw_contour(draw_, contour_dst, sh1, 8);
+					//FOR(m, 0, 4) circle(draw_, frame_b[m] + sh1, 3, Scalar(0, 255, 0));
+					//imshow("123123", draw_);
 				}
 				if (deve_opt)
 				{
@@ -263,7 +295,7 @@ namespace Tiling_tiles {
 				protoTile c1, c2;
 				c1.show_contour(conf_trans(contour_2), anc1);
 				c2.show_contour(conf_trans(con_re), anc2);
-				//RotationVis(c1, c2, AntiClockWise);
+				RotationVis(c1, c2, AntiClockWise);
 
 			}
 		}

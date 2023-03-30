@@ -3,7 +3,6 @@
 #include <opencv2/core/utils/logger.hpp>
 #include <highgui/highgui.hpp>
 #include <imgproc/imgproc.hpp>
-#include <unordered_set>
 #include <ctime>
 #include <io.h>
 #include <iostream>
@@ -81,6 +80,7 @@ vector<Point2f> load_point_file(string filepath);
 void fileout(string filepath, vector<Point2f> contour_);
 void save_svg(string svg_path, vector<Point2f> contour, Scalar color, Point2f shift, double zoom_scale);
 void write_obj(string filepath, MatrixXd V, MatrixXi F);
+void write_para(string filepath, vector<int> indexs, vector<Point2f> new_places);
 
 //compare two contours by TAR
 vector<vector<double>> compute_TAR(vector<Point2f> &contour_, double &shape_complexity, double frac = 0.5);
@@ -98,7 +98,7 @@ double edge_nd_degree(vector<Point2f> edge, int type); // non-developable degree
 void edge_nd_opt(vector<Point2f>& edge, int type);
 void whole_con_opt(vector<Point2f> &cont, vector<int> &indexes, int type);
 
-void triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F);
+int triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F);
 int add_points(vector<Point2f>& contour, double sparse_ratio);
 
 

@@ -14,7 +14,7 @@ int main()
 	start = clock();
 	Tiling_opt tiling;
 	
-	int f = 10;
+	int f = 1;
 
 	if (f == 0)
 	{
@@ -98,9 +98,16 @@ int main()
 		imshow("Triangulation", image);
 
 		write_obj("duck.obj", V,F);
+		string obj_path = ParaPath;
+		string para_path = ParaPath;
+		string command = "D:/vs2015project/ARAP_Deform/x64/Debug/ARAP_Deform.exe "+ obj_path+"duck.obj "+ para_path+"deform_para.txt";
+		cout << command << endl;
+		system(command.c_str());
 
 	}
-
+	else if (f == 11) //save contours
+	{
+	}
 	finish = clock();
 	cout << endl << "All time consumption: " << (double)(finish - start) / CLOCKS_PER_SEC << " s " << endl;
 	waitKey(0);
