@@ -95,8 +95,8 @@ double isoperimetric_inequality(vector<Point2f> contour);
 double bound_collision(vector<Point2f> cont, vector<int> indexes, int type = -1);
 
 double edge_nd_degree(vector<Point2f> edge, int type); // non-developable degree
-void edge_nd_opt(vector<Point2f>& edge, int type);
-void whole_con_opt(vector<Point2f> &cont, vector<int> &indexes, int type);
+double edge_nd_opt(vector<Point2f>& edge, int type);
+double whole_con_opt(vector<Point2f> &cont, vector<int> &indexes, int type);
 
 int triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F);
 int add_points(vector<Point2f>& contour, double sparse_ratio);

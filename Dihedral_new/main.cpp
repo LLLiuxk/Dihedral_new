@@ -26,8 +26,8 @@ int main()
 	}
 	if (f == 1) //specify
 	{
-		vector<int> anc_points = { 6,19,24,31 }; // 6,19,24,31
-		tiling.tiliing_gen_specify("44", anc_points);
+		vector<int> anc_points = { 4,14,22,32 }; // 6,19,24,31
+		tiling.tiliing_gen_specify("71", anc_points);
 
 
 	}
@@ -71,7 +71,8 @@ int main()
 	{
 		//tiling.load_dataset(false);
 		string filepath = DefaultPath;
-		string filepath1 = filepath + "contour/189.txt";
+		//string filepath1 = filepath + "contour/189.txt";
+		string filepath1 = "D:/vs2015project/Dihedral_new/Dihedral_new/mid_shape.txt";
 		tiling.prototile_first = protoTile(filepath1);
 		MatrixXd V;
 		MatrixXi F;

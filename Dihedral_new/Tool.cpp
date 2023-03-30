@@ -1536,7 +1536,7 @@ double edge_nd_degree(vector<Point2f> edge, int type)
 	return total_angle / (count*0.5*PI);
 }
 
-void edge_nd_opt(vector<Point2f>& edge, int type)
+double edge_nd_opt(vector<Point2f>& edge, int type)
 {
 	int esize = edge.size();
 	if (type == 1)
@@ -1549,7 +1549,7 @@ void edge_nd_opt(vector<Point2f>& edge, int type)
 	Point2f end_p = edge[esize - 1];
 	double edge_colli_score = edge_nd_degree(edge, type);
 	int count = 0;
-	int max_times = 10;
+	int max_times = 15;
 	while (edge_colli_score > 0 && count<max_times)
 	{
 		count++;
@@ -1592,10 +1592,12 @@ void edge_nd_opt(vector<Point2f>& edge, int type)
 		edge_colli_score = edge_nd_degree(edge, type);
 		//cout << "count: " << count << endl;
 	}
+	return edge_colli_score;
 }
 
-void whole_con_opt(vector<Point2f>& cont, vector<int>& indexes, int type)
+double whole_con_opt(vector<Point2f>& cont, vector<int>& indexes, int type)
 {
+	double degree_opt = 0;
 	int index_size = indexes.size();
 	int csize = cont.size();
 	vector<vector<Point2f>> four_edges;
@@ -1608,7 +1610,8 @@ void whole_con_opt(vector<Point2f>& cont, vector<int>& indexes, int type)
 	vector<Point2f> edge;
 	for (int j = indexes[index_size - 1]; j <= indexes[0] + csize; j++)  edge.push_back(cont[j%csize]);
 	four_edges.push_back(edge);
-	FOR(i, 0, four_edges.size())  edge_nd_opt(four_edges[i], type);
+
+	FOR(i, 0, four_edges.size())  degree_opt+=edge_nd_opt(four_edges[i], type);
 	vector<Point2f> new_c;
 	vector<int> new_index;
 	for (int m = 0; m < 4; m++)
@@ -1621,15 +1624,16 @@ void whole_con_opt(vector<Point2f>& cont, vector<int>& indexes, int type)
 	}
 	cont = new_c;
 	indexes = new_index;
+	return degree_opt;
 }
 
 int triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F)
 {
 	vector<Point2f> con_ori = contour;
+	Point2f cen = center_p(con_ori);
 	int ori_num = add_points(contour, 0.08);
-	//contour.push_back(Point2f(300, 300));
 	// create a Subdiv2D object from the contour
-	cv::Subdiv2D subdiv(Rect(0, 0, 1000, 1000)); // change the rectangle size according to your contour
+	cv::Subdiv2D subdiv(Rect(cen.x - 500, cen.y - 500, 1000, 1000)); // change the rectangle size according to your contour
 	for (int i = 0; i < contour.size(); i++) {
 		subdiv.insert(contour[i]);
 	}
@@ -1709,7 +1713,7 @@ int add_points(vector<Point2f>& contour, double sparse_ratio)
 	double maxy = bbx_p[3].y;
 	double interval_x = sparse_ratio*(maxx - minx);
 	double interval_y = sparse_ratio*(maxy - miny);
-	cout << interval_x << "   " << interval_y << endl;
+	cout << "bbx:"<<maxx << "   " << maxy<<"  "<< minx<<"   "<< miny << endl;
 	double margin = min(interval_x, interval_y);
 	vector<Point2f> new_con;
 	for (double nx = minx + interval_x; nx < maxx; nx += interval_x)

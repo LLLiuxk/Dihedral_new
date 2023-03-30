@@ -234,7 +234,8 @@ namespace Tiling_tiles {
 				}
 				vector<Point2f> contour_dst = conf_trans(contour_2);
 				bool pers_trans = 1;
-				bool deve_opt = 1;
+				bool deve_opt = 0;
+				double degree_after_opt = 0;
 				if (pers_trans)
 				{
 					Mat draw_ = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
@@ -247,6 +248,7 @@ namespace Tiling_tiles {
 					MatrixXd V;
 					MatrixXi F;
 					vector<Point2f> con = contour_dst;
+					//fileout("D:/vs2015project/Dihedral_new/Dihedral_new/mid_shape.txt", con);
 					int consize = con.size();
 					triangulateContour(con, V, F);
 
@@ -283,7 +285,8 @@ namespace Tiling_tiles {
 				}
 				if (deve_opt)
 				{
-					whole_con_opt(contour_dst, anc1, 0);
+					degree_after_opt = whole_con_opt(contour_dst, anc1, 0);
+					cout << "After developable optimation, the collision degree: " << degree_after_opt << endl;
 				}
 				contour_2 = set_flags(contour_dst, contour_2);
 				Mat draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
