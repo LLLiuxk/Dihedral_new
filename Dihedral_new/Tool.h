@@ -98,6 +98,9 @@ double edge_nd_degree(vector<Point2f> edge, int type); // non-developable degree
 double edge_nd_opt(vector<Point2f>& edge, int type);
 double whole_con_opt(vector<Point2f> &cont, vector<int> &indexes, int type);
 
+void contour_de_crossing(vector<Point2f> &contour_, int first, int second);  //交叉的优化
+void contour_fine_tuning(vector<Point2f> &contour_, int first, int second);  //过近的优化
+
 int triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F);
 int add_points(vector<Point2f>& contour, double sparse_ratio);
 

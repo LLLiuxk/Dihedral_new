@@ -1627,6 +1627,58 @@ double whole_con_opt(vector<Point2f>& cont, vector<int>& indexes, int type)
 	return degree_opt;
 }
 
+void contour_de_crossing(vector<Point2f> &contour_, int first, int second)
+{
+	vector<Point2f> mid_con;
+	int csize = contour_.size();
+	vector<Point2f> pre;
+	vector<Point2f> post;
+	std::cout << csize << " " << first << " " << second << endl;
+	if (second - first < 4)
+	{
+		Point2f tem = contour_[first + 1];
+		contour_[first + 1] = contour_[second];
+		contour_[second] = tem;
+	}
+	else
+	{
+		int mid = (first + second) / 2;
+		for (int t = first; t < mid; t++)
+		{
+			pre.push_back(contour_[t]);
+		}
+		for (int t = mid; t <= second + 1; t++)
+		{
+			post.push_back(contour_[t]);
+		}
+		for (int t = 0; t < first; t++)
+		{
+			mid_con.push_back(contour_[t]);
+		}
+		if (mid_con.empty()) mid_con.push_back(0.5*contour_[csize - 1] + 0.5*post[post.size() - 2]);
+		else mid_con.push_back(0.5*mid_con.back() + 0.5*post[post.size() - 2]);
+		for (int t = post.size() - 2; t >= 0; t--)
+		{
+			mid_con.push_back(post[t]);
+		}
+		for (int t = pre.size() - 1; t > 0; t--)
+		{
+			mid_con.push_back(pre[t]);
+		}
+		mid_con.push_back(0.5*mid_con.back() + 0.5*contour_[(second + 2) % csize]);
+		for (int t = second + 2; t < csize; t++)
+		{
+			mid_con.push_back(contour_[t]);
+		}
+		contour_.swap(mid_con);
+	}
+}
+
+void contour_fine_tuning(vector<Point2f> &contour_, int first, int second)  //过近的优化
+{
+
+}
+
 int triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F)
 {
 	vector<Point2f> con_ori = contour;

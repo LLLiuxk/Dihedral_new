@@ -258,8 +258,8 @@ namespace Tiling_tiles {
 					string deformed_c = parap + "deformed_c.txt";
 					write_obj(obj_path, V, F);
 					write_para(para_path, anc1, frame_b);
-					string command = "D:/vs2015project/Dihedral_new/Dihedral_new/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c; 
-					//string command = "D:/vs2015project/ARAP_Deform/x64/Debug/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c;
+					//string command = "D:/vs2015project/Dihedral_new/Dihedral_new/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c; 
+					string command = "D:/vs2015project/ARAP_Deform/x64/Debug/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c;
 					//cout << command << endl;
 					system(command.c_str());
 					contour_dst = load_point_file(deformed_c);
