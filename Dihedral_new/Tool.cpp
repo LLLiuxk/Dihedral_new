@@ -1633,7 +1633,7 @@ void contour_de_crossing(vector<Point2f> &contour_, int first, int second)
 	int csize = contour_.size();
 	vector<Point2f> pre;
 	vector<Point2f> post;
-	std::cout << csize << " " << first << " " << second << endl;
+	std::cout << "Contour de-crossing: "<<csize << " " << first << " " << second << endl;
 	if (second - first < 4)
 	{
 		Point2f tem = contour_[first + 1];
@@ -1651,9 +1651,12 @@ void contour_de_crossing(vector<Point2f> &contour_, int first, int second)
 		{
 			post.push_back(contour_[t]);
 		}
-		for (int t = 0; t < first; t++)
+		int tt = 0;
+		if ((second + 1) % csize == 0)
+			tt = (second + 1) % csize;
+		for (; tt < first; tt++)
 		{
-			mid_con.push_back(contour_[t]);
+			mid_con.push_back(contour_[tt]);
 		}
 		if (mid_con.empty()) mid_con.push_back(0.5*contour_[csize - 1] + 0.5*post[post.size() - 2]);
 		else mid_con.push_back(0.5*mid_con.back() + 0.5*post[post.size() - 2]);
