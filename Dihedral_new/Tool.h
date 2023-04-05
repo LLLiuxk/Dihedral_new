@@ -19,10 +19,13 @@
 #define OP Point2f(0,0)
 #define FOR(i,s,t)  for(int i=(s); i<(t); i++)
 
+
+
 using namespace std;
 using namespace cv;
 using namespace Eigen;
 
+extern vector<string> frame_type;
 extern vector<pair<string, Scalar>> colorbar;
 
 //draw tools
@@ -38,6 +41,7 @@ Point2f center_p(vector<Point2f> contour_);
 vector<Point2f> Trans_contour(vector<Point2f> c1, Point2f trans_shift);
 vector<Point2f> Rotate_contour(vector<Point2f> src, Point2f center, double angle);
 vector<Point2f> Flip_contour(vector<Point2f> cont_s);
+double conotour_align(vector<Point2f>& cont1, vector<Point2f>& cont2, vector<pair<int, int>> path_min);
 
 vector<int>  cal_feature(vector<Point2f> contour_, int  n_min, int n_max, double angle_cos, bool show_result = false); //n_min, n_max 表示计算cos度数选取的点个数
 vector<Point2f> con_sample(vector<Point2f> contour_, vector<int> &feature_, int sam_num, bool show_result = false);
@@ -98,8 +102,8 @@ double edge_nd_degree(vector<Point2f> edge, int type); // non-developable degree
 double edge_nd_opt(vector<Point2f>& edge, int type);
 double whole_con_opt(vector<Point2f> &cont, vector<int> &indexes, int type);
 
-void contour_de_crossing(vector<Point2f> &contour_, int first, int second);  //交叉的优化
-void contour_fine_tuning(vector<Point2f> &contour_, int first, int second);  //过近的优化
+void contour_de_crossing(vector<Point2f> &contour_);  //交叉的优化
+void contour_fine_tuning(vector<Point2f> &contour_);  //过近的优化
 
 int triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F);
 int add_points(vector<Point2f>& contour, double sparse_ratio);

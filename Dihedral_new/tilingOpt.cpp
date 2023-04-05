@@ -1,4 +1,5 @@
 #include "tilingOpt.h"
+vector<string> frame_type={ "parallelogram", "rhombus", "rectangle", "square" };
 
 namespace Tiling_tiles {
 
@@ -48,32 +49,32 @@ namespace Tiling_tiles {
 				draw_contour_points(draw, conf_trans(contour_2), sh2, 3, 2);
 				imshow("correspond path", draw);
 				vector<Point_f> con_re;
-				vector<int> anc1;
-				vector<int> anc2;
+				vector<int> anc_mid;
+				vector<int> anc_re;
 				FOR(t, 0, contour_2.size())
 				{
 					if (contour_2[t].type == fixed_p)
-						anc1.push_back(t);
+						anc_mid.push_back(t);
 				}
-				//vector<Point2f> frame = { contour_2[anc1[0]].point, contour_2[anc1[1]].point, contour_2[anc1[2]].point, contour_2[anc1[3]].point };
+				//vector<Point2f> frame = { contour_2[anc_mid[0]].point, contour_2[anc_mid[1]].point, contour_2[anc_mid[2]].point, contour_2[anc_mid[3]].point };
 				//vector<Point2f> frame_b = base_frame(frame, 3);
 				//Mat rot_mat = getPerspectiveTransform(frame, frame_b);// getAffineTransform(frame_1, frame_b_1);
 				//													  //cout << rot_mat << endl;
 				//vector<Point2f> contour_dst;
 				//perspectiveTransform(conf_trans(contour_2), contour_dst, rot_mat);
 				//
-				//whole_con_opt(contour_dst, anc1, 0);
+				//whole_con_opt(contour_dst, anc_mid, 0);
 				//contour_2 = set_flags(contour_dst, contour_2);
 
 				Mat draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
-				if (translation_placement(contour_2, con_re, anc1, anc2, draw2))
+				if (translation_placement(contour_2, con_re, anc_mid, anc_re, draw2))
 				{
 					cout << "OK!" << endl;
 				}
 
 				protoTile c1, c2;
-				c1.show_contour(conf_trans(contour_2), anc1);
-				c2.show_contour(conf_trans(con_re), anc2);
+				c1.show_contour(conf_trans(contour_2), anc_mid);
+				c2.show_contour(conf_trans(con_re), anc_re);
 				RotationVis(c1,c2, AntiClockWise);
 				//for (; ratio <= 90; ratio += 5)
 				//{
@@ -225,22 +226,37 @@ namespace Tiling_tiles {
 				draw_contour_points(draw, conf_trans(contour_2), sh2, 3, 2);
 				imshow("correspond path", draw);
 				vector<Point_f> con_re;
-				vector<int> anc1;
-				vector<int> anc2;
+				vector<int> anc_mid;
+				vector<int> anc_re;
 				FOR(t, 0, contour_2.size())
 				{
 					if (contour_2[t].type == fixed_p)
-						anc1.push_back(t);
+						anc_mid.push_back(t);
 				}
 				vector<Point2f> contour_dst = conf_trans(contour_2);
 				bool pers_trans = 1;
-				bool deve_opt = 0;
+				bool coll_opt = 1;
+				bool deve_opt = 1;
 				double degree_after_opt = 0;
 				if (pers_trans)
 				{
 					Mat draw_ = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
-					vector<Point2f> frame = { contour_2[anc1[0]].point, contour_2[anc1[1]].point, contour_2[anc1[2]].point, contour_2[anc1[3]].point };
-					vector<Point2f> frame_b = base_frame(frame, 0);
+					vector<Point2f> frame = { contour_2[anc_mid[0]].point, contour_2[anc_mid[1]].point, contour_2[anc_mid[2]].point, contour_2[anc_mid[3]].point };
+					int min_type = 0;
+					double min_l = 10000;
+					FOR(f_type, 0, 4)
+					{
+						vector<Point2f> frame_bb = base_frame(frame, f_type);
+						vector<pair<int, int>> path_min = { make_pair(0,0),make_pair(1,1),make_pair(2,2),make_pair(3,3) };
+						double alige_e = conotour_align(frame, frame_bb, path_min);
+						if (alige_e < min_l)
+						{
+							min_l = alige_e;
+							min_type = f_type;
+						}
+					}
+					cout << "frame_type: " << frame_type[min_type] << "   " << min_l << endl;
+					vector<Point2f> frame_b = base_frame(frame, min_type);
 					Point2f sh1(0, 400);
 					draw_contour(draw_, contour_dst, sh1, 5);
 					FOR(m, 0, 4) circle(draw_, frame[m] + sh1, 3, Scalar(125, 0, 0));
@@ -257,9 +273,9 @@ namespace Tiling_tiles {
 					string para_path = parap + "deform_para.txt";
 					string deformed_c = parap + "deformed_c.txt";
 					write_obj(obj_path, V, F);
-					write_para(para_path, anc1, frame_b);
-					//string command = "D:/vs2015project/Dihedral_new/Dihedral_new/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c; 
-					string command = "D:/vs2015project/ARAP_Deform/x64/Debug/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c;
+					write_para(para_path, anc_mid, frame_b);
+					string command = "D:/vs2015project/Dihedral_new/Dihedral_new/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c; 
+					//string command = "D:/vs2015project/ARAP_Deform/x64/Debug/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c;
 					//cout << command << endl;
 					system(command.c_str());
 					contour_dst = load_point_file(deformed_c);
@@ -272,7 +288,7 @@ namespace Tiling_tiles {
 					imshow("123123", draw_);
 
 					//Mat draw_ = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
-					//vector<Point2f> frame = { contour_2[anc1[0]].point, contour_2[anc1[1]].point, contour_2[anc1[2]].point, contour_2[anc1[3]].point };
+					//vector<Point2f> frame = { contour_2[anc_mid[0]].point, contour_2[anc_mid[1]].point, contour_2[anc_mid[2]].point, contour_2[anc_mid[3]].point };
 					//vector<Point2f> frame_b = base_frame(frame, 0);
 					//Point2f sh1(0, 400);
 					//draw_contour(draw_, contour_dst, sh1, 5);
@@ -283,21 +299,36 @@ namespace Tiling_tiles {
 					//FOR(m, 0, 4) circle(draw_, frame_b[m] + sh1, 3, Scalar(0, 255, 0));
 					//imshow("123123", draw_);
 				}
-				if (deve_opt)
-				{
-					degree_after_opt = whole_con_opt(contour_dst, anc1, 0);
-					cout << "After developable optimation, the collision degree: " << degree_after_opt << endl;
-				}
 				contour_2 = set_flags(contour_dst, contour_2);
 				Mat draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
-				if (translation_spec(contour_2, con_re, anc1, anc2, draw2))
+				int first = 0, second = 0;
+				if (self_intersect(contour_dst, first, second)) cout << "Bad  intersection!" << endl;
+				if (translation_spec(contour_2, con_re, anc_mid, anc_re, draw2))
 				{
 					cout << "OK! No intersection!" << endl;
 				}
+				contour_dst = conf_trans(con_re);
+				if (coll_opt)
+				{
+					//contour_de_crossing(contour_dst);
+					contour_fine_tuning(contour_dst);
+				}
+				if (deve_opt)
+				{
+					degree_after_opt = whole_con_opt(contour_dst, anc_re, 0);
+					//degree_after_opt = whole_con_opt(contour_dst, anc_mid, 0);
+					cout << "After developable optimation, the collision degree: " << degree_after_opt << endl;
+				}
+				con_re = set_flags(contour_dst, con_re);
+				draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
+				if (translation_spec(con_re, contour_2, anc_re, anc_mid, draw2))
+				{
+					cout << "OK! No intersection!" << endl;
+				}			
 				else cout << "Bad result with intersection!" << endl;
 				protoTile c1, c2;
-				c1.show_contour(conf_trans(contour_2), anc1);
-				c2.show_contour(conf_trans(con_re), anc2);
+				c1.show_contour(conf_trans(con_re), anc_re);
+				c2.show_contour(conf_trans(contour_2), anc_mid);
 				RotationVis(c1, c2, AntiClockWise);
 
 			}
@@ -972,7 +1003,7 @@ namespace Tiling_tiles {
 				rot_mat1 = getRotationMatrix2D(cen2, angle_min, 1);
 				cv::transform(contour_cand, contour_tem, rot_mat1);
 				angl_al += angle_min;
-				contour_cand = contour_tem;
+				//contour_cand = contour_tem;
 				//ÒÆ¶¯ÖØÐÄ
 				shift_t = Point2f(0, 0);
 				for (int m = 0; m < path_min.size(); m++)

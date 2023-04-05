@@ -147,6 +147,94 @@ vector<Point2f> Flip_contour(vector<Point2f> cont_s)
 	return cont_s;
 }
 
+double conotour_align(vector<Point2f>& cont1, vector<Point2f>& cont2, vector<pair<int, int>> path_min)
+{
+	double match_error = 0;
+	int method = 0;
+	int csize = cont1.size();
+	if (cont2.size() != csize)
+	{
+		cout << "cannot align two contours with different size!" << endl;
+		return match_error;
+	}
+	Point2f cen1 = center_p(cont1);
+	Point2f cen2 = center_p(cont2);
+	Point2f shift2 = cen1 - cen2;
+	for (int i = 0; i < csize; i++)
+	{
+		cont2[i] = cont2[i] + shift2;
+	}
+	//two types of calculating the scale: i.based on the arclength  ii.based in uniform scale
+	double scale = arcLength(cont1, true) / arcLength(cont2, true);
+	std::cout << "scale: " << scale << endl;
+	double s_1 = 0, s_2 = 0;
+	FOR(i, 0, csize)
+	{
+		s_1 += pow(length_2p(cont1[i], cen1), 2);
+		s_2 += pow(length_2p(cont2[2], cen1), 2);
+	}
+	double scale2 = sqrt(s_1 / s_2);
+	cout << "scale2: " << scale2 << endl;
+	for (int i = 0; i < cont2.size(); i++)
+	{
+		cont2[i] = cont2[i] * scale;
+	}
+
+	double length_min = 1000000;
+	int angle_min = 0;
+	int times = 0;
+	double angl_al = 0;
+	Point2f sh_al = Point2f(0, 0);
+	Point2f shift_t = Point2f(1000, 1000);
+	vector<Point2f> contour_tem;
+	while (times < 3 || length_2p(shift_t, Point2f(0, 0)) > 10 || angle_min > 10)// 
+	{
+		length_min = 1000000;
+		angle_min = 0;
+		cen2 = center_p(cont2);
+		//找到距离最近的角度
+		for (int angle = 0; angle < 360; angle = angle + 2)
+		{
+			double leng = 0;
+			Mat rot_mat(2, 3, CV_32FC1);
+			rot_mat = getRotationMatrix2D(cen2, angle, 1);
+			cv::transform(cont2, contour_tem, rot_mat);
+			for (int m = 0; m < path_min.size(); m++)
+			{
+				leng += pow(length_2p(cont1[path_min[m].first], contour_tem[path_min[m].second]), 2);
+				/*leng += length_2p(prototile_mid.contour[path_min[m].first], contour_tem[path_min[m].second]);*/
+			}
+			leng = sqrt(leng);
+			if (leng < length_min)
+			{
+				angle_min = angle;
+				length_min = leng;
+			}
+		}
+		//cout << "angle_min: " << angle_min << "   length_min:  " << length_min << endl;
+		Mat rot_mat1(2, 3, CV_32FC1);
+		rot_mat1 = getRotationMatrix2D(cen2, angle_min, 1);
+		cv::transform(cont2, contour_tem, rot_mat1);
+		angl_al += angle_min;
+		cont2 = contour_tem;
+		//移动重心
+		shift_t = Point2f(0, 0);
+		for (int m = 0; m < path_min.size(); m++)
+		{
+			shift_t += cont1[path_min[m].first] - cont2[path_min[m].second];
+		}
+		shift_t = Point2f(shift_t.x / path_min.size(), shift_t.y / path_min.size());
+		for (int i = 0; i < cont2.size(); i++)
+		{
+			cont2[i] = cont2[i] + shift_t;
+		}
+		sh_al += shift_t;
+		times++;
+		cout << "rotate angle_all: " << angl_al << "   length_min:  " << length_min << "    shift all: " << sh_al << "   shift_t: " << shift_t << endl;
+	}
+	return length_min;
+}
+
 vector<int> cal_feature(vector<Point2f> contour_, int  n_min, int n_max, double angle_cos, bool show_result)
 {
 	vector<int> index_num;
@@ -698,16 +786,17 @@ vector<Point2f> base_frame(vector<Point2f> frame, int type)  //two fixed point
 	bool show = true;
 	if (show)
 	{
+		Point2f shift = Point2f(300, 300) - center_p(base_points);
 		Mat draw = Mat(600, 600, CV_8UC3, Scalar(255, 255, 255));
 		for (int i = 0; i < base_points.size(); i++)
 		{
 			//cout << "base_points: " << base_points[i] << endl;
-			circle(draw, base_points[i], 3, Scalar(0, 255, 0), -1);
-			line(draw, base_points[i], base_points[(i + 1) % 4], Scalar(200, 200, 200), 2);
-			circle(draw, frame[i], 3, Scalar(0, 0, 255), -1);
-			line(draw, frame[i], frame[(i + 1) % 4], Scalar(0, 0, 0), 2);
+			circle(draw, base_points[i] + shift, 3, Scalar(0, 255, 0), -1);
+			line(draw, base_points[i] + shift, base_points[(i + 1) % 4] + shift, Scalar(200, 200, 200), 2);
+			circle(draw, frame[i] + shift, 3, Scalar(0, 0, 255), -1);
+			line(draw, frame[i] + shift, frame[(i + 1) % 4] + shift, Scalar(0, 0, 0), 2);
 		}
-		imshow("base frame" + to_string(type), draw);
+		imshow("frame: " + frame_type[type], draw);
 	}
 	/*cout << "length: " << length_2p(base_points[0], base_points[1]) << "   " << length_2p(base_points[1], base_points[2])
 	<< "   " << length_2p(base_points[2], base_points[3]) << "   " << length_2p(base_points[3], base_points[0]) << endl;
@@ -765,20 +854,20 @@ vector<Point2f> base_frame2(vector<Point2f> frame, int type) //one fixed point
 	//	cout << "six_edges:  " << four_edges[i] << endl;
 	//for (int i = 0; i < four_angles.size(); i++) 
 	//	cout << "four_angles: " << four_angles[i] << endl;
-
 	bool show = true;
 	if (show)
 	{
+		Point2f shift = Point2f(300, 300) - center_p(base_points);
 		Mat draw = Mat(600, 600, CV_8UC3, Scalar(255, 255, 255));
 		for (int i = 0; i < base_points.size(); i++)
 		{
 			//cout << "base_points: " << base_points[i] << endl;
-			circle(draw, base_points[i], 3, Scalar(0, 0, 255), -1);
-			line(draw, base_points[i], base_points[(i + 1) % 4], Scalar(0, 0, 0), 2);
-			circle(draw, frame[i], 3, Scalar(0, 255, 0), -1);
-			line(draw, frame[i], frame[(i + 1) % 4], Scalar(200, 200, 200), 2);
+			circle(draw, base_points[i] + shift, 3, Scalar(0, 255, 0), -1);
+			line(draw, base_points[i] + shift, base_points[(i + 1) % 4] + shift, Scalar(200, 200, 200), 2);
+			circle(draw, frame[i] + shift, 3, Scalar(0, 0, 255), -1);
+			line(draw, frame[i] + shift, frame[(i + 1) % 4] + shift, Scalar(0, 0, 0), 2);
 		}
-		imshow("base frame" + to_string(type), draw);
+		imshow("frame: " + frame_type[type], draw);
 	}
 	/*cout << "length: " << length_2p(base_points[0], base_points[1]) << "   " << length_2p(base_points[1], base_points[2])
 	<< "   " << length_2p(base_points[2], base_points[3]) << "   " << length_2p(base_points[3], base_points[0]) << endl;
@@ -1627,59 +1716,124 @@ double whole_con_opt(vector<Point2f>& cont, vector<int>& indexes, int type)
 	return degree_opt;
 }
 
-void contour_de_crossing(vector<Point2f> &contour_, int first, int second)
+void contour_de_crossing(vector<Point2f> &contour_)
 {
-	vector<Point2f> mid_con;
-	int csize = contour_.size();
-	vector<Point2f> pre;
-	vector<Point2f> post;
-	std::cout << "Contour de-crossing: "<<csize << " " << first << " " << second << endl;
-	if (second - first < 4)
+	int first = 0, second = 0, time = 0;
+	int iter_times = 5;
+	while (self_intersect(contour_, first, second) && time < iter_times)
 	{
-		Point2f tem = contour_[first + 1];
-		contour_[first + 1] = contour_[second];
-		contour_[second] = tem;
+		time++;
+		vector<Point2f> mid_con;
+		int csize = contour_.size();
+		vector<Point2f> pre;
+		vector<Point2f> post;
+		std::cout << "Contour de-crossing: " << csize << " " << first << " " << second << endl;
+		if (second - first < 4)
+		{
+			Point2f tem = contour_[first + 1];
+			contour_[first + 1] = contour_[second];
+			contour_[second] = tem;
+		}
+		else
+		{
+			int mid = (first + second) / 2;
+			for (int t = first; t < mid; t++)
+			{
+				pre.push_back(contour_[t]);
+			}
+			for (int t = mid; t <= second + 1; t++)
+			{
+				post.push_back(contour_[t]);
+			}
+			int tt = 0;
+			if ((second + 1) % csize == 0)
+				tt = (second + 1) % csize;
+			for (; tt < first; tt++)
+			{
+				mid_con.push_back(contour_[tt]);
+			}
+			if (mid_con.empty()) mid_con.push_back(0.5*contour_[csize - 1] + 0.5*post[post.size() - 2]);
+			else mid_con.push_back(0.5*mid_con.back() + 0.5*post[post.size() - 2]);
+			for (int t = post.size() - 2; t >= 0; t--)
+			{
+				mid_con.push_back(post[t]);
+			}
+			for (int t = pre.size() - 1; t > 0; t--)
+			{
+				mid_con.push_back(pre[t]);
+			}
+			mid_con.push_back(0.5*mid_con.back() + 0.5*contour_[(second + 2) % csize]);
+			for (int t = second + 2; t < csize; t++)
+			{
+				mid_con.push_back(contour_[t]);
+			}
+			contour_.swap(mid_con);
+		}
+	}
+	if (self_intersect(contour_, first, second))
+	{
+		cout << "Waring: still self_intersection! " << endl;
 	}
 	else
-	{
-		int mid = (first + second) / 2;
-		for (int t = first; t < mid; t++)
-		{
-			pre.push_back(contour_[t]);
-		}
-		for (int t = mid; t <= second + 1; t++)
-		{
-			post.push_back(contour_[t]);
-		}
-		int tt = 0;
-		if ((second + 1) % csize == 0)
-			tt = (second + 1) % csize;
-		for (; tt < first; tt++)
-		{
-			mid_con.push_back(contour_[tt]);
-		}
-		if (mid_con.empty()) mid_con.push_back(0.5*contour_[csize - 1] + 0.5*post[post.size() - 2]);
-		else mid_con.push_back(0.5*mid_con.back() + 0.5*post[post.size() - 2]);
-		for (int t = post.size() - 2; t >= 0; t--)
-		{
-			mid_con.push_back(post[t]);
-		}
-		for (int t = pre.size() - 1; t > 0; t--)
-		{
-			mid_con.push_back(pre[t]);
-		}
-		mid_con.push_back(0.5*mid_con.back() + 0.5*contour_[(second + 2) % csize]);
-		for (int t = second + 2; t < csize; t++)
-		{
-			mid_con.push_back(contour_[t]);
-		}
-		contour_.swap(mid_con);
-	}
+		cout << "No self_intersection! " << time<<" iters!"<< endl;
 }
 
-void contour_fine_tuning(vector<Point2f> &contour_, int first, int second)  //过近的优化
+void contour_fine_tuning(vector<Point2f> &contour_)  //过近的优化
 {
-
+	Mat imagefine = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
+	Point2f shift = Point2f(600, 600) - center_p(contour_);
+	draw_contour_points(imagefine, contour_, shift, 8, 2);
+	int dis_thres = 8;
+	int win_width = 4;
+	int csize = contour_.size();
+	double con_length = arcLength(contour_, true);
+	double len_thres = 2 * con_length / csize;
+	cout << "length threshold: " << len_thres << endl;
+	int exist_close_p = true;
+	int iter_times = 0;
+	while (exist_close_p)
+	{
+		exist_close_p = false;
+		iter_times++;
+		FOR(i, 0, csize)
+		{
+			FOR(j, i, csize)
+			{
+				if (abs(j - i) < dis_thres || abs(i + csize - j) < dis_thres)
+					continue;
+				else
+				{
+					if (length_2p(contour_[i], contour_[j]) < len_thres) //两个点过近
+					{
+						exist_close_p = true;
+						cout << "before: " << length_2p(contour_[i], contour_[j]) << "   " << contour_[i] << "   " << contour_[j] << endl;
+						circle(imagefine, contour_[i] + shift, 3, Scalar(0, 255, 0), -1);
+						circle(imagefine, contour_[j] + shift, 3, Scalar(0, 255, 0), -1);
+						Point2f unit_v = unit_vec(contour_[i] - contour_[j]);
+						cout << unit_v << endl;
+						double max_r = 0.25;
+						contour_[i] = contour_[i] + max_r*unit_v;
+						contour_[j] = contour_[j] - max_r*unit_v;
+						FOR(g, 1, win_width)
+						{
+							double ratio = max_r - max_r/ win_width*g;
+							contour_[(i + g) % csize] += ratio*unit_v;
+							contour_[(i - g + csize)% csize] += ratio*unit_v;
+							contour_[(j + g) % csize] -= ratio*unit_v;
+							contour_[(j - g + csize) % csize] -= ratio*unit_v;
+							//cout << "dst: " << dst.size() << "   " << dst[0] << "   " << dst[1] << endl;					
+						}
+						circle(imagefine, contour_[i] + shift, 3, Scalar(255, 0, 0), -1);
+						circle(imagefine, contour_[j] + shift, 3, Scalar(255, 0, 0), -1);
+						cout << "after: " << length_2p(contour_[i], contour_[j]) << contour_[i] << "   " << contour_[j] << endl;
+					}
+				}
+			}
+		}
+	}
+	draw_contour_points(imagefine, contour_, shift+Point2f(300,300), 9, 2);
+	cout << "fine tuning times: " << iter_times << endl;
+	imshow("contour_dst", imagefine);
 }
 
 int triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F)
