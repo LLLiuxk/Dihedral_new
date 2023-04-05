@@ -1,5 +1,8 @@
 #include "tilingOpt.h"
 vector<string> frame_type={ "parallelogram", "rhombus", "rectangle", "square" };
+bool pers_trans = 1;
+bool coll_opt = 1;
+bool deve_opt = 1;
 
 namespace Tiling_tiles {
 
@@ -228,15 +231,14 @@ namespace Tiling_tiles {
 				vector<Point_f> con_re;
 				vector<int> anc_mid;
 				vector<int> anc_re;
-				FOR(t, 0, contour_2.size())
+				int csize = contour_2.size();
+				FOR(t, 0, csize)
 				{
 					if (contour_2[t].type == fixed_p)
 						anc_mid.push_back(t);
 				}
 				vector<Point2f> contour_dst = conf_trans(contour_2);
-				bool pers_trans = 1;
-				bool coll_opt = 1;
-				bool deve_opt = 1;
+
 				double degree_after_opt = 0;
 				if (pers_trans)
 				{
@@ -244,6 +246,7 @@ namespace Tiling_tiles {
 					vector<Point2f> frame = { contour_2[anc_mid[0]].point, contour_2[anc_mid[1]].point, contour_2[anc_mid[2]].point, contour_2[anc_mid[3]].point };
 					int min_type = 0;
 					double min_l = 10000;
+					vector<Point2f> frame_b;
 					FOR(f_type, 0, 4)
 					{
 						vector<Point2f> frame_bb = base_frame(frame, f_type);
@@ -253,10 +256,43 @@ namespace Tiling_tiles {
 						{
 							min_l = alige_e;
 							min_type = f_type;
+							frame_b = frame_bb;
 						}
 					}
 					cout << "frame_type: " << frame_type[min_type] << "   " << min_l << endl;
-					vector<Point2f> frame_b = base_frame(frame, min_type);
+
+					// ¹¹½¨handle area
+					vector<int> handle_area;
+					vector<Point2f> handle_points;
+					FOR(index_num, 0, anc_mid.size())
+					{
+						Point2f shift_new = frame_b[index_num] - frame[index_num];
+						int area_width = handle_area_width;
+						vector<Point2f> handle_one;
+						FOR(width_n, -area_width, area_width + 1) 
+						//for (int width_n = -area_width; width_n < area_width + 1; width_n += 2)
+						{
+							int index_ = (anc_mid[index_num] + width_n + csize) % csize;
+							handle_area.push_back(index_);
+							//handle_points.push_back(contour_2[index_].point + shift_new);
+							handle_one.push_back(contour_2[index_].point + shift_new);
+						}
+						//cout << "handle_one before: " << handle_one[0] << "  " << handle_one[1] << "  " << handle_one[1] << endl;
+						int cen_index = handle_one.size() / 2;
+						Point2f cen_line = handle_one[0] + handle_one[handle_one.size() - 1] - 2*handle_one[cen_index];
+						double cos1 = cos_2v(cen_line, shift_new);
+						double sin1 = sin_2v(cen_line, shift_new);
+						double angle = acos(cos1) / PI * 180;
+						if (sin1 < 0) angle = -angle;		
+						if (abs(angle)>90) angle = 0.5*(angle - angle / abs(angle) * 180);
+						else angle = 0.5*angle;
+						//cout << cen_line << " " << shift_new << cos1 << "  " << angle << endl;
+						handle_one = Rotate_contour(handle_one, handle_one[cen_index], angle);
+						//cout << "handle_one after: " << handle_one[0] << "  " << handle_one[1] << "  " << handle_one[1] << endl;
+						for(auto p: handle_one)
+							handle_points.push_back(p);
+					}
+
 					Point2f sh1(0, 400);
 					draw_contour(draw_, contour_dst, sh1, 5);
 					FOR(m, 0, 4) circle(draw_, frame[m] + sh1, 3, Scalar(125, 0, 0));
@@ -273,7 +309,8 @@ namespace Tiling_tiles {
 					string para_path = parap + "deform_para.txt";
 					string deformed_c = parap + "deformed_c.txt";
 					write_obj(obj_path, V, F);
-					write_para(para_path, anc_mid, frame_b);
+					//write_para(para_path, anc_mid, frame_b);
+					write_para(para_path, handle_area, handle_points);
 					string command = "D:/vs2015project/Dihedral_new/Dihedral_new/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c; 
 					//string command = "D:/vs2015project/ARAP_Deform/x64/Debug/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c;
 					//cout << command << endl;

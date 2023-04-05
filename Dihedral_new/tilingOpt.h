@@ -19,12 +19,15 @@
 #define AngleThres 165
 #define SCDisThres 0.35
 #define WindowsWidth 10
+#define handle_area_width 1
 #define DefaultPath "C:/Users/liuxk/OneDrive/Recent/DualNPR/"
 #define SavePath "D:/vs2015project/Dihedral_new/result/"
 #define ParaPath "D:/vs2015project/Dihedral_new/Dihedral_new/"
 
 extern string image_id;
-
+extern bool pers_trans;
+extern bool coll_opt;
+extern bool deve_opt;
 
 using namespace cv;
 using namespace std;

@@ -150,7 +150,7 @@ vector<Point2f> Flip_contour(vector<Point2f> cont_s)
 double conotour_align(vector<Point2f>& cont1, vector<Point2f>& cont2, vector<pair<int, int>> path_min)
 {
 	double match_error = 0;
-	int method = 0;
+	int method = 1;
 	int csize = cont1.size();
 	if (cont2.size() != csize)
 	{
@@ -175,6 +175,8 @@ double conotour_align(vector<Point2f>& cont1, vector<Point2f>& cont2, vector<pai
 	}
 	double scale2 = sqrt(s_1 / s_2);
 	cout << "scale2: " << scale2 << endl;
+	if (method == 1)  
+		//scale = scale2;
 	for (int i = 0; i < cont2.size(); i++)
 	{
 		cont2[i] = cont2[i] * scale;
