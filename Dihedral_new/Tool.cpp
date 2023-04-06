@@ -1914,6 +1914,100 @@ int triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F)
 	return ori_num;
 }
 
+
+int triangulate_2Contours(vector<Point2f>& cont1, vector<Point2f>& cont2, MatrixXd& V, MatrixXi& F)
+{
+	vector<Point2f> con_union;
+	vector<Point2f> con_intersection;
+	int csize = cont1.size();
+	if (csize != cont2.size())
+		cout << "different size of these contours in the triangulate_2Contours!" << endl;
+	vector<int> endp1(2), endp2(2);
+	FOR(i, 0, csize)
+	{
+		FOR(j, 0, csize)
+		{
+			if (cont1[i] == cont2[j])
+			{
+				endp1[0] = i;
+				endp2[1] = j;
+			}
+		}
+	}
+	= contour;
+	Point2f cen = center_p(con_ori);
+	int ori_num = add_points(contour, 0.08);
+	// create a Subdiv2D object from the contour
+	cv::Subdiv2D subdiv(Rect(cen.x - 500, cen.y - 500, 1000, 1000)); // change the rectangle size according to your contour
+	for (int i = 0; i < contour.size(); i++) {
+		subdiv.insert(contour[i]);
+	}
+	//calculate V
+	V.resize(contour.size(), 2);
+	for (int m = 0; m < contour.size(); m++)
+	{
+		V.row(m) << contour[m].x, contour[m].y;
+		//cout << "rest: " << V.row(m) << endl;
+	}
+
+	// get the triangle list
+	std::vector<Vec6f> triangleList;
+	subdiv.getTriangleList(triangleList);
+	// convert the triangle list to vertex and face matrices
+	//V.resize(3 * triangleList.size(), 2);
+	F.resize(triangleList.size(), 3);
+	int i = 0;
+	for (auto& t : triangleList) {
+		for (int j = 0; j < 3; j++)
+		{
+			Point2f p(t[2 * j], t[2 * j + 1]);
+			//cout << "tri: " << p.x << "   " << p.y << endl;
+			//uset.emplace(p);
+			auto it = find(contour.begin(), contour.end(), p);//vertexs.find(p);
+			if (it != contour.end()) {
+				//V.row(3 * i + j) << t[2 * j], t[2 * j + 1];
+				F(i, j) = distance(contour.begin(), it);
+			}
+			else
+			{
+				//V.row(3 * i + j) << t[2 * j], t[2 * j + 1];
+				F(i, j) = contour.size() - 1;
+			}
+		}
+		i++;
+	}
+	cout << "contour.size " << contour.size() << "   triangleList.size " << triangleList.size() << "  V and F: " << V.size() << "  " << F.size() << endl;
+	//for (int n = 0; n < F.size() / 3; n++) cout << "n row: "<<F.row(n) << endl;
+	//cout << "triangleList.size(): " << triangleList.size() << "   " << F.size() << endl;
+	// remove triangles outside the contour
+	std::vector<bool> keep(F.rows(), false);
+	for (int i = 0; i < F.rows(); i++) {
+		Vector2d p1 = V.row(F(i, 0));
+		Vector2d p2 = V.row(F(i, 1));
+		Vector2d p3 = V.row(F(i, 2));
+		if (pointPolygonTest(con_ori, 1.0 / 3 * (Point2f(p1[0], p1[1]) + Point2f(p2[0], p2[1]) + Point2f(p3[0], p3[1])), false) >= 0) {
+			keep[i] = true;
+		}
+		//if (keep[i]) cout << "true!" << endl;
+	}
+	int numFaces = keep.size() - count(keep.begin(), keep.end(), false);
+	cout << "numFaces: " << numFaces << endl;
+	MatrixXi newF(numFaces, 3);
+	int j = 0;
+	for (int i = 0; i < F.rows(); i++) {
+		if (keep[i]) {
+			newF.row(j) = F.row(i);
+			j++;
+		}
+	}
+	F = newF;
+	//V.conservativeResize(F.maxCoeff() + 1, 2);
+	/*cout << "  V : " << V.size() << "  F: " << F.size() << endl;
+	for (int n = 0; n < V.rows(); n++) cout << n << " V row: " << V.row(n) << endl;
+	for (int n = 0; n < F.rows(); n++) cout << n << " F row: " << F.row(n) << endl;*/
+	return ori_num;
+}
+
 int add_points(vector<Point2f>& contour, double sparse_ratio)
 {
 	int add_index = contour.size();
