@@ -106,7 +106,7 @@ void contour_de_crossing(vector<Point2f> &contour_);  //交叉的优化
 void contour_fine_tuning(vector<Point2f> &contour_);  //过近的优化
 
 int triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F);
-int triangulate_2Contours(vector<Point2f>& cont1, vector<Point2f>& cont2, MatrixXd& V, MatrixXi& F);
+vector<Point2f> triangulate_2Contours(vector<Point2f>& cont1, vector<Point2f>& cont2, MatrixXd& V, MatrixXi& F);
 int add_points(vector<Point2f>& contour, double sparse_ratio);
 
 
