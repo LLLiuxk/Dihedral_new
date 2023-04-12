@@ -18,16 +18,16 @@ int main()
 
 	if (f == 0)
 	{
-		bool control_parameter = true;
+		bool control_parameter = false;
 		if (control_parameter)  tiling.load_para("para.txt");
-		else image_id = "201";
+		else image_id = "192";
 		tiling.tiliing_generation(image_id);
 
 	}
 	if (f == 1) //specify
 	{
-		vector<int> anc_points = { 4,14,22,32 }; // 44:6,19,24,31    71:4,14,22,32    70: 0,8,19,28
-		tiling.tiliing_gen_specify("71", anc_points);
+		vector<int> anc_points = { 0,8,19,28 }; // 44:6,19,24,31    71:4,14,22,32    70: 0,8,19,28    192: 0,9,18,27
+		tiling.tiliing_gen_specify("70", anc_points);
 
 
 	}

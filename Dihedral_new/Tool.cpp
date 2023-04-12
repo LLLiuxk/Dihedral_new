@@ -655,6 +655,20 @@ vector<Point2f> bbx(vector<Point2f> &cont)
 	return four_cor;
 }
 
+bool bbx_intersection(vector<Point2f> bbx1, vector<Point2f> bbx2, Point2f &bbx_ins)
+{
+	double left = max(bbx1[0].x, bbx2[0].x);
+	double right = min(bbx1[2].x, bbx2[2].x);
+	double bottom = max(bbx1[2].y, bbx2[2].y);
+	double top = min(bbx1[0].y, bbx2[0].y);
+	if (left < right && top < bottom) {
+		bbx_ins = Point2f(0.5*(left + right), 0.5*(top + bottom));
+		return 1;
+	}
+	else {
+		return 0; //相交区域为空
+	}
+}
 
 //translate
 vector<Point2f> PtoP2f(vector<Point> cont)
@@ -938,7 +952,8 @@ int line_intersection(Point2f start1, Point2f end1, Point2f start2, Point2f end2
 	return 1;
 }
 
-vector<Point2f> line_polygon(Point2f start1, Point2f end1, vector<Point2f> contour, bool closed)
+vector<Point2f> 
+line_polygon(Point2f start1, Point2f end1, vector<Point2f> contour, bool closed)
 {
 	vector<Point2f> all_inter;
 	if (closed) contour.push_back(contour[0]);
@@ -950,9 +965,22 @@ vector<Point2f> line_polygon(Point2f start1, Point2f end1, vector<Point2f> conto
 		if (f == 1)
 		{
 			if (all_inter.empty() || length_2p(all_inter.back(), cen)>0.01)
+			{
 				all_inter.push_back(cen);
+				//cout << "f==1" << cen << "  " << start1<<"  "<< end1 << "  " << contour[i] << "  " << contour[i + 1] << "  " << endl;
+			}
 		}
-		else if (f == 2) all_inter.push_back(0.5 * (contour[i], contour[i + 1]));
+		else if (f == 2)
+		{
+			vector<Point2f> bbx1 = bbx(vector<Point2f>{ start1, end1 });
+			vector<Point2f> bbx2 = bbx(vector<Point2f>{ contour[i], contour[i + 1] });
+			if (bbx_intersection(bbx1, bbx2, cen))
+			{
+				all_inter.push_back(cen);
+			}
+			//all_inter.push_back(0.5 * (contour[i] + contour[i + 1]));
+			//cout << "f==2" << cen << "  " << start1 << "  " << end1 << "  " << contour[i] << "  " << contour[i + 1] << "  " << endl; 
+		}
 	}
 	//cout << "intersize :  "<<all_inter.size() << all_inter [0]<<" "<<all_inter[1]<< endl;
 	return all_inter;
@@ -969,6 +997,7 @@ vector<Point2f> poly_poly(vector<Point2f> contour, vector<Point2f> contour_)
 		vector<Point2f> interp = line_polygon(contour[i], contour[(i + 1) % contsize], contour_);
 		if (!interp.empty())
 		{
+			cout << "interp: "<<interp << "   " << i << "   " << contour[i] << "   " << contour[(i + 1) % contsize] << endl;
 			for (int j = 0; j < interp.size(); j++)
 			{
 				int f = 0;
@@ -1022,8 +1051,14 @@ bool self_intersect(vector<Point2f> &contour_, int &first, int &second)
 
 bool coll_detec(vector<Point2f> contour1, vector<Point2f> contour2, int threshold)
 {
+	//Mat drawing1 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
+	//draw_contour_points(drawing1, contour1, Point2f(300,300), 4, 2);
+	//draw_contour_points(drawing1, contour2, Point2f(300, 300), 5, 2);
 	vector<Point2f> all_colli_points = poly_poly(contour1, contour2);
 	//cout << "all_colli_points.size: " << all_colli_points.size()<<endl;
+	//cout << contour1.size() << "   " << contour2.size() << endl;
+	//for (auto p : all_colli_points) circle(drawing1, p+ Point2f(300, 300), 3, Scalar(0, 0, 255), -1);//cout << p << endl;
+	//imshow("collision",drawing1);
 	if (all_colli_points.size() > threshold) return true;
 	return false;
 }

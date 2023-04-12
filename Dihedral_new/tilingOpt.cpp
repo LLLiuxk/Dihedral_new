@@ -1,8 +1,8 @@
 #include "tilingOpt.h"
 vector<string> frame_type={ "parallelogram", "rhombus", "rectangle", "square" };
 bool pers_trans = 1;
-bool coll_opt = 1;
-bool deve_opt = 1;
+bool coll_opt = 0;
+bool deve_opt = 0;
 
 namespace Tiling_tiles {
 
@@ -267,7 +267,7 @@ namespace Tiling_tiles {
 				}
 				//imwrite("Triangulation.png", image);
 				imshow("Triangulation", image);
-				//double degree_after_opt = 0;
+				double degree_after_opt = 0;
 				if (pers_trans)
 				{
 					Mat draw_ = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
@@ -342,8 +342,8 @@ namespace Tiling_tiles {
 					write_para(para_path, anc_mid_, frame_b);
 					//write_para(para_path, anc_mid, frame_b);
 					//write_para(para_path, handle_area, handle_points);
-					string command = "D:/vs2015project/Dihedral_new/Dihedral_new/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c; 
-					//string command = "D:/vs2015project/ARAP_Deform/x64/Debug/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c;
+					//string command = "D:/vs2015project/Dihedral_new/Dihedral_new/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c; 
+					string command = "D:/vs2015project/ARAP_Deform/x64/Debug/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c;
 					cout << command << endl;
 					system(command.c_str());
 					contour_dst = load_point_file(deformed_c);
@@ -419,7 +419,7 @@ namespace Tiling_tiles {
 		{
 			//vector<int> t = { 26 };
 			//int tin = 0;
-			FOR(i, 70, 72)
+			FOR(i, 192, 193)
 			{			
 				//if (i != t[tin]) continue;
 				//else tin++;
@@ -492,7 +492,7 @@ namespace Tiling_tiles {
 			if (Clock_order == ClockWise)
 			{
 				cout << "ClockWise" << endl;
-				for (int degree = 0; degree < 46; degree += 2)
+				for (int degree = 0; degree < 91; degree += 2)
 				{
 					Mat drawing = Mat(draw_row, draw_col, CV_8UC3, Scalar(255, 255, 255));
 					vector<Point2f> c1_r = Rotate_contour(c1.contour, c1.contour[c1.anchor_points[1]], -degree);
@@ -516,7 +516,7 @@ namespace Tiling_tiles {
 			else if (Clock_order == AntiClockWise)
 			{
 				cout << "AntiClockWise" << endl;
-				for (int degree = 0; degree < 46; degree += 2)
+				for (int degree = 0; degree < 91; degree += 2)
 				{
 					Mat drawing = Mat(draw_row, draw_col, CV_8UC3, Scalar(255, 255, 255));
 					vector<Point2f> c1_r = Rotate_contour(c1.contour, c1.contour[c1.anchor_points[0]], degree);
@@ -653,6 +653,7 @@ namespace Tiling_tiles {
 
 	bool Tiling_opt::translation_placement(vector<Point_f> &contour_s, vector<Point_f> &extracted, vector<int> indexes, vector<int> &ex_indexes, Mat &countname)
 	{
+		bool test_coll = false;
 		int csize = contour_s.size();
 		Point2f line1 = contour_s[indexes[2]].point - contour_s[indexes[0]].point;
 		Point2f line2 = contour_s[indexes[3]].point - contour_s[indexes[1]].point;
@@ -688,7 +689,6 @@ namespace Tiling_tiles {
 		//              \  /   \  /           i´Ó1È¡µ½3
 		//              3\/    \/3
 		//               ¢Ú    ¢Ü
-		bool test_coll = false;
 		if (test_coll)
 		{
 			Mat drawing1 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));

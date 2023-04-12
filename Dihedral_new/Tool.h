@@ -50,6 +50,7 @@ vector<Point2f> sampling_seg(vector<Point2f> &segment, int points_num);
 
 //bbx
 vector<Point2f> bbx(vector<Point2f> &cont);
+bool bbx_intersection(vector<Point2f> bbx1, vector<Point2f> bbx2, Point2f &bbx_ins);
 
 //translate
 vector<Point2f> PtoP2f(vector<Point> cont);
