@@ -181,12 +181,15 @@ namespace Tiling_tiles {
 			//feature_match();
 			for (int j = 0; j < 1; j++)
 			{
-				Mat draw = Mat(1000, 1000, CV_8UC3, Scalar(255, 255, 255));
 				vector<pair<int, int>> path = cand_paths[j];
 				cout << "path num: " << path.size() << endl;
 				vector<Point_f> contour1 = prototile_mid.contour_f;
 				vector<Point_f> contour2 = candidate_contours[j];
 				prototile_second = protoTile(contour2);
+				vector<pair<int, int>> path_fea = cand_fea_paths[j];
+
+				//show the path
+				Mat draw = Mat(1000, 1000, CV_8UC3, Scalar(255, 255, 255));
 				Point2f sh = Point2f(300, 500) - center_p(conf_trans(contour1));
 				draw_pair(draw, conf_trans(contour1), conf_trans(contour2), path, sh);
 				imshow("pair  match", draw);
@@ -202,8 +205,6 @@ namespace Tiling_tiles {
 				circle(draw22, prototile_second.contour[prototile_second.feature_points[0]] + shh2, 5, Scalar(0, 125, 255), -1);
 				circle(draw22, prototile_mid.contour[0] + sh, 6, Scalar(25, 200, 25), 2);
 				circle(draw22, prototile_second.contour[0] + shh2, 6, Scalar(25, 200, 25), 2);
-				vector<pair<int, int>> path_fea= cand_fea_paths[j];
-
 				FOR(i, 0, path_fea.size())
 				{
 					//int tsfsize = prototile_second.feature_points.size();
@@ -212,6 +213,7 @@ namespace Tiling_tiles {
 					line(draw22, f1, f2, colorbar[6].second);
 				}
 				imshow("fea match", draw22);
+				//----------show the feature------------
 
 				double con_sc;
 				vector<vector<double>> contour2_tar;
@@ -342,8 +344,8 @@ namespace Tiling_tiles {
 					write_para(para_path, anc_mid_, frame_b);
 					//write_para(para_path, anc_mid, frame_b);
 					//write_para(para_path, handle_area, handle_points);
-					//string command = "D:/vs2015project/Dihedral_new/Dihedral_new/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c; 
-					string command = "D:/vs2015project/ARAP_Deform/x64/Debug/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c;
+					string command = "D:/vs2015project/Dihedral_new/Dihedral_new/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c; 
+					//string command = "D:/vs2015project/ARAP_Deform/x64/Debug/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c;
 					cout << command << endl;
 					system(command.c_str());
 					contour_dst = load_point_file(deformed_c);

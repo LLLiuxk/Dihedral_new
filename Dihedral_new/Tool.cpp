@@ -1979,15 +1979,16 @@ vector<Point2f> triangulate_2Contours(vector<Point2f>& cont1, vector<Point2f>& c
 	//cout << "con_union size: " << con_union[0]<< "   " << con_union.back() << endl;
 	FOR(i, endp2[1], endp2[0] + csize) con_union.push_back(cont2[i%csize]);
 	//cout << "con_union2 size: " << con_union[size1] << "   " << con_union.back() << endl;
-	FOR(i, endp1[0] + 1, endp1[1]) con_intersection.push_back(cont1[i]);
+	//FOR(i, endp1[0] + 1, endp1[1]) con_intersection.push_back(cont1[i]);
 	//cout << "con_intersection size: " << con_intersection[0] << "   " << con_intersection.back() << endl;
-	int ori_num1 = add_points(cont1, 0.1);
-	int ori_num2 = add_points(cont2, 0.1);
-
+	//int ori_num1 = add_points(cont1, 0.1);
+	//int ori_num2 = add_points(cont2, 0.1);
 	con_tri = con_union;
-	con_tri.insert(con_tri.end(), con_intersection.begin(), con_intersection.end());
-	FOR(i, ori_num1, cont1.size())  con_tri.push_back(cont1[i]);
-	FOR(i, ori_num2, cont2.size())  con_tri.push_back(cont2[i]);
+	int ori_num = add_points(con_tri, 0.04);
+
+	//con_tri.insert(con_tri.end(), con_intersection.begin(), con_intersection.end());
+	//FOR(i, ori_num1, cont1.size())  con_tri.push_back(cont1[i]);
+	//FOR(i, ori_num2, cont2.size())  con_tri.push_back(cont2[i]);
 	Point2f cen = center_p(con_tri);
 	// create a Subdiv2D object from the contour
 	cv::Subdiv2D subdiv(Rect(cen.x - 600, cen.y - 600, 1200, 1200)); // change the rectangle size according to your contour
@@ -2062,7 +2063,7 @@ vector<Point2f> triangulate_2Contours(vector<Point2f>& cont1, vector<Point2f>& c
 	draw_contour_points(image_o, con_intersection, Point2f(600, 600) - center_p(con_union), 6, 2);
 	draw_contour_points(image_o, con_tri, Point2f(1200, 600) - center_p(con_union), 5, 2);
 	imshow("two triangle: ", image_o);
-	cout << con_union.size() << "  " << con_intersection.size() << "  " << ori_num1 << "   " << ori_num2 << "  " << con_tri.size() << endl;
+	//cout << con_union.size() << "  " << con_intersection.size() << "  " << ori_num1 << "   " << ori_num2 << "  " << con_tri.size() << endl;
 	return con_tri;
 }
 
