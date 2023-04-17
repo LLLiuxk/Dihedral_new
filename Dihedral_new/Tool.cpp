@@ -2067,6 +2067,154 @@ vector<Point2f> triangulate_2Contours(vector<Point2f>& cont1, vector<Point2f>& c
 	return con_tri;
 }
 
+
+vector<Point2f> triangulate_Contours_bbx(vector<Point2f>& cont1, vector<int> anc1, MatrixXd& V, MatrixXi& F)
+{
+	vector<Point2f> con_tri;
+	vector<Point2f> con_union;
+	vector<Point2f> con_intersection;
+	vector<int> anc_tri;
+	int csize = cont1.size();
+	Point2f line1 = cont1[anc1[2]] - cont1[anc1[0]];
+	Point2f line2 = cont1[anc1[3]] - cont1[anc1[1]];
+	vector<Point2f> shifting;
+	shifting.push_back(line1);
+	shifting.push_back(line1 + line2);
+	shifting.push_back(line2);
+
+	// 提取平移围成的轮廓
+	vector<vector<Point2f>> four_place;
+	four_place.push_back(cont1);
+	for (int i = 0; i < 3; i++)
+	{
+		vector<Point2f> one_loca;
+		for (int j = 0; j < csize; j++)
+		{
+			one_loca.push_back(cont1[j]+ shifting[i]);
+		}
+		four_place.push_back(one_loca);
+	}
+
+	int total_num = 0;
+	for (int i = 0; i < four_place.size(); i++)
+	{
+		anc_tri.push_back(total_num);
+		int s_i = (i + 3) % 4;
+		int e_i = (i + 2) % 4;
+		int t_end = anc1[e_i];
+		if (s_i>e_i)  t_end += csize;
+		for (int t = anc1[s_i]; t < t_end; t++)                   //translation的提取规律为1的4-3, 2的1-4, 3的2-1, 4的3-2
+		{
+			con_tri.push_back(four_place[i][t % csize]);
+			total_num++;
+			//circle(drawing_ttt, four_place[0][t], 2, Scalar(0, 255, 0), -1);
+		}
+	}
+	con_union = con_tri;
+	FOR(g, 0, 4)
+	{
+		cout << anc_tri[g] << "   "<< con_tri[anc_tri[g]]<<endl;
+	}
+	
+	cout << "total_num: " << total_num << endl;
+
+	for (int i = 0; i < four_place.size(); i++)
+	{
+		int s_i = (i + 3) % 4;
+		int e_i = (i + 2) % 4;
+		int ts = anc1[s_i];
+		if (s_i<e_i)  ts += csize;
+		for (int t = ts - 1; t > anc1[e_i]; t--)                   //translation的提取规律为1的4-3, 2的1-4, 3的2-1, 4的3-2
+		{
+			con_intersection.push_back(four_place[i][t % csize]);
+		}
+	}
+	con_tri.insert(con_tri.end(), con_intersection.begin(), con_intersection.end());
+	cout << "total_num2: " << con_tri.size() << endl;
+	for (int i = 0; i < four_place.size(); i++)
+	{
+		int ori_num = add_points(four_place[i], 0.08);
+		FOR(j, ori_num, four_place[i].size())  con_tri.push_back(four_place[i][j]);
+	}
+	int ori_num2 = add_points(con_intersection, 0.08);
+	FOR(j, ori_num2, con_intersection.size())  con_tri.push_back(con_intersection[j]);
+	cout << "total_num3: " << con_tri.size() << endl;
+
+	Point2f cen = center_p(con_tri);
+	// create a Subdiv2D object from the contour
+	cv::Subdiv2D subdiv(Rect(cen.x - 800, cen.y - 800, 1600, 1600)); // change the rectangle size according to your contour
+	for (int i = 0; i < con_tri.size(); i++) {
+		subdiv.insert(con_tri[i]);
+	}
+	//calculate V
+	V.resize(con_tri.size(), 2);
+	for (int m = 0; m < con_tri.size(); m++)
+	{
+		V.row(m) << con_tri[m].x, con_tri[m].y;
+		//cout << "rest: " << V.row(m) << endl;
+	}
+
+	// get the triangle list
+	std::vector<Vec6f> triangleList;
+	subdiv.getTriangleList(triangleList);
+	// convert the triangle list to vertex and face matrices
+	//V.resize(3 * triangleList.size(), 2);
+	F.resize(triangleList.size(), 3);
+	int i = 0;
+	for (auto& t : triangleList) {
+		for (int j = 0; j < 3; j++)
+		{
+			Point2f p(t[2 * j], t[2 * j + 1]);
+			//cout << "tri: " << p.x << "   " << p.y << endl;
+			//uset.emplace(p);
+			auto it = find(con_tri.begin(), con_tri.end(), p);//vertexs.find(p);
+			if (it != con_tri.end()) {
+				//V.row(3 * i + j) << t[2 * j], t[2 * j + 1];
+				F(i, j) = distance(con_tri.begin(), it);
+			}
+			else
+			{
+				//V.row(3 * i + j) << t[2 * j], t[2 * j + 1];
+				F(i, j) = con_tri.size() - 1;
+			}
+		}
+		i++;
+	}
+	cout << "contour.size " << con_tri.size() << "   triangleList.size " << triangleList.size() << "  V and F: " << V.size() << "  " << F.size() << endl;
+	//for (int n = 0; n < F.size() / 3; n++) cout << "n row: "<<F.row(n) << endl;
+	//cout << "triangleList.size(): " << triangleList.size() << "   " << F.size() << endl;
+	// remove triangles outside the contour
+	std::vector<bool> keep(F.rows(), false);
+	for (int i = 0; i < F.rows(); i++) {
+		Vector2d p1 = V.row(F(i, 0));
+		Vector2d p2 = V.row(F(i, 1));
+		Vector2d p3 = V.row(F(i, 2));
+		if (pointPolygonTest(con_union, 1.0 / 3 * (Point2f(p1[0], p1[1]) + Point2f(p2[0], p2[1]) + Point2f(p3[0], p3[1])), false) >= 0) {
+			keep[i] = true;
+		}
+		//if (keep[i]) cout << "true!" << endl;
+	}
+	int numFaces = keep.size() - count(keep.begin(), keep.end(), false);
+	cout << "numFaces: " << numFaces << endl;
+	MatrixXi newF(numFaces, 3);
+	int j = 0;
+	for (int i = 0; i < F.rows(); i++) {
+		if (keep[i]) {
+			newF.row(j) = F.row(i);
+			j++;
+		}
+	}
+	F = newF;
+
+	Mat image_o = Mat(1600, 1600, CV_8UC3, Scalar(255, 255, 255));
+	draw_contour_points(image_o, con_union, Point2f(600, 600) - center_p(con_union), 5, 2);
+	draw_contour_points(image_o, con_intersection, Point2f(600, 600) - center_p(con_union), 6, 2);
+	draw_contour_points(image_o, con_tri, Point2f(1200, 600) - center_p(con_union), 5, 2);
+	imshow("two triangle: ", image_o);
+	return con_tri;
+}
+
+
 int add_points(vector<Point2f>& contour, double sparse_ratio)
 {
 	int add_index = contour.size();
@@ -2077,7 +2225,7 @@ int add_points(vector<Point2f>& contour, double sparse_ratio)
 	double maxy = bbx_p[3].y;
 	double interval_x = sparse_ratio*(maxx - minx);
 	double interval_y = sparse_ratio*(maxy - miny);
-	cout << "bbx:"<<maxx << "   " << maxy<<"  "<< minx<<"   "<< miny << endl;
+	//cout << "bbx:"<<maxx << "   " << maxy<<"  "<< minx<<"   "<< miny << endl;
 	double margin = 0.5*min(interval_x, interval_y);
 	vector<Point2f> new_con;
 	for (double nx = minx + interval_x; nx < maxx; nx += interval_x)
@@ -2114,7 +2262,7 @@ int point_locate(vector<Point2f> con, Point2f p)
 		if (length < thres_len)
 			return i;
 	}
-	cout << "No in the contour!" << endl;
+	cout << "Not in the contour!" << endl;
 	return -1;
 }
 

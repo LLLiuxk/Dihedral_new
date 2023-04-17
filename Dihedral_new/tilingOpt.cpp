@@ -231,6 +231,7 @@ namespace Tiling_tiles {
 				draw_contour_points(draw, conf_trans(contour_2), sh2, 3, 2);
 				imshow("correspond path", draw);
 
+				//calculate two deformed shapes
 				vector<Point_f> con_re;
 				vector<int> anc_mid;
 				vector<int> anc_re;
@@ -240,11 +241,12 @@ namespace Tiling_tiles {
 					if (contour_2[t].type == fixed_p)
 						anc_mid.push_back(t);
 				}
-				Mat draw2 = Mat(1000, 1000, CV_8UC3, Scalar(255, 255, 255));
+				Mat draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
 				if (translation_spec(contour_2, con_re, anc_mid, anc_re, draw2))
 				{
 					cout << "OK! No intersection!" << endl;
 				}
+
 				vector<Point2f> contour_dst = conf_trans(contour_2);
 				vector<Point2f> cont_re = conf_trans(con_re);
 				Mat draw3 = Mat(1000, 1000, CV_8UC3, Scalar(255, 255, 255));
@@ -253,7 +255,9 @@ namespace Tiling_tiles {
 				imshow("2 contours:", draw3);
 				MatrixXd V;
 				MatrixXi F;
-				vector<Point2f> tt = triangulate_2Contours(contour_dst, cont_re,V,F);
+				//vector<Point2f> tt = triangulate_2Contours(contour_dst, cont_re,V,F);
+				//vector<Point2f> tt = triangulate_Contours_bbx(cont_re, anc_re, V, F);
+				vector<Point2f> tt = triangulate_Contours_bbx(contour_dst, anc_mid, V, F);
 				Mat image = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
 				Point stf(0, 600);
 				for (size_t i = 0; i < F.rows(); i++)
@@ -273,7 +277,8 @@ namespace Tiling_tiles {
 				if (pers_trans)
 				{
 					Mat draw_ = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
-					vector<Point2f> frame = { contour_2[anc_mid[0]].point, contour_2[anc_mid[1]].point, contour_2[anc_mid[2]].point, contour_2[anc_mid[3]].point };
+					//vector<Point2f> frame = { contour_2[anc_mid[0]].point, contour_2[anc_mid[1]].point, contour_2[anc_mid[2]].point, contour_2[anc_mid[3]].point };
+					vector<Point2f> frame = { cont_re[anc_re[0]], cont_re[anc_re[1]], cont_re[anc_re[2]], cont_re[anc_re[3]] };
 					int min_type = 0;
 					double min_l = 10000;
 					vector<Point2f> frame_b;
@@ -290,7 +295,13 @@ namespace Tiling_tiles {
 						}
 					}
 					cout << "frame_type: " << frame_type[min_type] << "   " << min_l << endl;
-
+					vector<int> anc_mid_;
+					FOR(g, 0, 4)
+					{
+						cout << "frame[g]: " << frame[g] << endl;
+						anc_mid_.push_back(point_locate(tt, frame[g]));
+					}
+						
 					// 构建handle area
 					//vector<int> handle_area;
 					//vector<Point2f> handle_points;
@@ -333,9 +344,6 @@ namespace Tiling_tiles {
 					////fileout("D:/vs2015project/Dihedral_new/Dihedral_new/mid_shape.txt", con);
 					//int consize = con.size();
 					//triangulateContour(con, V, F);
-					vector<int> anc_mid_;
-					FOR(g, 0, 4)
-						anc_mid_.push_back(point_locate(tt, frame[g]));
 					string parap = ParaPath;
 					string obj_path = parap +"mid_result.obj";
 					string para_path = parap + "deform_para.txt";
@@ -756,8 +764,9 @@ namespace Tiling_tiles {
 		Point2f line2 = contour_s[indexes[3]].point - contour_s[indexes[1]].point;
 		vector<Point2f> shifting;
 		shifting.push_back(line1);
-		shifting.push_back(line2);
 		shifting.push_back(line1 + line2);
+		shifting.push_back(line2);
+		
 		// 提取平移围成的轮廓
 		vector<vector<Point_f>> four_place;
 		four_place.push_back(contour_s);
@@ -782,30 +791,45 @@ namespace Tiling_tiles {
 		int total_num = 0;
 		ex_indexes.swap(vector<int>());
 		extracted.swap(vector<Point_f>());
-		ex_indexes.push_back(0);
-		for (int t = indexes[3]; t > indexes[2]; t--)                   //translation的提取规律为1的4-3,2的1-4,4的2-1,3的3-2
+		//ex_indexes.push_back(0);
+		for (int i = 0; i < four_place.size(); i++)
 		{
-			extracted.push_back(four_place[0][t]);
-			total_num++;
-			//circle(drawing_ttt, four_place[0][t], 2, Scalar(0, 255, 0), -1);
+			ex_indexes.push_back(total_num);
+			int s_i = (i + 3) % 4;
+			int e_i = (i + 2) % 4;
+			int t = indexes[s_i];
+			if (s_i<e_i)  t += csize;
+			for (; t > indexes[e_i]; t--)                   //translation的提取规律为1的4-3, 2的1-4, 3的2-1, 4的3-2
+			{
+				extracted.push_back(four_place[i][t % csize]);
+				total_num++;
+				//circle(drawing_ttt, four_place[0][t], 2, Scalar(0, 255, 0), -1);
+			}
 		}
-		ex_indexes.push_back(total_num);
-		for (int t = indexes[0] + csize; t > indexes[3]; t--)
-		{
-			extracted.push_back(four_place[1][t % csize]);
-			total_num++;
-		}
-		ex_indexes.push_back(total_num);
-		for (int t = indexes[1]; t > indexes[0]; t--)
-		{
-			extracted.push_back(four_place[3][t]);
-			total_num++;
-		}
-		ex_indexes.push_back(total_num);
-		for (int t = indexes[2]; t > indexes[1]; t--)
-		{
-			extracted.push_back(four_place[2][t]);
-		}
+
+		//for (int t = indexes[3]; t > indexes[2]; t--)                   //translation的提取规律为1的4-3, 2的1-4, 3的2-1, 4的3-2
+		//{
+		//	extracted.push_back(four_place[0][t]);
+		//	total_num++;
+		//	//circle(drawing_ttt, four_place[0][t], 2, Scalar(0, 255, 0), -1);
+		//}
+		//ex_indexes.push_back(total_num);
+		//for (int t = indexes[0] + csize; t > indexes[3]; t--)
+		//{
+		//	extracted.push_back(four_place[1][t % csize]);
+		//	total_num++;
+		//}
+		//ex_indexes.push_back(total_num);
+		//for (int t = indexes[1]; t > indexes[0]; t--)
+		//{
+		//	extracted.push_back(four_place[3][t]);
+		//	total_num++;
+		//}
+		//ex_indexes.push_back(total_num);
+		//for (int t = indexes[2]; t > indexes[1]; t--)
+		//{
+		//	extracted.push_back(four_place[2][t]);
+		//}
 		draw_poly(countname, conf_trans(extracted), shift1, 5);
 		imshow(spath, countname);
 		//提取后检测是否自交
