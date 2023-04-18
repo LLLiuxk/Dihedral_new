@@ -438,6 +438,246 @@ namespace Tiling_tiles {
 
 	}
 
+	void Tiling_opt::tiliing_gen_specify2(string nameid, vector<int> anc_points)
+	{
+		load_dataset(false);
+		string filepath = DefaultPath;
+		filepath = filepath + "contour/" + nameid + ".txt";
+		prototile_first = protoTile(filepath);
+		string savepath = SavePath;
+		savepath = savepath.substr(0, savepath.length() - 7) + "result_spe/";
+		savepath += nameid;
+		const char *na = savepath.c_str();
+		if (_access(na, 0) != -1) printf("The  file/dir had been Exisit \n");
+		else	_mkdir(na);
+		vector<int> cand_points = prototile_first.getCandPoints(prototile_first.contour_f);
+		int trans = Tanslation_rule_spec(cand_points, prototile_first.contour_f, savepath, anc_points);
+		//int flips = Flipping_rule(p_p_index, cont_orig, rootname);
+		int all_inner_num = all_inner_conts.size();
+		if (all_inner_num == 0)
+		{
+			std::cout << "no right placement" << endl;
+			return;
+		}
+		FOR(i, 0, 1)
+			//FOR(i, 0, all_inner_num)
+		{
+			match_candidate_(i);
+			//feature_match();
+			for (int j = 0; j < 1; j++)
+			{
+				vector<pair<int, int>> path = cand_paths[j];
+				cout << "path num: " << path.size() << endl;
+				vector<Point_f> contour1 = prototile_mid.contour_f;
+				vector<Point_f> contour2 = candidate_contours[j];
+				prototile_second = protoTile(contour2);
+				vector<pair<int, int>> path_fea = cand_fea_paths[j];
+
+				//show the path
+				Mat draw = Mat(1000, 1000, CV_8UC3, Scalar(255, 255, 255));
+				Point2f sh = Point2f(300, 500) - center_p(conf_trans(contour1));
+				draw_pair(draw, conf_trans(contour1), conf_trans(contour2), path, sh);
+				imshow("pair  match", draw);
+				Point2f shh2 = sh + Point2f(400, 0);
+				Mat draw22 = Mat(1000, 1000, CV_8UC3, Scalar(255, 255, 255));
+				draw_contour_points(draw22, prototile_mid.contour, sh, 5, 2);
+				draw_contour_points(draw22, prototile_second.contour, shh2, 7, 2);
+				FOR(i, 0, prototile_mid.feature_points.size())
+					circle(draw22, prototile_mid.contour[prototile_mid.feature_points[i]] + sh, 3, Scalar(0, 0, 255), -1);
+				FOR(i, 0, prototile_second.feature_points.size())
+					circle(draw22, prototile_second.contour[prototile_second.feature_points[i]] + shh2, 3, Scalar(0, 125, 255), -1);
+				circle(draw22, prototile_mid.contour[prototile_mid.feature_points[0]] + sh, 5, Scalar(120, 0, 255), -1);
+				circle(draw22, prototile_second.contour[prototile_second.feature_points[0]] + shh2, 5, Scalar(0, 125, 255), -1);
+				circle(draw22, prototile_mid.contour[0] + sh, 6, Scalar(25, 200, 25), 2);
+				circle(draw22, prototile_second.contour[0] + shh2, 6, Scalar(25, 200, 25), 2);
+				FOR(i, 0, path_fea.size())
+				{
+					//int tsfsize = prototile_second.feature_points.size();
+					Point2f f1 = prototile_mid.contour[path_fea[i].first] + sh;
+					Point2f f2 = prototile_second.contour[path_fea[i].second] + shh2;
+					line(draw22, f1, f2, colorbar[6].second);
+				}
+				imshow("fea match", draw22);
+				//----------show the feature------------
+
+				double con_sc;
+				vector<vector<double>> contour2_tar;
+				//求contour_对应的point_f和tar值
+				//contour2_tar = computeTAR(contour_, con_sc, 0.5);
+				double angle = 165;
+				double ratio_max = 100;
+				double result_score = 0;
+				double ratio = 0.5;
+				vector<Point_f> contour_2 = morphing(contour1, contour2, path_fea, ratio);
+				cout << "contour_2.size:  " << contour_2.size() << "   " << contour1.size() << endl;
+				//FOR(mm, 0, contour_2.size()) cout << contour_2[mm].type << "   " << contour1[mm].type << endl;
+				//vector<Point_f> contour_2 = morphing_dir(contour1, contour2, path, ratio);
+				Point2f sh2 = Point2f(700, 500) - center_p(conf_trans(contour_2));
+				draw_contour_points(draw, conf_trans(contour_2), sh2, 3, 2);
+				imshow("correspond path", draw);
+
+				//calculate two deformed shapes
+				vector<Point_f> con_re;
+				vector<int> anc_mid;
+				vector<int> anc_re;
+				int csize = contour_2.size();
+				FOR(t, 0, csize)
+				{
+					if (contour_2[t].type == fixed_p)
+						anc_mid.push_back(t);
+				}
+				Mat draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
+				if (translation_spec(contour_2, con_re, anc_mid, anc_re, draw2))
+				{
+					cout << "OK! No intersection!" << endl;
+				}
+
+				vector<Point2f> contour_dst = conf_trans(contour_2);
+				vector<Point2f> cont_re = conf_trans(con_re);
+				Mat draw3 = Mat(1000, 1000, CV_8UC3, Scalar(255, 255, 255));
+				draw_contour_points(draw3, contour_dst, Point2f(600, 600) - center_p(contour_dst), 5, 2);
+				draw_contour_points(draw3, cont_re, Point2f(600, 600) - center_p(contour_dst), 6, 2);
+				imshow("2 contours:", draw3);
+				contour_opt(contour_2, anc_mid);
+				contour_opt(con_re, anc_re);
+
+				draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
+				if (translation_spec(con_re, contour_2, anc_re, anc_mid, draw2))
+				{
+					cout << "OK! No intersection!" << endl;
+				}
+				else cout << "Bad result with intersection!" << endl;
+				protoTile c1, c2;
+				c1.show_contour(conf_trans(con_re), anc_re);
+				c2.show_contour(conf_trans(contour_2), anc_mid);
+				RotationVis(c1, c2, AntiClockWise);
+
+			}
+		}
+
+
+	}
+
+
+	vector<Point_f> Tiling_opt::contour_opt(vector<Point_f> cont, vector<int> anc_p)
+	{
+		vector<Point_f> con_re;
+		vector<Point2f> contour_dst = conf_trans(cont);
+		int csize = contour_dst.size();
+		MatrixXd V;
+		MatrixXi F;
+		//vector<Point2f> tt = triangulate_2Contours(contour_dst, cont_re,V,F);
+		//vector<Point2f> tt = triangulate_Contours_bbx(cont_re, anc_re, V, F);
+		//vector<Point2f> tt = triangulate_Contours_bbx(contour_dst, anc_mid, V, F);
+		vector<Point2f> tt = triangulate_bbx(contour_dst, V, F);
+		Mat image = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
+		Point stf(0, 600);
+		for (size_t i = 0; i < F.rows(); i++)
+		{
+			Point pt1(V.row(F(i, 0)).x(), V.row(F(i, 0)).y());
+			Point pt2(V.row(F(i, 1)).x(), V.row(F(i, 1)).y());
+			Point pt3(V.row(F(i, 2)).x(), V.row(F(i, 2)).y());
+			//cout << F(i, 0) << "   " << F(i, 1) << "   " << F(i, 2) << endl;
+			//cout << pt1 << "    " << pt2 << "   " << pt3 << endl;
+			line(image, pt1 + stf, pt2 + stf, Scalar(0, 255, 0), 1, LINE_AA);
+			line(image, pt2 + stf, pt3 + stf, Scalar(0, 255, 0), 1, LINE_AA);
+			line(image, pt3 + stf, pt1 + stf, Scalar(0, 255, 0), 1, LINE_AA);
+		}
+		//imwrite("Triangulation.png", image);
+		imshow("Triangulation", image);
+		double degree_after_opt = 0;
+		if (pers_trans)
+		{
+			vector<Point2f> frame = { contour_dst[anc_p[0]], contour_dst[anc_p[1]], contour_dst[anc_p[2]], contour_dst[anc_p[3]] };
+			//vector<Point2f> frame = { cont_re[anc_re[0]], cont_re[anc_re[1]], cont_re[anc_re[2]], cont_re[anc_re[3]] };
+			int min_type = 0;
+			double min_l = 10000;
+			vector<Point2f> frame_b;// = base_frame(frame, 0);
+			FOR(f_type, 0, 4)
+			{
+				vector<Point2f> frame_bb = base_frame(frame, f_type);
+				vector<pair<int, int>> path_min = { make_pair(0,0),make_pair(1,1),make_pair(2,2),make_pair(3,3) };
+				double alige_e = conotour_align(frame, frame_bb, path_min);
+				if (alige_e < min_l)
+				{
+					min_l = alige_e;
+					min_type = f_type;
+					frame_b = frame_bb;
+				}
+			}
+			cout << "frame_type: " << frame_type[min_type] << "   " << min_l << endl;
+			vector<int> anc_mid_;
+			FOR(g, 0, 4)
+			{
+				cout << "frame[g]: " << frame[g] << endl;
+				anc_mid_.push_back(point_locate(tt, frame[g]));
+			}
+			// before 
+			Mat draw_ = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
+			Point2f sh1 = Point2f(600, 600) - center_p(contour_dst);
+			draw_contour(draw_, contour_dst, sh1, 5);
+			FOR(m, 0, 4) circle(draw_, frame[m] + sh1, 3, Scalar(125, 0, 0));
+
+			string parap = ParaPath;
+			string obj_path = parap + "mid_result.obj";
+			string para_path = parap + "deform_para.txt";
+			string deformed_c = parap + "deformed_c.txt";
+			write_obj(obj_path, V, F);
+			write_para(para_path, anc_mid_, frame_b);
+			//write_para(para_path, anc_mid, frame_b);
+			//write_para(para_path, handle_area, handle_points);
+			string command = "D:/vs2015project/Dihedral_new/Dihedral_new/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c;
+			//string command = "D:/vs2015project/ARAP_Deform/x64/Debug/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c;
+			cout << command << endl;
+			system(command.c_str());
+			contour_dst = load_point_file(deformed_c);
+			vector<Point2f> con_tem;
+			FOR(m, 0, csize) con_tem.push_back(contour_dst[m]);
+			contour_dst = con_tem;
+
+			draw_contour(draw_, contour_dst, sh1, 8);
+			FOR(m, 0, 4) circle(draw_, frame_b[m] + sh1, 3, Scalar(0, 255, 0));
+			imshow("123123", draw_);
+			// = set_flags(contour_dst, con_re);
+		}
+		/*contour_2 = set_flags(contour_dst, contour_2);
+		Mat draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
+		int first = 0, second = 0;
+		if (self_intersect(contour_dst, first, second)) cout << "Bad  intersection!" << endl;
+		if (translation_spec(contour_2, con_re, anc_mid, anc_re, draw2))
+		{
+		cout << "OK! No intersection!" << endl;
+		}
+		contour_dst = conf_trans(con_re);*/
+		//con_re = set_flags(contour_dst, con_re);
+		if (coll_opt)
+		{
+			//contour_de_crossing(contour_dst);
+			contour_fine_tuning(contour_dst);
+			con_re = set_flags(contour_dst, cont);
+		}
+		if (deve_opt)
+		{
+			vector<Point2f> resam_dst = sampling_ave(contour_dst, contour_dst.size());
+			vector<Point2f> resam_ = { contour_dst[anc_p[0]],contour_dst[anc_p[1]], contour_dst[anc_p[2]], contour_dst[anc_p[3]] };
+			vector<int> anc_re = relocate(resam_, resam_dst);
+			FOR(ii, 0, 4)
+			{
+				resam_dst[anc_re[ii]] = resam_[ii];
+				cout << resam_[ii] << "   " << resam_dst[anc_re[ii]] << endl;
+			}
+
+			degree_after_opt = whole_con_opt(resam_dst, anc_re, 0);
+			//degree_after_opt = whole_con_opt(contour_dst, anc_re, 0);
+			//degree_after_opt = whole_con_opt(contour_dst, anc_mid, 0);
+			cout << "After developable optimation, the collision degree: " << degree_after_opt << endl;
+			vector<Point_f> con_resam;
+			FOR(ii, 0, resam_dst.size()) con_resam.push_back(Point_f(resam_dst[ii], general_p));
+			FOR(jj, 0, anc_re.size()) con_resam[anc_re[jj]].type = fixed_p;
+			con_re = con_resam;
+		}
+	}
+
 	void Tiling_opt::load_dataset(bool input_images)
 	{
 		if (!contour_dataset.empty() || !all_con_tars.empty())
