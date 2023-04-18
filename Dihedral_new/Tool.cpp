@@ -633,6 +633,27 @@ vector<Point2f> sampling_seg(vector<Point2f> &segment, int points_num)
 	return contour_sam;
 }
 
+vector<int> relocate(vector<Point2f> anc_points, vector<Point2f> c2)
+{
+	int con_size = c2.size();
+	vector<int> anc_index2;
+	for (int i = 0; i <anc_points.size(); i++)
+	{
+		int index_ = 0;
+		double dist = 10000;
+		for (int t = 0; t <con_size; t++)
+		{
+			if (length_2p(anc_points[i], c2[t]) < dist)
+			{
+				dist = length_2p(anc_points[i], c2[t]);
+				index_ = t;
+			}
+		}
+		anc_index2.push_back(index_);
+	}
+	return anc_index2;
+}
+
 //bbx
 vector<Point2f> bbx(vector<Point2f> &cont)
 {
@@ -751,6 +772,9 @@ vector<Point2f> base_frame(vector<Point2f> frame, int type)  //two fixed point
 	Point2f shift_ = cen1 - cen2;
 	frame[1] += shift_;
 	frame[3] += shift_;
+	/*Point2f shift_ = cen2 - cen1;
+	frame[0] += shift_;
+	frame[2] += shift_;*/
 	// parallelogram to the end
 	if (type == 1) //rhombus
 	{
@@ -813,6 +837,7 @@ vector<Point2f> base_frame(vector<Point2f> frame, int type)  //two fixed point
 			line(draw, frame[i] + shift, frame[(i + 1) % 4] + shift, Scalar(0, 0, 0), 2);
 		}
 		imshow("frame: " + frame_type[type], draw);
+		imwrite("D:/vs2015project/Dihedral_new/Dihedral_new/frame.png ", draw);
 	}
 	/*cout << "length: " << length_2p(base_points[0], base_points[1]) << "   " << length_2p(base_points[1], base_points[2])
 	<< "   " << length_2p(base_points[2], base_points[3]) << "   " << length_2p(base_points[3], base_points[0]) << endl;
@@ -1676,6 +1701,7 @@ double edge_nd_opt(vector<Point2f>& edge, int type)
 	double edge_colli_score = edge_nd_degree(edge, type);
 	int count = 0;
 	int max_times = 15;
+	int win_width = 0.3*max_times + 1;
 	while (edge_colli_score > 0 && count<max_times)
 	{
 		count++;
@@ -1695,7 +1721,6 @@ double edge_nd_opt(vector<Point2f>& edge, int type)
 					double sin_ = sin_2v(tan_unit, vec_unit);
 					double angle_ = asin(sin_);
 					//cout << tan_unit << "   " << vec_unit <<"  "<< angle_<< endl;
-					int win_width = 0.5*max_times + 1;
 					double max_r = 1.0 / max_times;
 					double ratio = max_r / win_width;
 					FOR(g, 0, win_width)
@@ -1750,6 +1775,9 @@ double whole_con_opt(vector<Point2f>& cont, vector<int>& indexes, int type)
 	}
 	cont = new_c;
 	indexes = new_index;
+	Mat imagefine = Mat(800, 800, CV_8UC3, Scalar(255, 255, 255));
+	draw_contour_points(imagefine, cont, Point2f(400, 400) - center_p(cont), 5, 2);
+	imshow("After contour deployability optimization:", imagefine);
 	return degree_opt;
 }
 
@@ -1820,7 +1848,7 @@ void contour_fine_tuning(vector<Point2f> &contour_)  //过近的优化
 	Mat imagefine = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
 	Point2f shift = Point2f(600, 600) - center_p(contour_);
 	draw_contour_points(imagefine, contour_, shift, 8, 2);
-	int dis_thres = 8;
+	int dis_thres = 6;
 	int win_width = 4;
 	int csize = contour_.size();
 	double con_length = arcLength(contour_, true);
@@ -1870,7 +1898,7 @@ void contour_fine_tuning(vector<Point2f> &contour_)  //过近的优化
 	}
 	draw_contour_points(imagefine, contour_, shift+Point2f(300,300), 9, 2);
 	cout << "fine tuning times: " << iter_times << endl;
-	imshow("contour_dst", imagefine);
+	imshow("After contour fine tuning: ", imagefine);
 }
 
 int triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F)
@@ -2101,36 +2129,32 @@ vector<Point2f> triangulate_Contours_bbx(vector<Point2f>& cont1, vector<int> anc
 		anc_tri.push_back(total_num);
 		int s_i = (i + 3) % 4;
 		int e_i = (i + 2) % 4;
-		int t_end = anc1[e_i];
-		if (s_i>e_i)  t_end += csize;
-		for (int t = anc1[s_i]; t < t_end; t++)                   //translation的提取规律为1的4-3, 2的1-4, 3的2-1, 4的3-2
+		int t = anc1[s_i];
+		if (s_i<e_i)  t += csize;
+		for (; t > anc1[e_i]; t--)                   //translation的提取规律为1的4-3, 2的1-4, 3的2-1, 4的3-2
 		{
-			con_tri.push_back(four_place[i][t % csize]);
 			total_num++;
-			//circle(drawing_ttt, four_place[0][t], 2, Scalar(0, 255, 0), -1);
-		}
-	}
-	con_union = con_tri;
-	FOR(g, 0, 4)
-	{
-		cout << anc_tri[g] << "   "<< con_tri[anc_tri[g]]<<endl;
-	}
-	
-	cout << "total_num: " << total_num << endl;
-
-	for (int i = 0; i < four_place.size(); i++)
-	{
-		int s_i = (i + 3) % 4;
-		int e_i = (i + 2) % 4;
-		int ts = anc1[s_i];
-		if (s_i<e_i)  ts += csize;
-		for (int t = ts - 1; t > anc1[e_i]; t--)                   //translation的提取规律为1的4-3, 2的1-4, 3的2-1, 4的3-2
-		{
 			con_intersection.push_back(four_place[i][t % csize]);
 		}
 	}
-	con_tri.insert(con_tri.end(), con_intersection.begin(), con_intersection.end());
+	cout << "total_num: " << total_num << endl;
+	for (int i = 0; i < four_place.size(); i++)
+	{
+		
+		int s_i = (i + 3) % 4;
+		int e_i = (i + 2) % 4;
+		int t_end = anc1[e_i];
+		if (s_i>e_i)  t_end += csize;
+		for (int t = anc1[s_i] + 1; t < t_end; t++)                   //translation的提取规律为1的4-3, 2的1-4, 3的2-1, 4的3-2
+		{
+			con_union.push_back(four_place[i][t % csize]);
+			//circle(drawing_ttt, four_place[0][t], 2, Scalar(0, 255, 0), -1);
+		}
+	}
+	con_tri = con_intersection;// .insert(con_tri.end(), con_intersection.begin(), con_intersection.end());
+	con_tri.insert(con_tri.end(), con_union.begin(), con_union.end());
 	cout << "total_num2: " << con_tri.size() << endl;
+
 	for (int i = 0; i < four_place.size(); i++)
 	{
 		int ori_num = add_points(four_place[i], 0.08);
@@ -2139,7 +2163,8 @@ vector<Point2f> triangulate_Contours_bbx(vector<Point2f>& cont1, vector<int> anc
 	int ori_num2 = add_points(con_intersection, 0.08);
 	FOR(j, ori_num2, con_intersection.size())  con_tri.push_back(con_intersection[j]);
 	cout << "total_num3: " << con_tri.size() << endl;
-
+	FOR(g, 0, 4)
+		cout << anc_tri[g] << "   " << con_tri[anc_tri[g]] << endl;
 	Point2f cen = center_p(con_tri);
 	// create a Subdiv2D object from the contour
 	cv::Subdiv2D subdiv(Rect(cen.x - 800, cen.y - 800, 1600, 1600)); // change the rectangle size according to your contour
@@ -2214,6 +2239,77 @@ vector<Point2f> triangulate_Contours_bbx(vector<Point2f>& cont1, vector<int> anc
 	return con_tri;
 }
 
+vector<Point2f> triangulate_bbx(vector<Point2f>& cont1, MatrixXd& V, MatrixXi& F)
+{
+	vector<Point2f> con_bbx = bbx(cont1);
+	double width = 20;
+	vector<Point2f> con_tri;// = { con_bbx[0] + Point2f(-width,width), con_bbx[1] + Point2f(-width,-width),con_bbx[2] + Point2f(width,-width),con_bbx[3] + Point2f(width,width) };
+	double minx = con_bbx[1].x - width;
+	double miny = con_bbx[1].y - width;
+	double maxx = con_bbx[3].x + width;
+	double maxy = con_bbx[3].y + width;
+	double interval_x = 0.08*(maxx - minx);
+	double interval_y = 0.08*(maxy - miny);
+	//cout << "bbx:"<<maxx << "   " << maxy<<"  "<< minx<<"   "<< miny << endl;
+	double margin = 0.5*min(interval_x, interval_y);
+	vector<Point2f> new_con;
+	for (double nx = minx; nx < maxx+ interval_x; nx += interval_x)
+	{
+		for (double ny = miny; ny < maxy + interval_y; ny += interval_y)
+		{
+			Point2f new_p(nx, ny);
+			double min_dis = abs(pointPolygonTest(cont1, new_p, true));
+			if (min_dis > margin)
+			{
+				new_con.push_back(new_p);
+			}
+		}
+	}
+	con_tri = cont1;
+	//con_tri.insert(con_tri.end(), cont1.begin(), cont1.end());
+	con_tri.insert(con_tri.end(), new_con.begin(), new_con.end());
+	
+	Point2f cen = center_p(con_tri);
+	// create a Subdiv2D object from the contour
+	cv::Subdiv2D subdiv(Rect(cen.x - 800, cen.y - 800, 1600, 1600)); // change the rectangle size according to your contour
+	for (int i = 0; i < con_tri.size(); i++) {
+		subdiv.insert(con_tri[i]);
+	}
+	//calculate V
+	V.resize(con_tri.size(), 2);
+	for (int m = 0; m < con_tri.size(); m++)
+	{
+		V.row(m) << con_tri[m].x, con_tri[m].y;
+		//cout << "rest: " << V.row(m) << endl;
+	}
+	// get the triangle list
+	std::vector<Vec6f> triangleList;
+	subdiv.getTriangleList(triangleList);
+	F.resize(triangleList.size(), 3);
+	int i = 0;
+	for (auto& t : triangleList) {
+		for (int j = 0; j < 3; j++)
+		{
+			Point2f p(t[2 * j], t[2 * j + 1]);
+			auto it = find(con_tri.begin(), con_tri.end(), p);//vertexs.find(p);
+			if (it != con_tri.end()) {
+				F(i, j) = distance(con_tri.begin(), it);
+			}
+			else
+			{
+				F(i, j) = con_tri.size() - 1;
+			}
+		}
+		i++;
+	}
+	cout << "contour.size " << con_tri.size() << "   triangleList.size " << triangleList.size() << "  V and F: " << V.size() << "  " << F.size() << endl;
+
+	Mat image_o = Mat(800, 800, CV_8UC3, Scalar(255, 255, 255));
+	draw_contour_points(image_o, con_tri, Point2f(600, 600) - center_p(con_tri), 5, 2);
+	draw_contour_points(image_o, cont1, Point2f(600, 600) - center_p(con_tri), 6, 2);
+	imshow("bbx triangle: ", image_o);
+	return con_tri;
+}
 
 int add_points(vector<Point2f>& contour, double sparse_ratio)
 {

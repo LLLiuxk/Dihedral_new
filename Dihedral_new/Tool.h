@@ -47,6 +47,7 @@ vector<int>  cal_feature(vector<Point2f> contour_, int  n_min, int n_max, double
 vector<Point2f> con_sample(vector<Point2f> contour_, vector<int> &feature_, int sam_num, bool show_result = false);
 vector<Point2f> sampling_ave(vector<Point2f> contour_, int points_num);  //points_num是采样点的个数
 vector<Point2f> sampling_seg(vector<Point2f> &segment, int points_num);
+vector<int> relocate(vector<Point2f> anc_points, vector<Point2f> c2);
 
 //bbx
 vector<Point2f> bbx(vector<Point2f> &cont);
@@ -109,6 +110,7 @@ void contour_fine_tuning(vector<Point2f> &contour_);  //过近的优化
 int triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F);
 vector<Point2f> triangulate_2Contours(vector<Point2f>& cont1, vector<Point2f>& cont2, MatrixXd& V, MatrixXi& F);
 vector<Point2f> triangulate_Contours_bbx(vector<Point2f>& cont1, vector<int> anc1, MatrixXd& V, MatrixXi& F);
+vector<Point2f> triangulate_bbx(vector<Point2f>& cont1, MatrixXd& V, MatrixXi& F);
 int add_points(vector<Point2f>& contour, double sparse_ratio);
 int point_locate(vector<Point2f> con, Point2f p);
 

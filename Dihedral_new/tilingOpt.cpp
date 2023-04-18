@@ -257,7 +257,8 @@ namespace Tiling_tiles {
 				MatrixXi F;
 				//vector<Point2f> tt = triangulate_2Contours(contour_dst, cont_re,V,F);
 				//vector<Point2f> tt = triangulate_Contours_bbx(cont_re, anc_re, V, F);
-				vector<Point2f> tt = triangulate_Contours_bbx(contour_dst, anc_mid, V, F);
+				//vector<Point2f> tt = triangulate_Contours_bbx(contour_dst, anc_mid, V, F);
+				vector<Point2f> tt = triangulate_bbx(contour_dst, V, F);
 				Mat image = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
 				Point stf(0, 600);
 				for (size_t i = 0; i < F.rows(); i++)
@@ -276,12 +277,11 @@ namespace Tiling_tiles {
 				double degree_after_opt = 0;
 				if (pers_trans)
 				{
-					Mat draw_ = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
-					//vector<Point2f> frame = { contour_2[anc_mid[0]].point, contour_2[anc_mid[1]].point, contour_2[anc_mid[2]].point, contour_2[anc_mid[3]].point };
-					vector<Point2f> frame = { cont_re[anc_re[0]], cont_re[anc_re[1]], cont_re[anc_re[2]], cont_re[anc_re[3]] };
+					vector<Point2f> frame = { contour_dst[anc_mid[0]], contour_dst[anc_mid[1]], contour_dst[anc_mid[2]], contour_dst[anc_mid[3]] };
+					//vector<Point2f> frame = { cont_re[anc_re[0]], cont_re[anc_re[1]], cont_re[anc_re[2]], cont_re[anc_re[3]] };
 					int min_type = 0;
 					double min_l = 10000;
-					vector<Point2f> frame_b;
+					vector<Point2f> frame_b;// = base_frame(frame, 0);
 					FOR(f_type, 0, 4)
 					{
 						vector<Point2f> frame_bb = base_frame(frame, f_type);
@@ -333,9 +333,9 @@ namespace Tiling_tiles {
 					//	for(auto p: handle_one)
 					//		handle_points.push_back(p);
 					//}
-
-					Point2f sh1(0, 400);
-					draw_contour(draw_, contour_dst, sh1, 5);
+					Mat draw_ = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
+					Point2f sh1=Point2f(600, 600)-center_p(cont_re);
+					draw_contour(draw_, cont_re, sh1, 5);
 					FOR(m, 0, 4) circle(draw_, frame[m] + sh1, 3, Scalar(125, 0, 0));
 					//
 					//MatrixXd V;
@@ -344,6 +344,13 @@ namespace Tiling_tiles {
 					////fileout("D:/vs2015project/Dihedral_new/Dihedral_new/mid_shape.txt", con);
 					//int consize = con.size();
 					//triangulateContour(con, V, F);
+
+					//vector<Point2f> ttt = { tt[0],tt[1],tt[2],tt[3] };
+					//Mat rot_mat = getPerspectiveTransform(frame, frame_b);// getAffineTransform(frame_1, frame_b_1);
+					//perspectiveTransform(ttt, frame_b, rot_mat);
+					/*vector<int> amid_ = { anc_mid_[0] + 4,anc_mid_[1] + 4,anc_mid_[2] + 4,anc_mid_[3] + 4 };
+					anc_mid_ = amid_;*/
+
 					string parap = ParaPath;
 					string obj_path = parap +"mid_result.obj";
 					string para_path = parap + "deform_para.txt";
@@ -358,13 +365,13 @@ namespace Tiling_tiles {
 					system(command.c_str());
 					contour_dst = load_point_file(deformed_c);
 					vector<Point2f> con_tem;
-					//FOR(m, 0, consize) con_tem.push_back(contour_dst[m]);
-					//contour_dst = con_tem;
+					FOR(m, 0, csize) con_tem.push_back(contour_dst[m]);
+					contour_dst = con_tem;
 
 					draw_contour(draw_, contour_dst, sh1, 8);
 					FOR(m, 0, 4) circle(draw_, frame_b[m] + sh1, 3, Scalar(0, 255, 0));
 					imshow("123123", draw_);
-
+					con_re = set_flags(contour_dst, con_re);
 					//Mat draw_ = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
 					//vector<Point2f> frame = { contour_2[anc_mid[0]].point, contour_2[anc_mid[1]].point, contour_2[anc_mid[2]].point, contour_2[anc_mid[3]].point };
 					//vector<Point2f> frame_b = base_frame(frame, 0);
@@ -386,28 +393,44 @@ namespace Tiling_tiles {
 					cout << "OK! No intersection!" << endl;
 				}
 				contour_dst = conf_trans(con_re);*/
-				//if (coll_opt)
-				//{
-				//	//contour_de_crossing(contour_dst);
-				//	contour_fine_tuning(contour_dst);
-				//}
-				//if (deve_opt)
-				//{
-				//	degree_after_opt = whole_con_opt(contour_dst, anc_re, 0);
-				//	//degree_after_opt = whole_con_opt(contour_dst, anc_mid, 0);
-				//	cout << "After developable optimation, the collision degree: " << degree_after_opt << endl;
-				//}
 				//con_re = set_flags(contour_dst, con_re);
-				//draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
-				//if (translation_spec(con_re, contour_2, anc_re, anc_mid, draw2))
-				//{
-				//	cout << "OK! No intersection!" << endl;
-				//}			
-				//else cout << "Bad result with intersection!" << endl;
-				//protoTile c1, c2;
-				//c1.show_contour(conf_trans(con_re), anc_re);
-				//c2.show_contour(conf_trans(contour_2), anc_mid);
-				//RotationVis(c1, c2, AntiClockWise);
+				if (coll_opt)
+				{
+					//contour_de_crossing(contour_dst);
+					contour_fine_tuning(contour_dst);
+					con_re = set_flags(contour_dst, con_re);
+				}
+				if (deve_opt)
+				{
+					vector<Point2f> resam_dst = sampling_ave(contour_dst, contour_dst.size());
+					vector<Point2f> resam_ = { contour_dst[anc_re[0]],contour_dst[anc_re[1]], contour_dst[anc_re[2]], contour_dst[anc_re[3]] };
+					anc_re = relocate(resam_, resam_dst);
+					FOR(ii, 0, 4) 
+					{
+						resam_dst[anc_re[ii]] = resam_[ii];
+						cout << resam_[ii] << "   " << resam_dst[anc_re[ii]] << endl;
+					}
+
+					degree_after_opt = whole_con_opt(resam_dst, anc_re, 0);
+					//degree_after_opt = whole_con_opt(contour_dst, anc_re, 0);
+					//degree_after_opt = whole_con_opt(contour_dst, anc_mid, 0);
+					cout << "After developable optimation, the collision degree: " << degree_after_opt << endl;
+					vector<Point_f> con_resam;
+					FOR(ii, 0, resam_dst.size()) con_resam.push_back(Point_f(resam_dst[ii], general_p));
+					FOR(jj, 0, anc_re.size()) con_resam[anc_re[jj]].type = fixed_p;
+					con_re = con_resam;
+				}
+				
+				draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
+				if (translation_spec(con_re, contour_2, anc_re, anc_mid, draw2))
+				{
+					cout << "OK! No intersection!" << endl;
+				}			
+				else cout << "Bad result with intersection!" << endl;
+				protoTile c1, c2;
+				c1.show_contour(conf_trans(con_re), anc_re);
+				c2.show_contour(conf_trans(contour_2), anc_mid);
+				RotationVis(c1, c2, AntiClockWise);
 
 			}
 		}
@@ -485,6 +508,7 @@ namespace Tiling_tiles {
 		//
 		cout << "c1: "<<c1.contour.size() << c1.contour[0] << " " << c1.contour[1] << " " << c1.contour[2] << " " << c1.contour[3]<<  endl;
 		cout << "c2: "<<c2.contour.size() << c2.contour[0] << " " << c2.contour[1] << " " << c2.contour[2] << " " << c2.contour[3] << endl;
+		int rot_deg = 46;
 		int count = 10;
 		while (count > 0)
 		{
@@ -502,7 +526,7 @@ namespace Tiling_tiles {
 			if (Clock_order == ClockWise)
 			{
 				cout << "ClockWise" << endl;
-				for (int degree = 0; degree < 91; degree += 2)
+				for (int degree = 0; degree < rot_deg; degree += 2)
 				{
 					Mat drawing = Mat(draw_row, draw_col, CV_8UC3, Scalar(255, 255, 255));
 					vector<Point2f> c1_r = Rotate_contour(c1.contour, c1.contour[c1.anchor_points[1]], -degree);
@@ -526,7 +550,7 @@ namespace Tiling_tiles {
 			else if (Clock_order == AntiClockWise)
 			{
 				cout << "AntiClockWise" << endl;
-				for (int degree = 0; degree < 91; degree += 2)
+				for (int degree = 0; degree < rot_deg; degree += 2)
 				{
 					Mat drawing = Mat(draw_row, draw_col, CV_8UC3, Scalar(255, 255, 255));
 					vector<Point2f> c1_r = Rotate_contour(c1.contour, c1.contour[c1.anchor_points[0]], degree);
