@@ -546,6 +546,14 @@ namespace Tiling_tiles {
 				Point2f shift = contour_2[anc_mid[3]].point - con_re[anc_re[0]].point;
 				FOR(ii, 0, contour_2.size()) con_re[ii].point += shift;
 				merge_contours(contour_2, con_re, anc_mid, anc_re);
+				contour_dst = conf_trans(contour_2);
+				double degree_after_opt = whole_con_opt(contour_dst, anc_mid, 0);
+				contour_2 = set_flags(contour_dst, contour_2);
+				Mat draw222 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
+				if (translation_spec(contour_2, con_re, anc_mid, anc_re, draw222))
+				{
+					cout << "OK! No intersection!" << endl;
+				}
 
 				draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
 				draw_contour_points(draw2, conf_trans(contour_2), OP);
@@ -1918,9 +1926,11 @@ namespace Tiling_tiles {
 		vector<Point_f> c1_;
 		vector<Point_f> c2_;
 		vector<vector<Point_f>> c2_segs(4, vector<Point_f>());
+		double degree_opt = 0;
 		FOR(i, 0, 4)
 		{
-			vector<Point_f> each_seg;
+			vector<Point_f> each_seg; 
+			vector<Point2f> each_seg_;
 			int seg_size = c1_seg[i].size();
 			//cout << i << "  " << seg_size << "  " << c2_seg[(i + 2) % 4].size() << endl;
 			Point2f start1 = c1_seg[i][0].point;
@@ -1929,8 +1939,11 @@ namespace Tiling_tiles {
 			FOR(j, 0, seg_size)
 			{
 				Point2f mid = 0.5*(c1_seg[i][j].point + c2_seg[(i + 2) % 4][j].point + sh_);
+				//each_seg_.push_back(mid);
 				each_seg.push_back(Point_f(mid, general_p));
 			}
+			//degree_opt += edge_nd_opt(each_seg_, 0);
+			//for (auto p : each_seg_) each_seg.push_back(Point_f(p, general_p));
 			FOR(m, 0, each_seg.size() - 1)
 			{
 				c1_.push_back(each_seg[m]);
