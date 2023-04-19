@@ -541,6 +541,9 @@ namespace Tiling_tiles {
 				contour_2 = contour_opt(contour_2, anc_mid, 1);
 				con_re = contour_opt(con_re, anc_re, 1);
 				cout << "size: "<<contour_2.size() << "  " << con_re.size() << endl;
+				//将两个轮廓对齐
+				Point2f shift = contour_2[anc_mid[3]].point - con_re[anc_re[0]].point;
+				FOR(ii, 0, contour_2.size()) con_re[ii].point += shift;
 				merge_contours(contour_2, con_re, anc_mid, anc_re);
 				draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
 				draw_contour_points(draw2, conf_trans(contour_2), OP);
