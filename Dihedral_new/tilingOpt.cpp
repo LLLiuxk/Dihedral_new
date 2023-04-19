@@ -538,15 +538,20 @@ namespace Tiling_tiles {
 				draw_contour_points(draw3, contour_dst, Point2f(600, 600) - center_p(contour_dst), 5, 2);
 				draw_contour_points(draw3, cont_re, Point2f(600, 600) - center_p(contour_dst), 6, 2);
 				imshow("2 contours:", draw3);
-				contour_opt(contour_2, anc_mid);
-				contour_opt(con_re, anc_re);
-
+				contour_2 = contour_opt(contour_2, anc_mid, 1);
+				con_re = contour_opt(con_re, anc_re, 1);
+				cout << "size: "<<contour_2.size() << "  " << con_re.size() << endl;
+				merge_contours(contour_2, con_re, anc_mid, anc_re);
 				draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
-				if (translation_spec(con_re, contour_2, anc_re, anc_mid, draw2))
+				draw_contour_points(draw2, conf_trans(contour_2), OP);
+				draw_contour_points(draw2, conf_trans(con_re), OP,4);
+				FOR(cc, 0, 4)
 				{
-					cout << "OK! No intersection!" << endl;
+					circle(draw2, contour_2[anc_mid[cc]].point, 2, Scalar(0, 0, 255));
+					circle(draw2, con_re[anc_re[cc]].point, 2, Scalar(0, 0, 255));
 				}
-				else cout << "Bad result with intersection!" << endl;
+				imshow("after: ", draw2);
+				
 				protoTile c1, c2;
 				c1.show_contour(conf_trans(con_re), anc_re);
 				c2.show_contour(conf_trans(contour_2), anc_mid);
@@ -554,22 +559,23 @@ namespace Tiling_tiles {
 
 			}
 		}
-
-
 	}
 
 
-	vector<Point_f> Tiling_opt::contour_opt(vector<Point_f> cont, vector<int> anc_p)
+	vector<Point_f> Tiling_opt::contour_opt(vector<Point_f> cont, vector<int> anc_p, int type, bool pers_trans , bool coll_opt, bool deve_opt) //type: 0=contours bbx; 1: square bbx
 	{
 		vector<Point_f> con_re;
 		vector<Point2f> contour_dst = conf_trans(cont);
 		int csize = contour_dst.size();
 		MatrixXd V;
 		MatrixXi F;
-		//vector<Point2f> tt = triangulate_2Contours(contour_dst, cont_re,V,F);
 		//vector<Point2f> tt = triangulate_Contours_bbx(cont_re, anc_re, V, F);
 		//vector<Point2f> tt = triangulate_Contours_bbx(contour_dst, anc_mid, V, F);
-		vector<Point2f> tt = triangulate_bbx(contour_dst, V, F);
+		vector<Point2f> tt;
+		if(type==0)
+			tt= triangulate_Contours_bbx(contour_dst, anc_p, V, F);
+		else if(type==1)
+			tt = triangulate_bbx(contour_dst, V, F);
 		Mat image = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
 		Point stf(0, 600);
 		for (size_t i = 0; i < F.rows(); i++)
@@ -590,9 +596,14 @@ namespace Tiling_tiles {
 		{
 			vector<Point2f> frame = { contour_dst[anc_p[0]], contour_dst[anc_p[1]], contour_dst[anc_p[2]], contour_dst[anc_p[3]] };
 			//vector<Point2f> frame = { cont_re[anc_re[0]], cont_re[anc_re[1]], cont_re[anc_re[2]], cont_re[anc_re[3]] };
+			if (type == 0)
+			{
+				Point2f sh1 = frame[3] - frame[0];
+				FOR(n, 0, 4) frame[n] += sh1;
+			}
 			int min_type = 0;
 			double min_l = 10000;
-			vector<Point2f> frame_b;// = base_frame(frame, 0);
+			vector<Point2f> frame_b = base_frame(frame, 0);
 			FOR(f_type, 0, 4)
 			{
 				vector<Point2f> frame_bb = base_frame(frame, f_type);
@@ -634,11 +645,11 @@ namespace Tiling_tiles {
 			vector<Point2f> con_tem;
 			FOR(m, 0, csize) con_tem.push_back(contour_dst[m]);
 			contour_dst = con_tem;
-
+			//cout << "csize " << csize << "  "<<contour_dst.size() << endl;
 			draw_contour(draw_, contour_dst, sh1, 8);
 			FOR(m, 0, 4) circle(draw_, frame_b[m] + sh1, 3, Scalar(0, 255, 0));
 			imshow("123123", draw_);
-			// = set_flags(contour_dst, con_re);
+			con_re = set_flags(contour_dst, cont);
 		}
 		/*contour_2 = set_flags(contour_dst, contour_2);
 		Mat draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
@@ -676,6 +687,7 @@ namespace Tiling_tiles {
 			FOR(jj, 0, anc_re.size()) con_resam[anc_re[jj]].type = fixed_p;
 			con_re = con_resam;
 		}
+		return con_re;
 	}
 
 	void Tiling_opt::load_dataset(bool input_images)
@@ -1863,4 +1875,43 @@ namespace Tiling_tiles {
 		cout << "final_mid size: " << final_mid.size() << endl;
 		return prototile_fin.contour_f;
 	}
+
+	void Tiling_opt::merge_contours(vector<Point_f> c1, vector<Point_f> c2, vector<int> anc1, vector<int> anc2)
+	{
+		int cnum1 = c1.size();
+		if (c2.size() != cnum1)
+			cout << "Cannot merge for different size" << endl;
+		//将两个轮廓分段存储
+		vector<vector<Point_f>> c1_seg;
+		vector<vector<Point_f>> c2_seg;
+		vector<Point_f> final_con;
+		for (int g = 0; g < anc1.size(); g++)
+		{
+			vector<Point_f> c_seg1;
+			int s_index1 = anc1[g];
+			int e_index1 = anc1[(g + 1) % anc1.size()];
+			e_index1 > s_index1 ? e_index1 : e_index1 += cnum1;
+			//e_index1 = e_index1 + (e_index1 > s_index1 ? 0 : cnum1);
+			for (int n = s_index1; n <= e_index1; n++)
+				c_seg1.push_back(c1[n%cnum1]);
+			c1_seg.push_back(c_seg1);
+			cout << g << "  " << c_seg1.size() << "  " << c_seg1[0].point << "  " << c_seg1.back().point << endl;
+		}
+		for (int g = 0; g < anc2.size(); g++)
+		{
+			vector<Point_f> c_seg2;
+			//cout << final_pair[g].first << "  :  " << final_pair[g].second << endl;
+			int s_index2 = anc2[g];
+			int e_index2 = anc2[(g + 1) % anc2.size()];
+			e_index2> s_index2 ? e_index2 : e_index2 += cnum1;
+			for (int n = e_index2; n >= s_index2; n--)
+				c_seg2.push_back(c2[n%cnum1]);
+			c2_seg.push_back(c_seg2);
+			cout << g << "  " << c_seg2.size() << "  " << c_seg2[0].point << "  " << c_seg2.back().point << endl;
+		}
+
+
+	}
+
+
 }
