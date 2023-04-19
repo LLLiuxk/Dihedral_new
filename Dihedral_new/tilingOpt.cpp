@@ -539,8 +539,8 @@ namespace Tiling_tiles {
 				draw_contour_points(draw3, cont_re, Point2f(600, 600) - center_p(contour_dst), 6, 2);
 				imshow("2 contours:", draw3);
 
-				contour_2 = contour_opt(contour_2, anc_mid, 1, 1, 1, 1);
-				con_re = contour_opt(con_re, anc_re, 1, 1, 1, 1);
+				contour_2 = contour_opt(contour_2, anc_mid, 1, 0, 1, 1, 1);
+				con_re = contour_opt(con_re, anc_re, 1, 1, 1, 1, 1);
 				cout << "size: "<<contour_2.size() << "  " << con_re.size() << endl;
 				//将两个轮廓对齐
 				Point2f shift = contour_2[anc_mid[3]].point - con_re[anc_re[0]].point;
@@ -575,7 +575,7 @@ namespace Tiling_tiles {
 	}
 
 
-	vector<Point_f> Tiling_opt::contour_opt(vector<Point_f> cont, vector<int> anc_p, int type, bool pers_trans , bool coll_opt, bool deve_opt) //type: 0=contours bbx; 1: square bbx
+	vector<Point_f> Tiling_opt::contour_opt(vector<Point_f> cont, vector<int> anc_p, int type, int times, bool pers_trans , bool coll_opt, bool deve_opt) //type: 0=contours bbx; 1: square bbx
 	{
 		vector<Point_f> con_re;
 		vector<Point2f> contour_dst = conf_trans(cont);
@@ -650,7 +650,7 @@ namespace Tiling_tiles {
 			write_para(para_path, anc_mid_, frame_b);
 			//write_para(para_path, anc_mid, frame_b);
 			//write_para(para_path, handle_area, handle_points);
-			string command = "D:/vs2015project/Dihedral_new/Dihedral_new/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c;
+			string command = "D:/vs2015project/Dihedral_new/Dihedral_new/ARAP_Deform.exe  " + to_string(times) + "  " + obj_path + "  " + para_path + " " + deformed_c;
 			//string command = "D:/vs2015project/ARAP_Deform/x64/Debug/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c;
 			cout << command << endl;
 			system(command.c_str());
