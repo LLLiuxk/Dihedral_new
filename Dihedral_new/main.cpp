@@ -26,8 +26,8 @@ int main()
 	}
 	if (f == 1) //specify
 	{
-		vector<int> anc_points = { 0,8,19,28 }; // 44:6,19,24,31    71:4,14,22,32    70: 0,8,19,28    192: 0,9,18,27
-		tiling.tiliing_gen_specify2("70", anc_points);
+		vector<int> anc_points = { 4,14,22,32 }; // 44:6,19,24,31    71:4,14,22,32    70: 0,8,19,28    192: 0,9,18,27
+		tiling.tiliing_gen_specify2("71", anc_points);
 
 
 	}

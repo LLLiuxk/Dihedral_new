@@ -538,13 +538,15 @@ namespace Tiling_tiles {
 				draw_contour_points(draw3, contour_dst, Point2f(600, 600) - center_p(contour_dst), 5, 2);
 				draw_contour_points(draw3, cont_re, Point2f(600, 600) - center_p(contour_dst), 6, 2);
 				imshow("2 contours:", draw3);
-				contour_2 = contour_opt(contour_2, anc_mid, 1);
-				con_re = contour_opt(con_re, anc_re, 1);
+
+				contour_2 = contour_opt(contour_2, anc_mid, 1, 1, 1, 1);
+				con_re = contour_opt(con_re, anc_re, 1, 1, 1, 1);
 				cout << "size: "<<contour_2.size() << "  " << con_re.size() << endl;
 				//将两个轮廓对齐
 				Point2f shift = contour_2[anc_mid[3]].point - con_re[anc_re[0]].point;
 				FOR(ii, 0, contour_2.size()) con_re[ii].point += shift;
 				merge_contours(contour_2, con_re, anc_mid, anc_re);
+
 				draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
 				draw_contour_points(draw2, conf_trans(contour_2), OP);
 				draw_contour_points(draw2, conf_trans(con_re), OP,4);
@@ -672,7 +674,7 @@ namespace Tiling_tiles {
 		}
 		if (deve_opt)
 		{
-			vector<Point2f> resam_dst = sampling_ave(contour_dst, contour_dst.size());
+			/*vector<Point2f> resam_dst = sampling_ave(contour_dst, contour_dst.size());
 			vector<Point2f> resam_ = { contour_dst[anc_p[0]],contour_dst[anc_p[1]], contour_dst[anc_p[2]], contour_dst[anc_p[3]] };
 			vector<int> anc_re = relocate(resam_, resam_dst);
 			FOR(ii, 0, 4)
@@ -680,15 +682,16 @@ namespace Tiling_tiles {
 				resam_dst[anc_re[ii]] = resam_[ii];
 				cout << resam_[ii] << "   " << resam_dst[anc_re[ii]] << endl;
 			}
-
-			degree_after_opt = whole_con_opt(resam_dst, anc_re, 0);
-			//degree_after_opt = whole_con_opt(contour_dst, anc_re, 0);
+*/
+			//degree_after_opt = whole_con_opt(resam_dst, anc_re, 0);
+			degree_after_opt = whole_con_opt(contour_dst, anc_p, 0);
+			con_re = set_flags(contour_dst, cont);
 			//degree_after_opt = whole_con_opt(contour_dst, anc_mid, 0);
 			cout << "After developable optimation, the collision degree: " << degree_after_opt << endl;
-			vector<Point_f> con_resam;
+			/*vector<Point_f> con_resam;
 			FOR(ii, 0, resam_dst.size()) con_resam.push_back(Point_f(resam_dst[ii], general_p));
 			FOR(jj, 0, anc_re.size()) con_resam[anc_re[jj]].type = fixed_p;
-			con_re = con_resam;
+			con_re = con_resam;*/
 		}
 		return con_re;
 	}
@@ -1879,7 +1882,7 @@ namespace Tiling_tiles {
 		return prototile_fin.contour_f;
 	}
 
-	void Tiling_opt::merge_contours(vector<Point_f> c1, vector<Point_f> c2, vector<int> anc1, vector<int> anc2)
+	void Tiling_opt::merge_contours(vector<Point_f>& c1, vector<Point_f> &c2, vector<int> &anc1, vector<int> &anc2)
 	{
 		int cnum1 = c1.size();
 		if (c2.size() != cnum1)
@@ -1898,7 +1901,7 @@ namespace Tiling_tiles {
 			for (int n = s_index1; n <= e_index1; n++)
 				c_seg1.push_back(c1[n%cnum1]);
 			c1_seg.push_back(c_seg1);
-			cout << g << "  " << c_seg1.size() << "  " << c_seg1[0].point << "  " << c_seg1.back().point << endl;
+			//cout << g << "  " << c_seg1.size() << "  " << c_seg1[0].point << "  " << c_seg1.back().point << endl;
 		}
 		for (int g = 0; g < anc2.size(); g++)
 		{
@@ -1910,10 +1913,39 @@ namespace Tiling_tiles {
 			for (int n = e_index2; n >= s_index2; n--)
 				c_seg2.push_back(c2[n%cnum1]);
 			c2_seg.push_back(c_seg2);
-			cout << g << "  " << c_seg2.size() << "  " << c_seg2[0].point << "  " << c_seg2.back().point << endl;
+			//cout << g << "  " << c_seg2.size() << "  " << c_seg2[0].point << "  " << c_seg2.back().point << endl;
 		}
-
-
+		vector<Point_f> c1_;
+		vector<Point_f> c2_;
+		vector<vector<Point_f>> c2_segs(4, vector<Point_f>());
+		FOR(i, 0, 4)
+		{
+			vector<Point_f> each_seg;
+			int seg_size = c1_seg[i].size();
+			//cout << i << "  " << seg_size << "  " << c2_seg[(i + 2) % 4].size() << endl;
+			Point2f start1 = c1_seg[i][0].point;
+			Point2f start2 = c2_seg[(i + 2) % 4][0].point;
+			Point2f sh_ = start1 - start2;
+			FOR(j, 0, seg_size)
+			{
+				Point2f mid = 0.5*(c1_seg[i][j].point + c2_seg[(i + 2) % 4][j].point + sh_);
+				each_seg.push_back(Point_f(mid, general_p));
+			}
+			FOR(m, 0, each_seg.size() - 1)
+			{
+				c1_.push_back(each_seg[m]);
+				Point2f c2_p = each_seg[each_seg.size() - 1 - m].point - sh_;
+				c2_segs[(i + 2) % 4].push_back(Point_f(c2_p, general_p));
+			}
+		}
+		FOR(n, 0, 4)
+		{
+			for (auto p : c2_segs[n])
+				c2_.push_back(p);
+		}
+		c1 = c1_;
+		c2 = c2_;
+		//cout << c1.size() << "  " << c2.size() << endl;
 	}
 
 

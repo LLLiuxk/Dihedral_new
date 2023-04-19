@@ -159,7 +159,7 @@ namespace Tiling_tiles {
 		vector<Point_f> morphing(vector<Point_f> contour1, vector<Point_f> contour2, vector<pair<int, int>> final_pair, double ratio);
 		vector<Point_f> morph_segment(vector<Point_f> seg1, vector<Point_f> seg2, Point_f start, double ratio, double &num_error); //start 是上一个的尾端，是固定的
 		vector<Point_f> morphing_dir(vector<Point_f> c_mid, vector<Point_f> c_cand, vector<pair<int, int>> path, double ratio);
-		void merge_contours(vector<Point_f> c1, vector<Point_f> c2, vector<int> anc1, vector<int> anc2);
+		void merge_contours(vector<Point_f> &c1, vector<Point_f> &c2, vector<int>& anc1, vector<int>& anc2);
 
 	public:
 		//double dis[202][202];//两组点之间的坐标差异
