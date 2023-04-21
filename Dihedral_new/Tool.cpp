@@ -1022,7 +1022,7 @@ vector<Point2f> poly_poly(vector<Point2f> contour, vector<Point2f> contour_)
 		vector<Point2f> interp = line_polygon(contour[i], contour[(i + 1) % contsize], contour_);
 		if (!interp.empty())
 		{
-			cout << "interp: "<<interp << "   " << i << "   " << contour[i] << "   " << contour[(i + 1) % contsize] << endl;
+			//cout << "interp: "<<interp << "   " << i << "   " << contour[i] << "   " << contour[(i + 1) % contsize] << endl;
 			for (int j = 0; j < interp.size(); j++)
 			{
 				int f = 0;
@@ -1742,6 +1742,12 @@ double edge_nd_opt(vector<Point2f>& edge, int type)
 		}
 		edge_colli_score = edge_nd_degree(edge, type);
 		//cout << "count: " << count << endl;
+	}
+	if (type == 1)
+	{
+		vector<Point2f> edge_r;
+		for (int t = esize - 1; t >= 0; t--) edge_r.push_back(edge[t]);
+		edge.swap(edge_r);
 	}
 	return edge_colli_score;
 }

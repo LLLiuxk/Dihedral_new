@@ -546,14 +546,34 @@ namespace Tiling_tiles {
 				Point2f shift = contour_2[anc_mid[3]].point - con_re[anc_re[0]].point;
 				FOR(ii, 0, contour_2.size()) con_re[ii].point += shift;
 				merge_contours(contour_2, con_re, anc_mid, anc_re);
-				contour_dst = conf_trans(contour_2);
-				double degree_after_opt = whole_con_opt(contour_dst, anc_mid, 0);
-				contour_2 = set_flags(contour_dst, contour_2);
+				/*contour_dst = conf_trans(contour_2);
+				Mat draw2222 = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
+				draw_contour_points(draw2222, contour_dst, Point2f(600, 600) - center_p(contour_dst), 4);
+				double degree_after_opt = whole_con_opt(contour_dst, anc_mid, 1);
+				draw_contour_points(draw2222, contour_dst, Point2f(600, 600) - center_p(contour_dst), 5);
+				imshow("final opt:",draw2222);*/
+				/*con_re = set_flags(contour_dst, con_re);
+				Mat draw222 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
+				if (translation_spec(con_re, contour_2,  anc_re, anc_mid, draw222))
+				{
+					cout << "OK! No intersection!" << endl;
+				}
+
+				draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
+				draw_contour_points(draw2, conf_trans(contour_2), OP);
+				draw_contour_points(draw2, conf_trans(con_re), OP, 4);
+				FOR(cc, 0, 4)
+				{
+					circle(draw2, contour_2[anc_mid[cc]].point, 2, Scalar(0, 0, 255));
+					circle(draw2, con_re[anc_re[cc]].point, 2, Scalar(0, 0, 255));
+				}
+				imshow("after: ", draw2);*/
+				/*contour_2 = set_flags(contour_dst, contour_2);
 				Mat draw222 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
 				if (translation_spec(contour_2, con_re, anc_mid, anc_re, draw222))
 				{
 					cout << "OK! No intersection!" << endl;
-				}
+				}*/
 
 				draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
 				draw_contour_points(draw2, conf_trans(contour_2), OP);
@@ -1939,11 +1959,11 @@ namespace Tiling_tiles {
 			FOR(j, 0, seg_size)
 			{
 				Point2f mid = 0.5*(c1_seg[i][j].point + c2_seg[(i + 2) % 4][j].point + sh_);
-				//each_seg_.push_back(mid);
-				each_seg.push_back(Point_f(mid, general_p));
+				each_seg_.push_back(mid);
+				//each_seg.push_back(Point_f(mid, general_p));
 			}
-			//degree_opt += edge_nd_opt(each_seg_, 0);
-			//for (auto p : each_seg_) each_seg.push_back(Point_f(p, general_p));
+			degree_opt += edge_nd_opt(each_seg_, 1);
+			for (auto p : each_seg_) each_seg.push_back(Point_f(p, general_p));
 			FOR(m, 0, each_seg.size() - 1)
 			{
 				c1_.push_back(each_seg[m]);

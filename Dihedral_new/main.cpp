@@ -14,11 +14,11 @@ int main()
 	start = clock();
 	Tiling_opt tiling;
 	
-	int f = 1;
+	int f = 0;
 
 	if (f == 0)
 	{
-		bool control_parameter = false;
+		bool control_parameter = true;
 		if (control_parameter)  tiling.load_para("para.txt");
 		else image_id = "192";
 		tiling.tiliing_generation(image_id);
@@ -26,8 +26,8 @@ int main()
 	}
 	if (f == 1) //specify
 	{
-		vector<int> anc_points = { 6,12,23,31 }; // 44:6,19,24,31    71:4,14,22,32    70: 0,8,19,28    192: 0,9,18,27   157:6,12,23,31
-		tiling.tiliing_gen_specify2("157", anc_points);
+		vector<int> anc_points = { 4,14,22,32 }; // 44:6,19,24,31    71:4,14,22,32    70: 0,8,19,28    192: 0,9,18,27   157:6,12,23,31
+		tiling.tiliing_gen_specify2("71", anc_points);
 
 
 	}
