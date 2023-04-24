@@ -107,8 +107,11 @@ void progress_bar(double index, double total)
 Point2f center_p(vector<Point2f> contour_)
 {
 	//利用轮廓的矩
-	Moments mu = moments(contour_);
-	return Point2f(mu.m10 / mu.m00, mu.m01 / mu.m00);
+	/*Moments mu = moments(contour_);
+	return Point2f(mu.m10 / mu.m00, mu.m01 / mu.m00);*/
+	Point2f cen;
+	for (auto p : contour_) cen += p;
+	return  1.0 / contour_.size()*cen;
 }
 
 vector<Point2f> Trans_contour(vector<Point2f> c1, Point2f trans_shift)
@@ -1849,10 +1852,10 @@ void contour_de_crossing(vector<Point2f> &contour_)
 		cout << "No self_intersection! " << time<<" iters!"<< endl;
 }
 
-void contour_fine_tuning(vector<Point2f> &contour_)  //过近的优化
+void contour_fine_tuning(vector<Point2f> &contour_)//过近的优化
 {
 	Mat imagefine = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
-	Point2f shift = Point2f(600, 600) - center_p(contour_);
+	Point2f shift = Point2f(300, 600) - center_p(contour_);
 	draw_contour_points(imagefine, contour_, shift, 8, 2);
 	int dis_thres = 6;
 	int win_width = 4;
@@ -1902,7 +1905,7 @@ void contour_fine_tuning(vector<Point2f> &contour_)  //过近的优化
 			}
 		}
 	}
-	draw_contour_points(imagefine, contour_, shift+Point2f(300,300), 9, 2);
+	draw_contour_points(imagefine, contour_, shift+Point2f(600,0), 9, 2);
 	cout << "fine tuning times: " << iter_times << endl;
 	imshow("After contour fine tuning: ", imagefine);
 }
@@ -2274,7 +2277,6 @@ vector<Point2f> triangulate_bbx(vector<Point2f>& cont1, MatrixXd& V, MatrixXi& F
 	con_tri = cont1;
 	//con_tri.insert(con_tri.end(), cont1.begin(), cont1.end());
 	con_tri.insert(con_tri.end(), new_con.begin(), new_con.end());
-	
 	Point2f cen = center_p(con_tri);
 	// create a Subdiv2D object from the contour
 	cv::Subdiv2D subdiv(Rect(cen.x - 800, cen.y - 800, 1600, 1600)); // change the rectangle size according to your contour
@@ -2311,8 +2313,8 @@ vector<Point2f> triangulate_bbx(vector<Point2f>& cont1, MatrixXd& V, MatrixXi& F
 	cout << "contour.size " << con_tri.size() << "   triangleList.size " << triangleList.size() << "  V and F: " << V.size() << "  " << F.size() << endl;
 
 	Mat image_o = Mat(800, 800, CV_8UC3, Scalar(255, 255, 255));
-	draw_contour_points(image_o, con_tri, Point2f(600, 600) - center_p(con_tri), 5, 2);
-	draw_contour_points(image_o, cont1, Point2f(600, 600) - center_p(con_tri), 6, 2);
+	draw_contour_points(image_o, con_tri, Point2f(400, 400) - center_p(con_tri), 5, 2);
+	draw_contour_points(image_o, cont1, Point2f(400, 400) - center_p(con_tri), 6, 2);
 	imshow("bbx triangle: ", image_o);
 	return con_tri;
 }

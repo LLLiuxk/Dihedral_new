@@ -189,30 +189,27 @@ namespace Tiling_tiles {
 				vector<pair<int, int>> path_fea = cand_fea_paths[j];
 
 				//show the path
-				Mat draw = Mat(1000, 1000, CV_8UC3, Scalar(255, 255, 255));
-				Point2f sh = Point2f(300, 500) - center_p(conf_trans(contour1));
-				draw_pair(draw, conf_trans(contour1), conf_trans(contour2), path, sh);
-				imshow("pair  match", draw);
+				Point2f sh = Point2f(300, 300) - center_p(conf_trans(contour1));
 				Point2f shh2 = sh + Point2f(400, 0);
-				Mat draw22 = Mat(1000, 1000, CV_8UC3, Scalar(255, 255, 255));
-				draw_contour_points(draw22, prototile_mid.contour, sh, 5, 2);
-				draw_contour_points(draw22, prototile_second.contour, shh2, 7, 2);
+				Mat fea_match = Mat(600, 1000, CV_8UC3, Scalar(255, 255, 255));
+				draw_contour_points(fea_match, prototile_mid.contour, sh, 5, 2);
+				draw_contour_points(fea_match, prototile_second.contour, shh2, 7, 2);
 				FOR(i, 0, prototile_mid.feature_points.size())
-					circle(draw22, prototile_mid.contour[prototile_mid.feature_points[i]]+ sh, 3, Scalar(0, 0, 255), -1);
+					circle(fea_match, prototile_mid.contour[prototile_mid.feature_points[i]]+ sh, 3, Scalar(0, 0, 255), -1);
 				FOR(i, 0, prototile_second.feature_points.size())
-					circle(draw22, prototile_second.contour[prototile_second.feature_points[i]] + shh2, 3, Scalar(0, 125, 255), -1);
-				circle(draw22, prototile_mid.contour[prototile_mid.feature_points[0]]+ sh, 5, Scalar(120, 0, 255), -1);
-				circle(draw22, prototile_second.contour[prototile_second.feature_points[0]] + shh2, 5, Scalar(0, 125, 255), -1);
-				circle(draw22, prototile_mid.contour[0] + sh, 6, Scalar(25, 200, 25), 2);
-				circle(draw22, prototile_second.contour[0] + shh2, 6, Scalar(25, 200, 25), 2);
+					circle(fea_match, prototile_second.contour[prototile_second.feature_points[i]] + shh2, 3, Scalar(0, 125, 255), -1);
+				circle(fea_match, prototile_mid.contour[prototile_mid.feature_points[0]]+ sh, 5, Scalar(120, 0, 255), -1);
+				circle(fea_match, prototile_second.contour[prototile_second.feature_points[0]] + shh2, 5, Scalar(0, 125, 255), -1);
+				circle(fea_match, prototile_mid.contour[0] + sh, 6, Scalar(25, 200, 25), 2);
+				circle(fea_match, prototile_second.contour[0] + shh2, 6, Scalar(25, 200, 25), 2);
 				FOR(i, 0, path_fea.size())
 				{
 					//int tsfsize = prototile_second.feature_points.size();
 					Point2f f1 = prototile_mid.contour[path_fea[i].first] + sh;
 					Point2f f2 = prototile_second.contour[path_fea[i].second] + shh2;
-					line(draw22, f1, f2, colorbar[6].second);
+					line(fea_match, f1, f2, colorbar[6].second);
 				}
-				imshow("fea match", draw22);
+				imshow("fea match", fea_match);
 				//----------show the feature------------
 
 				double con_sc;
@@ -227,9 +224,11 @@ namespace Tiling_tiles {
 				cout << "contour_2.size:  " << contour_2.size() << "   " << contour1.size() << endl;
 				//FOR(mm, 0, contour_2.size()) cout << contour_2[mm].type << "   " << contour1[mm].type << endl;
 				//vector<Point_f> contour_2 = morphing_dir(contour1, contour2, path, ratio);
-				Point2f sh2 = Point2f(700, 500) - center_p(conf_trans(contour_2));
-				draw_contour_points(draw, conf_trans(contour_2), sh2, 3, 2);
-				imshow("correspond path", draw);
+				Mat pair_match = Mat(600, 1000, CV_8UC3, Scalar(255, 255, 255));
+				draw_pair(pair_match, conf_trans(contour1), conf_trans(contour2), path, sh);
+				Point2f sh2 = Point2f(700, 300) - center_p(conf_trans(contour_2));
+				draw_contour_points(pair_match, conf_trans(contour_2), sh2, 3, 2);
+				imshow("correspond path", pair_match);
 
 				//calculate two deformed shapes
 				vector<Point_f> con_re;
@@ -249,10 +248,10 @@ namespace Tiling_tiles {
 
 				vector<Point2f> contour_dst = conf_trans(contour_2);
 				vector<Point2f> cont_re = conf_trans(con_re);
-				Mat draw3 = Mat(1000, 1000, CV_8UC3, Scalar(255, 255, 255));
-				draw_contour_points(draw3, contour_dst, Point2f(600, 600) - center_p(contour_dst), 5, 2);
-				draw_contour_points(draw3, cont_re, Point2f(600, 600) - center_p(contour_dst), 6, 2);
-				imshow("2 contours:", draw3);
+				Mat two_c = Mat(800, 800, CV_8UC3, Scalar(255, 255, 255));
+				draw_contour_points(two_c, contour_dst, Point2f(400, 400) - center_p(contour_dst), 5, 2);
+				draw_contour_points(two_c, cont_re, Point2f(400, 400) - center_p(contour_dst), 6, 2);
+				imshow("2 contours:", two_c);
 				MatrixXd V;
 				MatrixXi F;
 				//vector<Point2f> tt = triangulate_2Contours(contour_dst, cont_re,V,F);
@@ -333,8 +332,8 @@ namespace Tiling_tiles {
 					//	for(auto p: handle_one)
 					//		handle_points.push_back(p);
 					//}
-					Mat draw_ = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
-					Point2f sh1=Point2f(600, 600)-center_p(cont_re);
+					Mat draw_ = Mat(800, 800, CV_8UC3, Scalar(255, 255, 255));
+					Point2f sh1=Point2f(400, 400)-center_p(cont_re);
 					draw_contour(draw_, cont_re, sh1, 5);
 					FOR(m, 0, 4) circle(draw_, frame[m] + sh1, 3, Scalar(125, 0, 0));
 					//
@@ -370,7 +369,7 @@ namespace Tiling_tiles {
 
 					draw_contour(draw_, contour_dst, sh1, 8);
 					FOR(m, 0, 4) circle(draw_, frame_b[m] + sh1, 3, Scalar(0, 255, 0));
-					imshow("123123", draw_);
+					imshow("After align handle points:", draw_);
 					con_re = set_flags(contour_dst, con_re);
 					//Mat draw_ = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
 					//vector<Point2f> frame = { contour_2[anc_mid[0]].point, contour_2[anc_mid[1]].point, contour_2[anc_mid[2]].point, contour_2[anc_mid[3]].point };
@@ -474,30 +473,28 @@ namespace Tiling_tiles {
 				vector<pair<int, int>> path_fea = cand_fea_paths[j];
 
 				//show the path
-				Mat draw = Mat(1000, 1000, CV_8UC3, Scalar(255, 255, 255));
-				Point2f sh = Point2f(300, 500) - center_p(conf_trans(contour1));
-				draw_pair(draw, conf_trans(contour1), conf_trans(contour2), path, sh);
-				imshow("pair  match", draw);
+				Point2f sh = Point2f(300, 300) - center_p(conf_trans(contour1));
 				Point2f shh2 = sh + Point2f(400, 0);
-				Mat draw22 = Mat(1000, 1000, CV_8UC3, Scalar(255, 255, 255));
-				draw_contour_points(draw22, prototile_mid.contour, sh, 5, 2);
-				draw_contour_points(draw22, prototile_second.contour, shh2, 7, 2);
+				Mat fea_match = Mat(600, 1000, CV_8UC3, Scalar(255, 255, 255));
+				draw_contour_points(fea_match, prototile_mid.contour, sh, 5, 2);
+				draw_contour_points(fea_match, prototile_second.contour, shh2, 7, 2);
 				FOR(i, 0, prototile_mid.feature_points.size())
-					circle(draw22, prototile_mid.contour[prototile_mid.feature_points[i]] + sh, 3, Scalar(0, 0, 255), -1);
+					circle(fea_match, prototile_mid.contour[prototile_mid.feature_points[i]] + sh, 3, Scalar(0, 0, 255), -1);
 				FOR(i, 0, prototile_second.feature_points.size())
-					circle(draw22, prototile_second.contour[prototile_second.feature_points[i]] + shh2, 3, Scalar(0, 125, 255), -1);
-				circle(draw22, prototile_mid.contour[prototile_mid.feature_points[0]] + sh, 5, Scalar(120, 0, 255), -1);
-				circle(draw22, prototile_second.contour[prototile_second.feature_points[0]] + shh2, 5, Scalar(0, 125, 255), -1);
-				circle(draw22, prototile_mid.contour[0] + sh, 6, Scalar(25, 200, 25), 2);
-				circle(draw22, prototile_second.contour[0] + shh2, 6, Scalar(25, 200, 25), 2);
+					circle(fea_match, prototile_second.contour[prototile_second.feature_points[i]] + shh2, 3, Scalar(0, 125, 255), -1);
+				circle(fea_match, prototile_mid.contour[prototile_mid.feature_points[0]] + sh, 5, Scalar(120, 0, 255), -1);
+				circle(fea_match, prototile_second.contour[prototile_second.feature_points[0]] + shh2, 5, Scalar(0, 125, 255), -1);
+				circle(fea_match, prototile_mid.contour[0] + sh, 6, Scalar(25, 200, 25), 2);
+				circle(fea_match, prototile_second.contour[0] + shh2, 6, Scalar(25, 200, 25), 2);
 				FOR(i, 0, path_fea.size())
 				{
 					//int tsfsize = prototile_second.feature_points.size();
 					Point2f f1 = prototile_mid.contour[path_fea[i].first] + sh;
 					Point2f f2 = prototile_second.contour[path_fea[i].second] + shh2;
-					line(draw22, f1, f2, colorbar[6].second);
+					line(fea_match, f1, f2, colorbar[6].second);
 				}
-				imshow("fea match", draw22);
+				imshow("fea match", fea_match);
+				//imwrite("D:/fea match.png", fea_match);
 				//----------show the feature------------
 
 				double con_sc;
@@ -512,9 +509,11 @@ namespace Tiling_tiles {
 				cout << "contour_2.size:  " << contour_2.size() << "   " << contour1.size() << endl;
 				//FOR(mm, 0, contour_2.size()) cout << contour_2[mm].type << "   " << contour1[mm].type << endl;
 				//vector<Point_f> contour_2 = morphing_dir(contour1, contour2, path, ratio);
-				Point2f sh2 = Point2f(700, 500) - center_p(conf_trans(contour_2));
-				draw_contour_points(draw, conf_trans(contour_2), sh2, 3, 2);
-				imshow("correspond path", draw);
+				Mat pair_match = Mat(600, 1000, CV_8UC3, Scalar(255, 255, 255));
+				draw_pair(pair_match, conf_trans(contour1), conf_trans(contour2), path, sh);
+				Point2f sh2 = Point2f(700, 300) - center_p(conf_trans(contour_2));
+				draw_contour_points(pair_match, conf_trans(contour_2), sh2, 3, 2);
+				imshow("correspond path", pair_match);
 
 				//calculate two deformed shapes
 				vector<Point_f> con_re;
@@ -534,10 +533,10 @@ namespace Tiling_tiles {
 
 				vector<Point2f> contour_dst = conf_trans(contour_2);
 				vector<Point2f> cont_re = conf_trans(con_re);
-				Mat draw3 = Mat(1000, 1000, CV_8UC3, Scalar(255, 255, 255));
-				draw_contour_points(draw3, contour_dst, Point2f(600, 600) - center_p(contour_dst), 5, 2);
-				draw_contour_points(draw3, cont_re, Point2f(600, 600) - center_p(contour_dst), 6, 2);
-				imshow("2 contours:", draw3);
+				Mat two_c = Mat(800, 800, CV_8UC3, Scalar(255, 255, 255));
+				draw_contour_points(two_c, contour_dst, Point2f(400, 400) - center_p(contour_dst), 5, 2);
+				draw_contour_points(two_c, cont_re, Point2f(400, 400) - center_p(contour_dst), 6, 2);
+				imshow("2 contours:", two_c);
 
 				contour_2 = contour_opt(contour_2, anc_mid, 1, 0, 1, 1, 1);
 				con_re = contour_opt(con_re, anc_re, 1, 1, 1, 1, 1);
@@ -657,8 +656,8 @@ namespace Tiling_tiles {
 				anc_mid_.push_back(point_locate(tt, frame[g]));
 			}
 			// before 
-			Mat draw_ = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
-			Point2f sh1 = Point2f(600, 600) - center_p(contour_dst);
+			Mat draw_ = Mat(1000, 1000, CV_8UC3, Scalar(255, 255, 255));
+			Point2f sh1 = Point2f(500, 500) - center_p(contour_dst);
 			draw_contour(draw_, contour_dst, sh1, 5);
 			FOR(m, 0, 4) circle(draw_, frame[m] + sh1, 3, Scalar(125, 0, 0));
 
@@ -681,7 +680,7 @@ namespace Tiling_tiles {
 			//cout << "csize " << csize << "  "<<contour_dst.size() << endl;
 			draw_contour(draw_, contour_dst, sh1, 8);
 			FOR(m, 0, 4) circle(draw_, frame_b[m] + sh1, 3, Scalar(0, 255, 0));
-			imshow("123123", draw_);
+			imshow("After align handle points:", draw_);
 			con_re = set_flags(contour_dst, cont);
 		}
 		/*contour_2 = set_flags(contour_dst, contour_2);
@@ -1436,7 +1435,7 @@ namespace Tiling_tiles {
 			cout << path_size << "   " << sec_size << endl;
 			FOR(m, 0, path_size)
 			{
-				int mar = 4;
+				int mar = path_margin;
 				//cout << "m: " << m << "   " << path[m].first<< "  " << path[m].second << endl;
 				//cout << "m: " <<m<< "   " << prototile_mid.contour_f[path[m].first].type <<"  "<< prototile_second.contour_f[path[m].second].type << endl;
 				pair<int, int> one_pair = path[m];
