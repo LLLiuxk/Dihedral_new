@@ -1,6 +1,6 @@
 #include "tilingOpt.h"
 vector<string> frame_type={ "parallelogram", "rhombus", "rectangle", "square" };
-bool pers_trans = 1;
+bool pers_trans = 0;
 bool coll_opt = 0;
 bool deve_opt = 0;
 
@@ -1776,16 +1776,16 @@ namespace Tiling_tiles {
 		{
 			double angle1 = cos_2v(Point2f(1, 0), seg1.back().point - seg1[0].point);
 			angle1 = acos(angle1);
-			if (sin_2v(Point2f(1, 0), seg1.back().point - seg1[0].point) < 0) angle1 = -angle1;
+			if (sin_2v(Point2f(1, 0), seg1.back().point - seg1[0].point) < 0) angle1 = 2*PI -angle1;
 			double angle_12 = cos_2v(Point2f(1, 0), seg2.back().point - seg2[0].point);
 			angle_12 = acos(angle_12);
-			if (sin_2v(Point2f(1, 0), seg2.back().point - seg2[0].point) < 0) angle_12 = -angle_12;
+			if (sin_2v(Point2f(1, 0), seg2.back().point - seg2[0].point) < 0) angle_12 = 2 * PI -angle_12;
 			angle_ave = ratio*angle1 + (1 - ratio)*angle_12;
 			length_ave = ratio*length_2p(seg1.back().point, seg1[0].point) + (1 - ratio)* length_2p(seg2.back().point, seg2[0].point);
-			//cout << "angle1: " << angle1 << " angle_12: " << angle_12 << " length: " << length_2p(seg1.back().point, seg1[0].point) << "   " << length_2p(seg2.back().point, seg2[0].point) << "  " << length_ave << endl;
+			cout << "angle1: " << angle1/PI*180 << " angle_12: " << angle_12 / PI * 180 << " length: " << length_2p(seg1.back().point, seg1[0].point) << "   " << length_2p(seg2.back().point, seg2[0].point) << "  " << length_ave << endl;
 			Point2f vec_fin = Point2f(cos(angle_ave), sin(angle_ave));
 			end.point = start.point + length_ave*vec_fin;
-			//cout << start.point << "   " << length_ave << "    " << vec_fin << endl;
+			cout << start.point << "   " << length_ave << "    " << vec_fin << endl;
 
 			//double angle1 = cos_2v(Point2f(1, 0), seg1.back().point - seg1[0].point);
 			//angle1 = (angle1 > 0.999) ? 0.999 : (angle1 < -0.999) ? -0.999 : angle1; //防止出现acos(1)的情况，会返回错误值
