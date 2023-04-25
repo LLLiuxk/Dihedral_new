@@ -575,8 +575,9 @@ namespace Tiling_tiles {
 				}*/
 
 				draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
-				draw_contour_points(draw2, conf_trans(contour_2), OP);
-				draw_contour_points(draw2, conf_trans(con_re), OP,4);
+				Point2f tttsh = Point2f(600, 600) - center_p(conf_trans(contour_2));
+				draw_contour_points(draw2, conf_trans(contour_2), tttsh);
+				draw_contour_points(draw2, conf_trans(con_re), tttsh,4);
 				FOR(cc, 0, 4)
 				{
 					circle(draw2, contour_2[anc_mid[cc]].point, 2, Scalar(0, 0, 255));
@@ -609,7 +610,7 @@ namespace Tiling_tiles {
 		else if(type==1)
 			tt = triangulate_bbx(contour_dst, V, F);
 		Mat image = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
-		Point stf(0, 600);
+		Point stf=Point2f(600, 600) - center_p(contour_dst);
 		for (size_t i = 0; i < F.rows(); i++)
 		{
 			Point pt1(V.row(F(i, 0)).x(), V.row(F(i, 0)).y());
@@ -959,6 +960,7 @@ namespace Tiling_tiles {
 
 			string filename = rootname + "/" + to_string(all_inner_conts.size() - 1) + "transPlacingResult.png";
 			cv::imwrite(filename, drawing1);
+			cv::imshow("Initial tiling placement: ", drawing1);
 		}
 		std::cout << "Trans times: " << times << endl;
 		return trans;
@@ -1433,6 +1435,7 @@ namespace Tiling_tiles {
 			int path_size = path.size();
 			int sec_size = prototile_second.contour_f.size();
 			cout << path_size << "   " << sec_size << endl;
+			int last_index = -1;
 			FOR(m, 0, path_size)
 			{
 				int mar = path_margin;
@@ -1443,21 +1446,29 @@ namespace Tiling_tiles {
 				if (prototile_mid.contour_f[one_pair.first].type == fixed_p || prototile_mid.contour_f[one_pair.first].type == fea_p)  //must have a match
 				{
 					vector<int> waiting_merge;
+					cout <<  "last_index  " << last_index << endl;
 					FOR(n, 1-mar, mar)
 					{
 						int tem_sec = (sec_index + n + sec_size) % sec_size;
-						if (prototile_second.contour_f[tem_sec].type == fea_p)
-							waiting_merge.push_back(tem_sec);
+						if (tem_sec > last_index)
+						{
+							if (prototile_second.contour_f[tem_sec].type == fea_p)
+								waiting_merge.push_back(tem_sec);
+						}					
 					}
 					//if (m == 51) cout << waiting_merge.size()<<"    "<<waiting_merge[0] <<"   "<<shift << endl;
 					if (waiting_merge.empty())
 					{
-						if(prototile_mid.contour_f[one_pair.first].type == fixed_p)
+						if (prototile_mid.contour_f[one_pair.first].type == fixed_p)
+						{
 							path_fea.push_back(one_pair);
+							last_index = one_pair.second;
+						}
 						else continue;
 					}
 					else
 					{
+						FOR(mm, 0, waiting_merge.size()) cout << one_pair.first<<"  "<< waiting_merge[mm] << endl;
 						int min_index = 0;
 						if (waiting_merge.size() != 1)
 						{
@@ -1490,12 +1501,16 @@ namespace Tiling_tiles {
 							}
 						}
 						//cout<<
-						if (path_fea.empty() || repet_index == -1) 
+						if (path_fea.empty() || repet_index == -1)
+						{
 							path_fea.push_back(make_pair(one_pair.first, waiting_merge[min_index]));
+							last_index = waiting_merge[min_index];
+						}
 						else if (prototile_mid.contour_f[one_pair.first].type>prototile_mid.contour_f[path_fea[repet_index].first].type)
 						{
 							path_fea.pop_back();
 							path_fea.push_back(make_pair(one_pair.first, waiting_merge[min_index]));
+							last_index = waiting_merge[min_index];
 						}
 						else if (prototile_mid.contour_f[one_pair.first].type == prototile_mid.contour_f[path_fea[repet_index].first].type)
 						{
@@ -1506,6 +1521,7 @@ namespace Tiling_tiles {
 							{
 								path_fea.pop_back();
 								path_fea.push_back(make_pair(one_pair.first, waiting_merge[min_index]));
+								last_index = waiting_merge[min_index];
 							}
 						}
 					}				
@@ -1776,11 +1792,12 @@ namespace Tiling_tiles {
 		{
 			double angle1 = cos_2v(Point2f(1, 0), seg1.back().point - seg1[0].point);
 			angle1 = acos(angle1);
-			if (sin_2v(Point2f(1, 0), seg1.back().point - seg1[0].point) < 0) angle1 = 2*PI -angle1;
-			double angle_12 = cos_2v(Point2f(1, 0), seg2.back().point - seg2[0].point);
+			if (sin_2v(Point2f(1, 0), seg1.back().point - seg1[0].point) < 0) angle1 = - angle1;
+
+			double angle_12 = cos_2v(seg1.back().point - seg1[0].point, seg2.back().point - seg2[0].point);
 			angle_12 = acos(angle_12);
-			if (sin_2v(Point2f(1, 0), seg2.back().point - seg2[0].point) < 0) angle_12 = 2 * PI -angle_12;
-			angle_ave = ratio*angle1 + (1 - ratio)*angle_12;
+			if (sin_2v(seg1.back().point - seg1[0].point, seg2.back().point - seg2[0].point) < 0) angle_12 = -angle_12;
+			angle_ave = angle1 + (1 - ratio)*angle_12;
 			length_ave = ratio*length_2p(seg1.back().point, seg1[0].point) + (1 - ratio)* length_2p(seg2.back().point, seg2[0].point);
 			cout << "angle1: " << angle1/PI*180 << " angle_12: " << angle_12 / PI * 180 << " length: " << length_2p(seg1.back().point, seg1[0].point) << "   " << length_2p(seg2.back().point, seg2[0].point) << "  " << length_ave << endl;
 			Point2f vec_fin = Point2f(cos(angle_ave), sin(angle_ave));
