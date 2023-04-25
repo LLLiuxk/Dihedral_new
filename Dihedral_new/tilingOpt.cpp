@@ -1461,8 +1461,13 @@ namespace Tiling_tiles {
 					{
 						if (prototile_mid.contour_f[one_pair.first].type == fixed_p)
 						{
+							if (path_fea.back().second == one_pair.second)
+							{
+								path_fea.pop_back();			
+							}
 							path_fea.push_back(one_pair);
 							last_index = one_pair.second;
+							//cout << "fixed: " << one_pair.first << "   " << one_pair.second << endl;
 						}
 						else continue;
 					}
