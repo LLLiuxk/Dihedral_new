@@ -28,8 +28,8 @@ int main()
 	{
 		// 5: 6,11,16,29   13: 1,12,27,36  14: 0,4,17,24   22: 8,19,28,36   28: 6,23,25,35  31: 0,15,18,27   37: 10,18,25,37
 		//44:6,19,24,31    71:4,14,22,32    70: 0,8,19,28    192: 0,9,18,27   157:6,12,23,31
-		vector<int> anc_points = { 7,14,22,32 };
-		tiling.tiliing_gen_specify2("37", anc_points);
+		vector<int> anc_points = { 4,14,22,32 };
+		tiling.tiliing_gen_specify2("71", anc_points);
 
 
 	}

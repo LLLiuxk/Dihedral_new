@@ -338,7 +338,7 @@ vector<int> cal_feature(vector<Point2f> contour_, int  n_min, int n_max, double 
 		else index_num.pop_back();
 	}
 	//show feature points
-	cout << "Feature points:" << index_num.size() << endl;
+	//cout << "Feature points:" << index_num.size() << endl;
 	if (show_result)
 	{
 		Point2f shift_ = Point2f(300, 300) - center_p(contour_);
@@ -1188,8 +1188,7 @@ vector<Point2f> load_point_file(string filepath)
 	ifstream in(filepath);
 	if (!in.is_open())
 	{
-		cout << filepath << endl;
-		cout << "Error opening file" << endl;
+		cout << filepath << "        Error opening file!" << endl;
 		return con_point;
 	}
 	//挨个处理每个字符
@@ -1197,7 +1196,7 @@ vector<Point2f> load_point_file(string filepath)
 	vector<char> each_point;
 	int p_num;
 	in >> p_num;
-	cout << "points num: " << p_num << endl;
+	cout << "points num: " << p_num << "     ";
 	while (!in.eof())
 	{
 		double aa;

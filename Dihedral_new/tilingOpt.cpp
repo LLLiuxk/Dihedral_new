@@ -751,7 +751,7 @@ namespace Tiling_tiles {
 		{
 			string filepath = DefaultPath;
 			filepath = filepath + "contour/" + to_string(i) + ".txt";
-			cout << "Image " << to_string(i) << endl;
+			cout << "Image " << to_string(i) << "   ";
 			protoTile read_tile(filepath, false);
 			if (read_tile.contour.empty()) continue;
 			contour_dataset.push_back(read_tile.contour_f);
@@ -1435,17 +1435,21 @@ namespace Tiling_tiles {
 			int path_size = path.size();
 			int sec_size = prototile_second.contour_f.size();
 			cout << path_size << "   " << sec_size << endl;
-			int last_index = -1;
+			int mar = path_margin;
+			int last_index = -mar;
+			int last_m = -1;
 			FOR(m, 0, path_size)
 			{
-				int mar = path_margin;
-				//cout << "m: " << m << "   " << path[m].first<< "  " << path[m].second << endl;
+				//if (m > 0) last_first = path[m - 1].first;
+				cout << "m: " << m << "   " << path[m].first<< "  " << path[m].second << endl;
 				//cout << "m: " <<m<< "   " << prototile_mid.contour_f[path[m].first].type <<"  "<< prototile_second.contour_f[path[m].second].type << endl;
 				pair<int, int> one_pair = path[m];
 				int sec_index = one_pair.second;
 				if (prototile_mid.contour_f[one_pair.first].type == fixed_p || prototile_mid.contour_f[one_pair.first].type == fea_p)  //must have a match
 				{
 					vector<int> waiting_merge;
+					cout <<" last_m:  "<< last_m<< "  last_index  " << last_index << endl;
+					if (abs(last_m - last_index) > mar) last_index = last_index - (last_m + sec_size);
 					cout <<  "last_index  " << last_index << endl;
 					FOR(n, 1-mar, mar)
 					{
@@ -1454,7 +1458,7 @@ namespace Tiling_tiles {
 						{
 							if (prototile_second.contour_f[tem_sec].type == fea_p)
 								waiting_merge.push_back(tem_sec);
-						}					
+						}			
 					}
 					//if (m == 51) cout << waiting_merge.size()<<"    "<<waiting_merge[0] <<"   "<<shift << endl;
 					if (waiting_merge.empty())
@@ -1467,6 +1471,7 @@ namespace Tiling_tiles {
 							}
 							path_fea.push_back(one_pair);
 							last_index = one_pair.second;
+							last_m = one_pair.first;
 							//cout << "fixed: " << one_pair.first << "   " << one_pair.second << endl;
 						}
 						else continue;
@@ -1510,12 +1515,14 @@ namespace Tiling_tiles {
 						{
 							path_fea.push_back(make_pair(one_pair.first, waiting_merge[min_index]));
 							last_index = waiting_merge[min_index];
+							last_m = one_pair.first;
 						}
 						else if (prototile_mid.contour_f[one_pair.first].type>prototile_mid.contour_f[path_fea[repet_index].first].type)
 						{
 							path_fea.pop_back();
 							path_fea.push_back(make_pair(one_pair.first, waiting_merge[min_index]));
 							last_index = waiting_merge[min_index];
+							last_m = one_pair.first;
 						}
 						else if (prototile_mid.contour_f[one_pair.first].type == prototile_mid.contour_f[path_fea[repet_index].first].type)
 						{
@@ -1527,6 +1534,7 @@ namespace Tiling_tiles {
 								path_fea.pop_back();
 								path_fea.push_back(make_pair(one_pair.first, waiting_merge[min_index]));
 								last_index = waiting_merge[min_index];
+								last_m = one_pair.first;
 							}
 						}
 					}				

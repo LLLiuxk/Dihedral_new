@@ -7,7 +7,7 @@ namespace Tiling_tiles {
 		contour = load_point_file(filepath);
 		if (contour.empty())
 		{
-			cout << filepath << " does not exist! " << endl;
+			//cout << filepath << " does not exist! " << endl;
 		}
 		else
 		{
