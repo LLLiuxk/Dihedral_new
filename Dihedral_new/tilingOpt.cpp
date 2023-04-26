@@ -1460,19 +1460,20 @@ namespace Tiling_tiles {
 								waiting_merge.push_back(tem_sec);
 						}			
 					}
-					//if (m == 51) cout << waiting_merge.size()<<"    "<<waiting_merge[0] <<"   "<<shift << endl;
+					//if (m == 85) cout << waiting_merge.size()<<"    "<<waiting_merge[0]  << endl;
 					if (waiting_merge.empty())
 					{
 						if (prototile_mid.contour_f[one_pair.first].type == fixed_p)
 						{
-							if (path_fea.back().second == one_pair.second)
+							//cout << one_pair.second << "   " << path_fea.back().second << endl;
+							if (!path_fea.empty() && path_fea.back().second >= one_pair.second)
 							{
 								path_fea.pop_back();			
 							}
 							path_fea.push_back(one_pair);
 							last_index = one_pair.second;
 							last_m = one_pair.first;
-							//cout << "fixed: " << one_pair.first << "   " << one_pair.second << endl;
+						    //cout << "fixed: " << one_pair.first << "   " << one_pair.second << endl;
 						}
 						else continue;
 					}
