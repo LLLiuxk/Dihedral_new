@@ -95,9 +95,11 @@ double tar_mismatch(vector<vector<double>> first_arr, vector<vector<double>> sec
 double tar_mismatch_fea(vector<vector<double>> first_arr, vector<vector<double>> second_arr, vector<int> first_fea, vector<int> sec_fea, vector<pair<int, int>>& path, int &sec_shift, int width); //增加特征点的权重
 void print_TAR_Path(double d[][TAR_num], double dp[][TAR_num], int i, int j, vector<pair<int, int>>& path);
 double isoperimetric_inequality(vector<Point2f> contour);
-
+double getCurvature(Point2f p1, Point2f p2, Point2f p3);
 
 //edge evaluation and optimization
+double bound_recover(vector<Point2f> old_edge, vector<Point2f> new_edge);
+
 double bound_collision(vector<Point2f> cont, vector<int> indexes, int type = -1);
 
 double edge_nd_degree(vector<Point2f> edge, int type); // non-developable degree

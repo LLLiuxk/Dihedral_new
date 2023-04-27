@@ -30,8 +30,6 @@ int main()
 		//44:6,19,24,31    71:4,14,22,32    70: 0,8,19,28    192: 0,9,18,27   157:6,12,23,31
 		vector<int> anc_points = { 10,18,25,37 };
 		tiling.tiliing_gen_specify2("37", anc_points);
-
-
 	}
 	if (f == 2)
 	{

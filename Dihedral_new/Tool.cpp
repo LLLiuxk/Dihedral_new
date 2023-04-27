@@ -1606,7 +1606,52 @@ double isoperimetric_inequality(vector<Point2f> contour)
 	return ratio;
 }
 
+double getCurvature( Point2f p1,  Point2f p2,  Point2f p3) {
+	// 计算三个点之间的距离
+	double a = length_2p(p1, p2);
+	double b = length_2p(p2, p3);
+	double c = length_2p(p1, p3);
+
+	// 计算半周长
+	double s = (a + b + c) / 2.0;
+
+	// 计算三角形面积 
+	double area = std::sqrt(s * (s - a) * (s - b) * (s - c));
+
+	// 计算外接圆半径
+	double R = a * b * c / (4.0 * area);
+
+	// 计算曲率
+	return 1.0 / R;
+}
+
 //edge evaluation and optimization
+double bound_recover(vector<Point2f> old_edge, vector<Point2f> new_edge)
+{
+	double ratio = 0.5;
+	int csize = old_edge.size();
+	if (new_edge.size() != csize) cout << "Cannot recover for different size!" << endl;
+	int index = csize / 2;
+	Point2f origin = old_edge[index];
+	vector<double> angles;
+	for (int i = 1; i < index; i++)
+	{
+		double cos_ = cos_2v(old_edge[index - i] - origin, old_edge[index + i] - origin);
+		double sin_ = sin_2v(old_edge[index - i] - origin, old_edge[index + i] - origin);
+		double angle_ = acos(cos_);
+		if (sin_ < 0) angle_ = -angle_;
+		angles.push_back(angle_);
+	}
+	Point2f origin2 = new_edge[index];
+	for (int i = 1; i < index; i++)
+	{
+		double cos_2 = cos_2v(new_edge[index - i] - origin2, new_edge[index + i] - origin2);
+		double sin_2 = sin_2v(new_edge[index - i] - origin2, new_edge[index + i] - origin2);
+		double angle_2= acos(cos_2);
+		if (sin_2< 0) angle_2 = -angle_2;
+	}
+}
+
 double bound_collision(vector<Point2f> cont, vector<int> indexes, int type)
 {
 	int index_size = indexes.size();
