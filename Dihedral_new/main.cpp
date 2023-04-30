@@ -28,8 +28,16 @@ int main()
 	{
 		// 5: 6,11,16,29   13: 1,12,27,36  14: 0,4,17,24   22: 8,19,28,36   28: 6,23,25,35  31: 0,15,18,27   37: 10,18,25,37
 		//44:6,19,24,31    71:4,14,22,32    70: 0,8,19,28    192: 0,9,18,27   157:6,12,23,31
-		vector<int> anc_points = { 10,18,25,37 };
-		tiling.tiliing_gen_specify2("37", anc_points);
+		/*vector<int> anc_points = { 10,18,25,37 };
+		tiling.tiliing_gen_specify2("37", anc_points);*/
+		Point2f p1(10, 10);
+		Point2f p2(20, 20);
+		Point2f p3(20, 10);
+		vector<Point2f> ppp = { p2 };
+		cv::Mat rot_mat = cv::getRotationMatrix2D(p1, -45, 1.0);
+		/*cv::warpAffine(src, dst, rot_mat, src.size());*/
+		cv::transform(ppp, ppp, rot_mat);
+		for (auto p : ppp) cout << p << endl;
 	}
 	if (f == 2)
 	{

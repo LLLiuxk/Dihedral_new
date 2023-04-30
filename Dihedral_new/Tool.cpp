@@ -1634,7 +1634,7 @@ double bound_recover(vector<Point2f> old_edge, vector<Point2f> new_edge)
 	int index = csize / 2;
 	Point2f origin = old_edge[index];
 	vector<double> angles;
-	for (int i = 1; i < index; i++)
+	FOR(i, 1, index + 1) 
 	{
 		double cos_ = cos_2v(old_edge[index - i] - origin, old_edge[index + i] - origin);
 		double sin_ = sin_2v(old_edge[index - i] - origin, old_edge[index + i] - origin);
@@ -1643,12 +1643,30 @@ double bound_recover(vector<Point2f> old_edge, vector<Point2f> new_edge)
 		angles.push_back(angle_);
 	}
 	Point2f origin2 = new_edge[index];
-	for (int i = 1; i < index; i++)
+	FOR(i, 1, index + 1) 
 	{
-		double cos_2 = cos_2v(new_edge[index - i] - origin2, new_edge[index + i] - origin2);
-		double sin_2 = sin_2v(new_edge[index - i] - origin2, new_edge[index + i] - origin2);
+		Point2f p0p1 = new_edge[index - i] - origin2;
+		Point2f p2p1 = new_edge[index + i] - origin2;
+		double cos_2 = cos_2v(p0p1, p2p1);
+		double sin_2 = sin_2v(p0p1, p2p1);
 		double angle_2= acos(cos_2);
 		if (sin_2< 0) angle_2 = -angle_2;
+
+		double angle_delta = abs(angles[i - 1]) - abs(angle_2);
+		if (angle_delta>0)   //delta>0, 需要扩张
+		{
+
+			//Rotate_contour
+		}
+		else if (angle_delta < 0)   //delta<0, 需要收缩
+		{
+
+		}
+	}
+	FOR(i, 0, index)
+	{
+		
+
 	}
 }
 
