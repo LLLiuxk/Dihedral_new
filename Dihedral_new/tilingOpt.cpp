@@ -600,15 +600,36 @@ namespace Tiling_tiles {
 		vector<Point_f> con_re;
 		vector<Point2f> contour_dst = conf_trans(cont);
 		int csize = contour_dst.size();
+
+		vector<vector<int>> handle_area;
+		vector<vector<Point2f>> handle_points;
+		FOR(index_num, 0, anc_p.size())
+		{
+			int area_width = handle_area_width;
+			vector<int> area_one;
+			vector<Point2f> handle_one;
+			FOR(width_n, -area_width, area_width + 1) 
+			//for (int width_n = -area_width; width_n < area_width + 1; width_n += 2)
+			{
+				int index_ = (anc_p[index_num] + width_n + csize) % csize;
+				area_one.push_back(index_);
+				//handle_points.push_back(contour_2[index_].point + shift_new);
+				handle_one.push_back(cont[index_].point);
+			}
+			handle_area.push_back(area_one);
+			handle_points.push_back(handle_one);
+		}
 		MatrixXd V;
 		MatrixXi F;
 		//vector<Point2f> tt = triangulate_Contours_bbx(cont_re, anc_re, V, F);
 		//vector<Point2f> tt = triangulate_Contours_bbx(contour_dst, anc_mid, V, F);
 		vector<Point2f> tt;
-		if(type==0)
-			tt= triangulate_Contours_bbx(contour_dst, anc_p, V, F);
+		if (type == 0)
+			tt = triangulateContour(contour_dst, V, F);
 		else if(type==1)
 			tt = triangulate_bbx(contour_dst, V, F);
+		else if (type == 2)
+			tt= triangulate_Contours_bbx(contour_dst, anc_p, V, F);
 		Mat image = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
 		Point stf=Point2f(600, 600) - center_p(contour_dst);
 		for (size_t i = 0; i < F.rows(); i++)
@@ -629,7 +650,7 @@ namespace Tiling_tiles {
 		{
 			vector<Point2f> frame = { contour_dst[anc_p[0]], contour_dst[anc_p[1]], contour_dst[anc_p[2]], contour_dst[anc_p[3]] };
 			//vector<Point2f> frame = { cont_re[anc_re[0]], cont_re[anc_re[1]], cont_re[anc_re[2]], cont_re[anc_re[3]] };
-			if (type == 0)
+			if (type == 2)
 			{
 				Point2f sh1 = frame[3] - frame[0];
 				FOR(n, 0, 4) frame[n] += sh1;
@@ -653,8 +674,9 @@ namespace Tiling_tiles {
 			vector<int> anc_mid_;
 			FOR(g, 0, 4)
 			{
-				cout << "frame[g]: " << frame[g] << endl;
+				//cout << anc_p[g]<<"   "<<contour_dst[anc_p[g]] << "   " << tt[anc_p[g]] << "   " << frame[g] << endl;
 				anc_mid_.push_back(point_locate(tt, frame[g]));
+				cout << "frame[g]: " << frame[g] <<"   "<< anc_mid_.back()<< endl;
 			}
 			// before 
 			Mat draw_ = Mat(1000, 1000, CV_8UC3, Scalar(255, 255, 255));
@@ -678,10 +700,29 @@ namespace Tiling_tiles {
 			vector<Point2f> con_tem;
 			FOR(m, 0, csize) con_tem.push_back(contour_dst[m]);
 			contour_dst = con_tem;
+			//modify
+			FOR(index_h, 0, handle_area.size())
+			{
+				vector<int> new_indes = handle_area[index_h];
+				vector<Point2f> new_handp;
+				//cout << "index_h: " << index_h << "   " << handle_area.size() << endl;
+				FOR(i,0, new_indes.size())
+				{
+					new_handp.push_back(contour_dst[new_indes[i]]);
+					//cout << "i: " << i << "   " << contour_dst[new_indes[i]] << endl;
+				}
+				bound_recover(handle_points[index_h], new_handp);
+				FOR(i, 0, new_indes.size())
+				{
+					contour_dst[new_indes[i]] = new_handp[i];
+					//cout << "i: " << i << "   " << contour_dst[new_indes[i]] << endl;
+				}
+			}
+
 			//cout << "csize " << csize << "  "<<contour_dst.size() << endl;
 			draw_contour(draw_, contour_dst, sh1, 8);
 			FOR(m, 0, 4) circle(draw_, frame_b[m] + sh1, 3, Scalar(0, 255, 0));
-			imshow("After align handle points:", draw_);
+			imshow(to_string(times)+" After align handle points:", draw_);
 			con_re = set_flags(contour_dst, cont);
 		}
 		/*contour_2 = set_flags(contour_dst, contour_2);
@@ -714,6 +755,10 @@ namespace Tiling_tiles {
 			//degree_after_opt = whole_con_opt(resam_dst, anc_re, 0);
 			degree_after_opt = whole_con_opt(contour_dst, anc_p, 0);
 			con_re = set_flags(contour_dst, cont);
+
+			Mat dep_opt  = Mat(800, 800, CV_8UC3, Scalar(255, 255, 255));
+			draw_contour_points(dep_opt, contour_dst, Point2f(400, 400) - center_p(contour_dst), 5, 2);
+			imshow(to_string(times) + " After contour deployability optimization:", dep_opt);
 			//degree_after_opt = whole_con_opt(contour_dst, anc_mid, 0);
 			cout << "After developable optimation, the collision degree: " << degree_after_opt << endl;
 			/*vector<Point_f> con_resam;

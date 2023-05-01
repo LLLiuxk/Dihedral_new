@@ -41,6 +41,8 @@ Point2f center_p(vector<Point2f> contour_);
 vector<Point2f> Trans_contour(vector<Point2f> c1, Point2f trans_shift);
 vector<Point2f> Rotate_contour(vector<Point2f> src, Point2f center, double angle);
 vector<Point2f> Flip_contour(vector<Point2f> cont_s);
+vector<Point2f> Rotate_contour(vector<Point2f> src, Point2f center, double angle);
+Point2f rotate_p(Point2f cen, Point2f rop, double angle);
 double conotour_align(vector<Point2f>& cont1, vector<Point2f>& cont2, vector<pair<int, int>> path_min);
 
 vector<int>  cal_feature(vector<Point2f> contour_, int  n_min, int n_max, double angle_cos, bool show_result = false); //n_min, n_max 表示计算cos度数选取的点个数
@@ -98,7 +100,7 @@ double isoperimetric_inequality(vector<Point2f> contour);
 double getCurvature(Point2f p1, Point2f p2, Point2f p3);
 
 //edge evaluation and optimization
-double bound_recover(vector<Point2f> old_edge, vector<Point2f> new_edge);
+void bound_recover(vector<Point2f>& old_edge, vector<Point2f>& new_edge);
 
 double bound_collision(vector<Point2f> cont, vector<int> indexes, int type = -1);
 
@@ -109,7 +111,7 @@ double whole_con_opt(vector<Point2f> &cont, vector<int> &indexes, int type);
 void contour_de_crossing(vector<Point2f> &contour_);  //交叉的优化
 void contour_fine_tuning(vector<Point2f> &contour_);  //过近的优化
 
-int triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F);
+vector<Point2f> triangulateContour(vector<Point2f>& con_ori, MatrixXd& V, MatrixXi& F);
 vector<Point2f> triangulate_2Contours(vector<Point2f>& cont1, vector<Point2f>& cont2, MatrixXd& V, MatrixXi& F);
 vector<Point2f> triangulate_Contours_bbx(vector<Point2f>& cont1, vector<int> anc1, MatrixXd& V, MatrixXi& F);
 vector<Point2f> triangulate_bbx(vector<Point2f>& cont1, MatrixXd& V, MatrixXi& F);

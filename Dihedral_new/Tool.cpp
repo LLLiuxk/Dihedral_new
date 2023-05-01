@@ -150,6 +150,15 @@ vector<Point2f> Flip_contour(vector<Point2f> cont_s)
 	return cont_s;
 }
 
+Point2f rotate_p(Point2f cen, Point2f rop, double angle)  //angle 度数值
+{
+	vector<Point2f> dst = {rop};
+	cv::Mat rot_mat = cv::getRotationMatrix2D(cen, angle, 1.0);
+	/*cv::warpAffine(src, dst, rot_mat, src.size());*/
+	cv::transform(dst, dst, rot_mat);
+	return dst[0];
+}
+
 double conotour_align(vector<Point2f>& cont1, vector<Point2f>& cont2, vector<pair<int, int>> path_min)
 {
 	double match_error = 0;
@@ -235,7 +244,7 @@ double conotour_align(vector<Point2f>& cont1, vector<Point2f>& cont2, vector<pai
 		}
 		sh_al += shift_t;
 		times++;
-		cout << "rotate angle_all: " << angl_al << "   length_min:  " << length_min << "    shift all: " << sh_al << "   shift_t: " << shift_t << endl;
+		//cout << "rotate angle_all: " << angl_al << "   length_min:  " << length_min << "    shift all: " << sh_al << "   shift_t: " << shift_t << endl;
 	}
 	return length_min;
 }
@@ -1626,9 +1635,13 @@ double getCurvature( Point2f p1,  Point2f p2,  Point2f p3) {
 }
 
 //edge evaluation and optimization
-double bound_recover(vector<Point2f> old_edge, vector<Point2f> new_edge)
+void bound_recover(vector<Point2f>& old_edge, vector<Point2f> &new_edge)
 {
-	double ratio = 0.5;
+	Mat draw2 = Mat(600, 600, CV_8UC3, Scalar(255, 255, 255));
+	Point2f shift = Point2f(300, 300) - center_p(old_edge);
+	draw_contour_points(draw2, old_edge, shift, 2, 3);
+	draw_contour_points(draw2, new_edge, shift, 5, 3);
+
 	int csize = old_edge.size();
 	if (new_edge.size() != csize) cout << "Cannot recover for different size!" << endl;
 	int index = csize / 2;
@@ -1651,23 +1664,26 @@ double bound_recover(vector<Point2f> old_edge, vector<Point2f> new_edge)
 		double sin_2 = sin_2v(p0p1, p2p1);
 		double angle_2= acos(cos_2);
 		if (sin_2< 0) angle_2 = -angle_2;
-
+		if (angle_2*angles[i - 1] < 0) angle_2 = angles[i - 1]/abs(angles[i - 1])*(2*PI - abs(angle_2)) ;
 		double angle_delta = abs(angles[i - 1]) - abs(angle_2);
-		if (angle_delta>0)   //delta>0, 需要扩张
+		double angle_add = 0.5*(1 - 1.0*i / (index + 1))*angle_delta/PI*180; //每一边移动的角度
+		//cout << i<<"   "<< angles[i - 1]/PI*180<<"   "<<angle_2/PI*180<<"     "<<angle_delta/PI*180 << "  " << angle_add << endl;
+		if (angle_delta > 0)  //delta>0, 需要扩张
 		{
-
+			new_edge[index - i] = rotate_p(origin2, new_edge[index - i], angle_2 / abs(angle_2) *angle_add);
+			new_edge[index + i] = rotate_p(origin2, new_edge[index + i], -angle_2 / abs(angle_2) *angle_add);
+			
 			//Rotate_contour
 		}
 		else if (angle_delta < 0)   //delta<0, 需要收缩
 		{
-
+			new_edge[index - i] = rotate_p(origin2, new_edge[index - i], angle_2 / abs(angle_2) *angle_add);
+			new_edge[index + i] = rotate_p(origin2, new_edge[index + i], -angle_2 / abs(angle_2) *angle_add);
 		}
 	}
-	FOR(i, 0, index)
-	{
-		
 
-	}
+	draw_contour_points(draw2, new_edge, shift, 7, 3);
+	imshow("show:", draw2);
 }
 
 double bound_collision(vector<Point2f> cont, vector<int> indexes, int type)
@@ -1846,9 +1862,7 @@ double whole_con_opt(vector<Point2f>& cont, vector<int>& indexes, int type)
 	}
 	cont = new_c;
 	indexes = new_index;
-	Mat imagefine = Mat(800, 800, CV_8UC3, Scalar(255, 255, 255));
-	draw_contour_points(imagefine, cont, Point2f(400, 400) - center_p(cont), 5, 2);
-	imshow("After contour deployability optimization:", imagefine);
+
 	return degree_opt;
 }
 
@@ -1969,12 +1983,12 @@ void contour_fine_tuning(vector<Point2f> &contour_)//过近的优化
 	}
 	draw_contour_points(imagefine, contour_, shift+Point2f(600,0), 9, 2);
 	cout << "fine tuning times: " << iter_times << endl;
-	imshow("After contour fine tuning: ", imagefine);
+	imshow(to_string(iter_times)+ " After contour fine tuning: ", imagefine);
 }
 
-int triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F)
+vector<Point2f> triangulateContour(vector<Point2f>& con_ori, MatrixXd& V, MatrixXi& F)
 {
-	vector<Point2f> con_ori = contour;
+	vector<Point2f>  contour = con_ori;
 	Point2f cen = center_p(con_ori);
 	int ori_num = add_points(contour, 0.08);
 	// create a Subdiv2D object from the contour
@@ -2045,7 +2059,7 @@ int triangulateContour(vector<Point2f>& contour, MatrixXd& V, MatrixXi& F)
 	/*cout << "  V : " << V.size() << "  F: " << F.size() << endl;
 	for (int n = 0; n < V.rows(); n++) cout << n << " V row: " << V.row(n) << endl;
 	for (int n = 0; n < F.rows(); n++) cout << n << " F row: " << F.row(n) << endl;*/
-	return ori_num;
+	return contour;
 }
 
 

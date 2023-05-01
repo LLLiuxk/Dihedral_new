@@ -20,7 +20,7 @@
 #define SCDisThres 0.35
 #define WindowsWidth 10
 #define path_margin 4
-#define handle_area_width 1
+#define handle_area_width 4
 #define DefaultPath "C:/Users/liuxk/OneDrive/Recent/DualNPR/"
 #define SavePath "D:/vs2015project/Dihedral_new/result/"
 #define ParaPath "D:/vs2015project/Dihedral_new/Dihedral_new/"
