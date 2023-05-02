@@ -1928,7 +1928,7 @@ void contour_de_crossing(vector<Point2f> &contour_)
 		cout << "No self_intersection! " << time<<" iters!"<< endl;
 }
 
-void contour_fine_tuning(vector<Point2f> &contour_)//过近的优化
+void contour_fine_tuning(vector<Point2f> &contour_)
 {
 	Mat imagefine = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
 	Point2f shift = Point2f(300, 600) - center_p(contour_);
@@ -1966,9 +1966,9 @@ void contour_fine_tuning(vector<Point2f> &contour_)//过近的优化
 						contour_[j] = contour_[j] - max_r*unit_v;
 						FOR(g, 1, win_width)
 						{
-							double ratio = max_r - max_r/ win_width*g;
+							double ratio = max_r - max_r / win_width*g;
 							contour_[(i + g) % csize] += ratio*unit_v;
-							contour_[(i - g + csize)% csize] += ratio*unit_v;
+							contour_[(i - g + csize) % csize] += ratio*unit_v;
 							contour_[(j + g) % csize] -= ratio*unit_v;
 							contour_[(j - g + csize) % csize] -= ratio*unit_v;
 							//cout << "dst: " << dst.size() << "   " << dst[0] << "   " << dst[1] << endl;					
@@ -1981,10 +1981,11 @@ void contour_fine_tuning(vector<Point2f> &contour_)//过近的优化
 			}
 		}
 	}
-	draw_contour_points(imagefine, contour_, shift+Point2f(600,0), 9, 2);
+	draw_contour_points(imagefine, contour_, shift + Point2f(600, 0), 9, 2);
 	cout << "fine tuning times: " << iter_times << endl;
-	imshow(to_string(iter_times)+ " After contour fine tuning: ", imagefine);
+	imshow(to_string(iter_times) + " After contour fine tuning: ", imagefine);
 }
+
 
 vector<Point2f> triangulateContour(vector<Point2f>& con_ori, MatrixXd& V, MatrixXi& F)
 {
@@ -2445,6 +2446,7 @@ int point_locate(vector<Point2f> con, Point2f p)
 	cout << "Not in the contour!" << endl;
 	return -1;
 }
+
 
 
 

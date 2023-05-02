@@ -531,11 +531,11 @@ namespace Tiling_tiles {
 					cout << "OK! No intersection!" << endl;
 				}
 
-				vector<Point2f> contour_dst = conf_trans(contour_2);
-				vector<Point2f> cont_re = conf_trans(con_re);
-				Mat two_c = Mat(800, 800, CV_8UC3, Scalar(255, 255, 255));
-				draw_contour_points(two_c, contour_dst, Point2f(400, 400) - center_p(contour_dst), 5, 2);
-				draw_contour_points(two_c, cont_re, Point2f(400, 400) - center_p(contour_dst), 6, 2);
+
+				Mat two_c = Mat(1000, 1600, CV_8UC3, Scalar(255, 255, 255));
+				Point2f ima_sh = Point2f(400, 500) - center_p(conf_trans(contour_2));
+				draw_contour_points(two_c, conf_trans(contour_2), ima_sh, 5, 2);
+				draw_contour_points(two_c, conf_trans(con_re), ima_sh, 6, 2);
 				imshow("2 contours:", two_c);
 
 				contour_2 = contour_opt(contour_2, anc_mid, 1, 0, 1, 1, 1);
@@ -544,6 +544,18 @@ namespace Tiling_tiles {
 				//将两个轮廓对齐
 				Point2f shift = contour_2[anc_mid[3]].point - con_re[anc_re[0]].point;
 				FOR(ii, 0, contour_2.size()) con_re[ii].point += shift;
+				FOR(gg, 0, 4)
+				{
+					cout << contour_2[anc_mid[gg]].point << "    " << con_re[anc_re[gg]].point << endl;
+				}
+				ima_sh = Point2f(1200, 500) - center_p(conf_trans(contour_2));
+				draw_contour_points(two_c, conf_trans(contour_2), ima_sh, 5, 2);
+				draw_contour_points(two_c, conf_trans(con_re), ima_sh, 6, 2);
+				draw_contour_points(two_c, conf_trans(con_re), ima_sh+ contour_2[anc_mid[2]].point - con_re[anc_re[3]].point, 6, 2);
+				draw_contour_points(two_c, conf_trans(con_re), ima_sh + contour_2[anc_mid[1]].point - con_re[anc_re[2]].point, 6, 2);	
+				draw_contour_points(two_c, conf_trans(con_re), ima_sh + contour_2[anc_mid[0]].point - con_re[anc_re[1]].point, 6, 2);
+				imshow("2 contours:", two_c);
+
 				merge_contours(contour_2, con_re, anc_mid, anc_re);
 				/*contour_dst = conf_trans(contour_2);
 				Mat draw2222 = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
@@ -573,17 +585,6 @@ namespace Tiling_tiles {
 				{
 					cout << "OK! No intersection!" << endl;
 				}*/
-
-				draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
-				Point2f tttsh = Point2f(600, 600) - center_p(conf_trans(contour_2));
-				draw_contour_points(draw2, conf_trans(contour_2), tttsh);
-				draw_contour_points(draw2, conf_trans(con_re), tttsh,4);
-				FOR(cc, 0, 4)
-				{
-					circle(draw2, contour_2[anc_mid[cc]].point, 2, Scalar(0, 0, 255));
-					circle(draw2, con_re[anc_re[cc]].point, 2, Scalar(0, 0, 255));
-				}
-				imshow("after: ", draw2);
 				
 				protoTile c1, c2;
 				c1.show_contour(conf_trans(con_re), anc_re);
@@ -595,7 +596,7 @@ namespace Tiling_tiles {
 	}
 
 
-	vector<Point_f> Tiling_opt::contour_opt(vector<Point_f> cont, vector<int> anc_p, int type, int times, bool pers_trans , bool coll_opt, bool deve_opt) //type: 0=contours bbx; 1: square bbx
+	vector<Point_f> Tiling_opt::contour_opt(vector<Point_f> cont, vector<int>& anc_p, int type, int times, bool pers_trans , bool coll_opt, bool deve_opt) //type: 0=contours bbx; 1: square bbx
 	{
 		vector<Point_f> con_re;
 		vector<Point2f> contour_dst = conf_trans(cont);
@@ -718,53 +719,47 @@ namespace Tiling_tiles {
 					//cout << "i: " << i << "   " << contour_dst[new_indes[i]] << endl;
 				}
 			}
+			//resample contour_dst
+			vector<Point2f> resam_ = { contour_dst[anc_p[0]],contour_dst[anc_p[1]], contour_dst[anc_p[2]], contour_dst[anc_p[3]] };
+			protoTile mid(contour_dst);
+			contour_dst = mid.contour;
+			vector<int> anc_re = relocate(resam_, contour_dst);
+			FOR(ii, 0, 4)
+			{
+				cout << anc_p[ii]<<"   "<<resam_[ii] << "   " << anc_re[ii]<<"   "<<contour_dst[anc_re[ii]] << endl;
+				contour_dst[anc_re[ii]] = resam_[ii];
+			}
+			anc_p = anc_re;
+			FOR(ii, 0, csize) con_re.push_back(Point_f(contour_dst[ii], general_p));
+			FOR(jj, 0, anc_re.size()) con_re[anc_re[jj]].type = fixed_p;
 
 			//cout << "csize " << csize << "  "<<contour_dst.size() << endl;
 			draw_contour(draw_, contour_dst, sh1, 8);
 			FOR(m, 0, 4) circle(draw_, frame_b[m] + sh1, 3, Scalar(0, 255, 0));
 			imshow(to_string(times)+" After align handle points:", draw_);
-			con_re = set_flags(contour_dst, cont);
+			//con_re = set_flags(contour_dst, cont);
 		}
-		/*contour_2 = set_flags(contour_dst, contour_2);
-		Mat draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
-		int first = 0, second = 0;
-		if (self_intersect(contour_dst, first, second)) cout << "Bad  intersection!" << endl;
-		if (translation_spec(contour_2, con_re, anc_mid, anc_re, draw2))
-		{
-		cout << "OK! No intersection!" << endl;
-		}
-		contour_dst = conf_trans(con_re);*/
-		//con_re = set_flags(contour_dst, con_re);
 		if (coll_opt)
 		{
 			//contour_de_crossing(contour_dst);
 			contour_fine_tuning(contour_dst);
-			con_re = set_flags(contour_dst, cont);
+			//con_re = set_flags(contour_dst, cont);
+			con_re = set_flags(contour_dst, con_re);
 		}
 		if (deve_opt)
 		{
-			/*vector<Point2f> resam_dst = sampling_ave(contour_dst, contour_dst.size());
-			vector<Point2f> resam_ = { contour_dst[anc_p[0]],contour_dst[anc_p[1]], contour_dst[anc_p[2]], contour_dst[anc_p[3]] };
-			vector<int> anc_re = relocate(resam_, resam_dst);
-			FOR(ii, 0, 4)
-			{
-				resam_dst[anc_re[ii]] = resam_[ii];
-				cout << resam_[ii] << "   " << resam_dst[anc_re[ii]] << endl;
-			}
-*/
+			
 			//degree_after_opt = whole_con_opt(resam_dst, anc_re, 0);
 			degree_after_opt = whole_con_opt(contour_dst, anc_p, 0);
-			con_re = set_flags(contour_dst, cont);
-
+			//con_re = set_flags(contour_dst, cont);
+			con_re = set_flags(contour_dst, con_re);
 			Mat dep_opt  = Mat(800, 800, CV_8UC3, Scalar(255, 255, 255));
 			draw_contour_points(dep_opt, contour_dst, Point2f(400, 400) - center_p(contour_dst), 5, 2);
+			FOR(m, 0, 4) circle(dep_opt, contour_dst[anc_p[m]] + Point2f(400, 400) - center_p(contour_dst), 3, Scalar(0, 255, 0));
 			imshow(to_string(times) + " After contour deployability optimization:", dep_opt);
 			//degree_after_opt = whole_con_opt(contour_dst, anc_mid, 0);
 			cout << "After developable optimation, the collision degree: " << degree_after_opt << endl;
-			/*vector<Point_f> con_resam;
-			FOR(ii, 0, resam_dst.size()) con_resam.push_back(Point_f(resam_dst[ii], general_p));
-			FOR(jj, 0, anc_re.size()) con_resam[anc_re[jj]].type = fixed_p;
-			con_re = con_resam;*/
+		
 		}
 		return con_re;
 	}
@@ -2004,19 +1999,18 @@ namespace Tiling_tiles {
 			for (int n = s_index1; n <= e_index1; n++)
 				c_seg1.push_back(c1[n%cnum1]);
 			c1_seg.push_back(c_seg1);
-			//cout << g << "  " << c_seg1.size() << "  " << c_seg1[0].point << "  " << c_seg1.back().point << endl;
+			cout << g << "  " << c_seg1.size() << "  " << c_seg1[0].point << "  " << c_seg1.back().point << endl;
 		}
 		for (int g = 0; g < anc2.size(); g++)
 		{
 			vector<Point_f> c_seg2;
-			//cout << final_pair[g].first << "  :  " << final_pair[g].second << endl;
 			int s_index2 = anc2[g];
 			int e_index2 = anc2[(g + 1) % anc2.size()];
 			e_index2> s_index2 ? e_index2 : e_index2 += cnum1;
 			for (int n = e_index2; n >= s_index2; n--)
 				c_seg2.push_back(c2[n%cnum1]);
 			c2_seg.push_back(c_seg2);
-			//cout << g << "  " << c_seg2.size() << "  " << c_seg2[0].point << "  " << c_seg2.back().point << endl;
+			cout << g << "  " << c_seg2.size() << "  " << c_seg2[0].point << "  " << c_seg2.back().point << endl;
 		}
 		vector<Point_f> c1_;
 		vector<Point_f> c2_;
@@ -2031,6 +2025,7 @@ namespace Tiling_tiles {
 			Point2f start1 = c1_seg[i][0].point;
 			Point2f start2 = c2_seg[(i + 2) % 4][0].point;
 			Point2f sh_ = start1 - start2;
+			vector<Point_f> morph_seg = morph_segment(contour1_seg[seg_index], contour2_seg[seg_index], start_new, ratio, num_e);
 			FOR(j, 0, seg_size)
 			{
 				Point2f mid = 0.5*(c1_seg[i][j].point + c2_seg[(i + 2) % 4][j].point + sh_);
@@ -2054,6 +2049,16 @@ namespace Tiling_tiles {
 		c1 = c1_;
 		c2 = c2_;
 		//cout << c1.size() << "  " << c2.size() << endl;
+		Mat merge_ima = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
+		Point2f tttsh = Point2f(600, 600) - center_p(conf_trans(c1));
+		draw_contour_points(merge_ima, conf_trans(c1), tttsh);
+		draw_contour_points(merge_ima, conf_trans(c2), tttsh, 4);
+		FOR(cc, 0, 4)
+		{
+			circle(merge_ima, c1[anc1[cc]].point, 2, Scalar(0, 0, 255));
+			circle(merge_ima, c2[anc2[cc]].point, 2, Scalar(0, 0, 255));
+		}
+		imshow("After merging: ", merge_ima);
 	}
 
 

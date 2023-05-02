@@ -140,7 +140,7 @@ namespace Tiling_tiles {
 		void tiliing_generation(string nameid);
 		void tiliing_gen_specify(string nameid, vector<int> anc_points);
 		void tiliing_gen_specify2(string nameid, vector<int> anc_points);
-		vector<Point_f> contour_opt(vector<Point_f> cont, vector<int> anc_p, int type, int times, bool pers_trans=true,	bool coll_opt = false, bool deve_opt = false); //type: 0=contours bbx; 1: square bbx
+		vector<Point_f> contour_opt(vector<Point_f> cont, vector<int>& anc_p, int type, int times, bool pers_trans=true,	bool coll_opt = false, bool deve_opt = false); //type: 0=contours bbx; 1: square bbx
 		void load_dataset(bool input_images);
 		void load_para(string filename);
 		void RotationVis(protoTile c1, protoTile c2, int clockorder);
