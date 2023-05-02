@@ -746,6 +746,12 @@ double sin_2v(Point2f &v0, Point2f &v1)
 	return v0u.x*v1u.y - v0u.y*v1u.x;
 }
 
+double angle_2v(Point2f &v0, Point2f &v1)   //angle from v0 to v1
+{
+	double angle = atan2(v1.y, v1.x) - atan2(v0.y, v0.x);
+	return angle;
+}
+
 double cos_3edges(double l1, double l2, double l3)
 {
 	//l1,l2分别为左右两边,l3为对边
@@ -930,13 +936,9 @@ vector<Point2f> base_frame2(vector<Point2f> frame, int type) //one fixed point
 
 Point2f Polar_Car(Point2f origin, Point2f axis_p, double angle, double length)
 {
-	double angle_ori;
+
 	Point2f axis = axis_p - origin;
-	double angle_o_cos = cos_2v(Point2f(1, 0), axis);
-	double angle_o_sin = sin_2v(Point2f(1, 0), axis);
-	//cout << "axis:  "<<axis << "   " << angle_o_cos << "   " << angle_o_sin << endl;
-	if (angle_o_sin > 0) angle_ori = acos(angle_o_cos);
-	else angle_ori = -acos(angle_o_cos);
+	double angle_ori = angle_2v(Point2f(1, 0), axis);
 	//cout << angle_ori << endl;
 	Point2f target = Point2f(cos(angle_ori + angle), sin(angle_ori + angle));
 	target = length*  target + origin;
@@ -1637,10 +1639,10 @@ double getCurvature( Point2f p1,  Point2f p2,  Point2f p3) {
 //edge evaluation and optimization
 void bound_recover(vector<Point2f>& old_edge, vector<Point2f> &new_edge)
 {
-	Mat draw2 = Mat(600, 600, CV_8UC3, Scalar(255, 255, 255));
+	/*Mat draw2 = Mat(600, 600, CV_8UC3, Scalar(255, 255, 255));
 	Point2f shift = Point2f(300, 300) - center_p(old_edge);
 	draw_contour_points(draw2, old_edge, shift, 2, 3);
-	draw_contour_points(draw2, new_edge, shift, 5, 3);
+	draw_contour_points(draw2, new_edge, shift, 5, 3);*/
 
 	int csize = old_edge.size();
 	if (new_edge.size() != csize) cout << "Cannot recover for different size!" << endl;
@@ -1649,21 +1651,13 @@ void bound_recover(vector<Point2f>& old_edge, vector<Point2f> &new_edge)
 	vector<double> angles;
 	FOR(i, 1, index + 1) 
 	{
-		double cos_ = cos_2v(old_edge[index - i] - origin, old_edge[index + i] - origin);
-		double sin_ = sin_2v(old_edge[index - i] - origin, old_edge[index + i] - origin);
-		double angle_ = acos(cos_);
-		if (sin_ < 0) angle_ = -angle_;
+		double angle_ = angle_2v(old_edge[index - i] - origin, old_edge[index + i] - origin);
 		angles.push_back(angle_);
 	}
 	Point2f origin2 = new_edge[index];
 	FOR(i, 1, index + 1) 
 	{
-		Point2f p0p1 = new_edge[index - i] - origin2;
-		Point2f p2p1 = new_edge[index + i] - origin2;
-		double cos_2 = cos_2v(p0p1, p2p1);
-		double sin_2 = sin_2v(p0p1, p2p1);
-		double angle_2= acos(cos_2);
-		if (sin_2< 0) angle_2 = -angle_2;
+		double angle_2 = angle_2v(new_edge[index - i] - origin2, new_edge[index + i] - origin2);
 		if (angle_2*angles[i - 1] < 0) angle_2 = angles[i - 1]/abs(angles[i - 1])*(2*PI - abs(angle_2)) ;
 		double angle_delta = abs(angles[i - 1]) - abs(angle_2);
 		double angle_add = 0.5*(1 - 1.0*i / (index + 1))*angle_delta/PI*180; //每一边移动的角度
@@ -1682,8 +1676,8 @@ void bound_recover(vector<Point2f>& old_edge, vector<Point2f> &new_edge)
 		}
 	}
 
-	draw_contour_points(draw2, new_edge, shift, 7, 3);
-	imshow("show:", draw2);
+	/*draw_contour_points(draw2, new_edge, shift, 7, 3);
+	imshow("show:", draw2);*/
 }
 
 double bound_collision(vector<Point2f> cont, vector<int> indexes, int type)
@@ -1779,7 +1773,8 @@ double edge_nd_opt(vector<Point2f>& edge, int type)
 	}
 	Point2f origin_p = edge[0];
 	Point2f end_p = edge[esize - 1];
-	double edge_colli_score = edge_nd_degree(edge, type);
+	double edge_colli_score = edge_nd_degree(edge, 0);
+	cout << " edge_colli_score: " << edge_colli_score << endl;
 	int count = 0;
 	int max_times = 15;
 	int win_width = 0.3*max_times + 1;
@@ -1822,7 +1817,7 @@ double edge_nd_opt(vector<Point2f>& edge, int type)
 			}
 		}
 		edge_colli_score = edge_nd_degree(edge, type);
-		//cout << "count: " << count << endl;
+		cout << "count: " << count << endl;
 	}
 	if (type == 1)
 	{
@@ -1985,7 +1980,6 @@ void contour_fine_tuning(vector<Point2f> &contour_)
 	cout << "fine tuning times: " << iter_times << endl;
 	imshow(to_string(iter_times) + " After contour fine tuning: ", imagefine);
 }
-
 
 vector<Point2f> triangulateContour(vector<Point2f>& con_ori, MatrixXd& V, MatrixXi& F)
 {
@@ -2446,6 +2440,9 @@ int point_locate(vector<Point2f> con, Point2f p)
 	cout << "Not in the contour!" << endl;
 	return -1;
 }
+
+
+
 
 
 

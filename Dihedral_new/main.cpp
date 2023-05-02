@@ -28,8 +28,8 @@ int main()
 	{
 		// 5: 6,11,16,29   13: 1,12,27,36  14: 0,4,17,24   22: 8,19,28,36   28: 6,23,25,35  31: 0,15,18,27   37: 10,18,25,37
 		//44:6,19,24,31    71:4,14,22,32    70: 0,8,19,28    192: 0,9,18,27   157:6,12,23,31
-		vector<int> anc_points = { 4,14,22,32 };
-		tiling.tiliing_gen_specify2("71", anc_points);
+		vector<int> anc_points = { 6,11,16,29 };
+		tiling.tiliing_gen_specify2("5", anc_points);
 		/*Mat draw2 = Mat(600, 600, CV_8UC3, Scalar(255, 255, 255));
 		
 		vector<Point2f> old_edge = {Point2f(400,120),Point2f(350,150),Point2f(300,180),Point2f(250,200),Point2f(200,150),Point2f(150,120),Point2f(100,100)};

@@ -63,6 +63,7 @@ vector<Point> P2ftoP(vector<Point2f> cont);
 double length_2p(Point2f &u, Point2f &v);
 double cos_2v(Point2f &v0, Point2f &v1);
 double sin_2v(Point2f &v0, Point2f &v1);
+double angle_2v(Point2f &v0, Point2f &v1);
 double cos_3edges(double l1, double l2, double l3);
 double crossProduct_2v(Point2f &v0, Point2f &v1);
 double cross(Point2f a, Point2f b, Point2f c); //Èýµã²æ»ý(a-c)*(b-c)
@@ -117,7 +118,6 @@ vector<Point2f> triangulate_Contours_bbx(vector<Point2f>& cont1, vector<int> anc
 vector<Point2f> triangulate_bbx(vector<Point2f>& cont1, MatrixXd& V, MatrixXi& F);
 int add_points(vector<Point2f>& contour, double sparse_ratio);
 int point_locate(vector<Point2f> con, Point2f p);
-
 
 
 template<typename T>
