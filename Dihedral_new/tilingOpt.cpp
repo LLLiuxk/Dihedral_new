@@ -504,7 +504,7 @@ namespace Tiling_tiles {
 				double angle = 165;
 				double ratio_max = 100;
 				double result_score = 0;
-				double ratio = 0.5;
+				double ratio = 0.6;
 				vector<Point_f> contour_2 = morphing(contour1, contour2, path_fea, ratio);
 				cout << "contour_2.size:  " << contour_2.size() << "   " << contour1.size() << endl;
 				//FOR(mm, 0, contour_2.size()) cout << contour_2[mm].type << "   " << contour1[mm].type << endl;
@@ -550,10 +550,11 @@ namespace Tiling_tiles {
 				}
 				ima_sh = Point2f(1200, 500) - center_p(conf_trans(contour_2));
 				draw_contour_points(two_c, conf_trans(contour_2), ima_sh, 5, 2);
-				draw_contour_points(two_c, conf_trans(con_re), ima_sh, 6, 2);
+				FOR(ii,0,4) draw_contour_points(two_c, conf_trans(con_re), ima_sh + contour_2[anc_mid[ii]].point - con_re[anc_re[(ii + 1)%4]].point, 6, 2);
+				/*draw_contour_points(two_c, conf_trans(con_re), ima_sh, 6, 2);
 				draw_contour_points(two_c, conf_trans(con_re), ima_sh+ contour_2[anc_mid[2]].point - con_re[anc_re[3]].point, 6, 2);
 				draw_contour_points(two_c, conf_trans(con_re), ima_sh + contour_2[anc_mid[1]].point - con_re[anc_re[2]].point, 6, 2);	
-				draw_contour_points(two_c, conf_trans(con_re), ima_sh + contour_2[anc_mid[0]].point - con_re[anc_re[1]].point, 6, 2);
+				draw_contour_points(two_c, conf_trans(con_re), ima_sh + contour_2[anc_mid[0]].point - con_re[anc_re[1]].point, 6, 2);*/
 				imshow("2 contours:", two_c);
 				double merge_ratio = 0.5;
 				merge_contours(contour_2, con_re, anc_mid, anc_re, merge_ratio);
@@ -679,6 +680,7 @@ namespace Tiling_tiles {
 				anc_mid_.push_back(point_locate(tt, frame[g]));
 				cout << "frame[g]: " << frame[g] <<"   "<< anc_mid_.back()<< endl;
 			}
+			cout << frame[1] - frame[0] << "   " << frame[2] - frame[1] << endl;
 			// before 
 			Mat draw_ = Mat(1000, 1000, CV_8UC3, Scalar(255, 255, 255));
 			Point2f sh1 = Point2f(500, 500) - center_p(contour_dst);
@@ -720,20 +722,39 @@ namespace Tiling_tiles {
 				}
 			}
 			//resample contour_dst
+			
+			Mat draw_22 = Mat(800, 1200, CV_8UC3, Scalar(255, 255, 255));
 			vector<Point2f> resam_ = { contour_dst[anc_p[0]],contour_dst[anc_p[1]], contour_dst[anc_p[2]], contour_dst[anc_p[3]] };
+			Point2f sht = Point2f(300, 300) - center_p(contour_dst);
+			draw_contour_points(draw_22, contour_dst,sht);
+			draw_contour_points(draw_22, resam_, sht, 5,3);
+			circle(draw_22, contour_dst[0]+sht, 3, Scalar(0, 255, 0), 1);
 			protoTile mid(contour_dst);
 			contour_dst = mid.contour;
 			vector<int> anc_re = relocate(resam_, contour_dst);
+			int move_sht = 0 - anc_re[0];
+			if (move_sht != 0)
+			{
+				vector<Point2f> new_c;
+				FOR(ii, 0, csize) new_c.push_back(contour_dst[(anc_re[0] + ii) % csize]);
+				contour_dst = new_c;
+				FOR(ii, 0, 4) anc_re[ii] = (anc_re[ii] + move_sht + csize) % csize;
+			}
+			sht = Point2f(600, 0) + sht;
+			draw_contour_points(draw_22, contour_dst, sht);
+			circle(draw_22, contour_dst[0] + sht, 3, Scalar(0, 255, 0), 1);
+			FOR(tt,0,4) circle(draw_22, contour_dst[anc_re[tt]] + sht, 3, Scalar(0, 0, 255), 3);
+			imwrite("D:/ressample.png", draw_22);
 			FOR(ii, 0, 4)
 			{
-				cout << anc_p[ii]<<"   "<<resam_[ii] << "   " << anc_re[ii]<<"   "<<contour_dst[anc_re[ii]] << endl;
+				cout << anc_p[ii]<<"   "<<resam_[ii] << "   " << anc_re[ii]<<"   "<< contour_dst[anc_p[ii]]<<"   "<<contour_dst[anc_re[ii]] << endl;
 				contour_dst[anc_re[ii]] = resam_[ii];
 			}
 			anc_p = anc_re;
 			FOR(ii, 0, csize) con_re.push_back(Point_f(contour_dst[ii], general_p));
 			FOR(jj, 0, anc_re.size()) con_re[anc_re[jj]].type = fixed_p;
 
-			//cout << "csize " << csize << "  "<<contour_dst.size() << endl;
+			cout << "csize " << csize << "  "<<contour_dst.size() <<"  "<<con_re.size()<< endl;
 			draw_contour(draw_, contour_dst, sh1, 8);
 			FOR(m, 0, 4) circle(draw_, frame_b[m] + sh1, 3, Scalar(0, 255, 0));
 			imshow(to_string(times)+" After align handle points:", draw_);
@@ -745,6 +766,7 @@ namespace Tiling_tiles {
 			contour_fine_tuning(contour_dst);
 			//con_re = set_flags(contour_dst, cont);
 			con_re = set_flags(contour_dst, con_re);
+			cout << "csize " << csize << "  " << contour_dst.size() << "  " << con_re.size() << endl;
 		}
 		if (deve_opt)
 		{
@@ -759,7 +781,7 @@ namespace Tiling_tiles {
 			imshow(to_string(times) + " After contour deployability optimization:", dep_opt);
 			//degree_after_opt = whole_con_opt(contour_dst, anc_mid, 0);
 			cout << "After developable optimation, the collision degree: " << degree_after_opt << endl;
-		
+			cout << "csize " << csize << "  " << contour_dst.size() << "  " << con_re.size() << endl;
 		}
 		return con_re;
 	}
@@ -1494,11 +1516,13 @@ namespace Tiling_tiles {
 					FOR(n, 1-mar, mar)
 					{
 						int tem_sec = (sec_index + n + sec_size) % sec_size;
-						if (tem_sec > last_index)
+						/*if (tem_sec > last_index)
 						{
 							if (prototile_second.contour_f[tem_sec].type == fea_p)
 								waiting_merge.push_back(tem_sec);
-						}			
+						}	*/
+						if (prototile_second.contour_f[tem_sec].type == fea_p)
+							waiting_merge.push_back(tem_sec);
 					}
 					//if (m == 85) cout << waiting_merge.size()<<"    "<<waiting_merge[0]  << endl;
 					if (waiting_merge.empty())
@@ -1534,7 +1558,7 @@ namespace Tiling_tiles {
 								//cout << cand_index<<"   "<<prototile_second.contour[(waiting_merge[t] - 1 + pcsize) % pcsize] << "   " << prototile_second.contour[waiting_merge[t]] << "   " << prototile_second.contour[(waiting_merge[t] + 1) % pcsize] << endl;
 								//cout << cand_index << "   " << prototile_second.contour[cand_index - 1 ] << "   " << prototile_second.contour[cand_index] << "   " << prototile_second.contour[cand_index + 1] << endl;
 								double dis_tar = tar_length_2p(inner_tar[one_pair.first], cand_tar[cand_index]) + 0.02*abs(dis_cos1 - dis_cos2);
-								//cout << "distar" << dis_tar <<"  dis_cos1:"<< dis_cos1<<"   "<< dis_cos2<< endl;
+								cout << "distar: " << dis_tar<<"   "<<tar_length_2p(inner_tar[one_pair.first], cand_tar[cand_index]) <<"  dis_cos1:"<< dis_cos1<<"   "<< dis_cos2<< endl;
 								if (dis_tar < min_dis_tar)
 								{
 									min_dis_tar = dis_tar;
@@ -1542,7 +1566,7 @@ namespace Tiling_tiles {
 								}
 							}
 						}
-						cout << "m: " << m << "   " << min_index << endl;
+						cout << "m: " << m << "   min_index: " << min_index << "    " << waiting_merge[min_index] << endl;
 						int repet_index = -1;
 						FOR(pin, 0, path_fea.size())
 						{
@@ -1844,10 +1868,9 @@ namespace Tiling_tiles {
 		if (end.type < 4) // 确定新的end点 
 		{
 			double angle1 = angle_2v(Point2f(1, 0), seg1.back().point - seg1[0].point);
-			double angle_12= angle_2v(seg1.back().point - seg1[0].point, seg2.back().point - seg2[0].point);
-			/*double angle_12 = cos_2v(seg1.back().point - seg1[0].point, seg2.back().point - seg2[0].point);
+			double angle_12 = cos_2v(seg1.back().point - seg1[0].point, seg2.back().point - seg2[0].point);
 			angle_12 = acos(angle_12);
-			if (sin_2v(seg1.back().point - seg1[0].point, seg2.back().point - seg2[0].point) < 0) angle_12 = -angle_12;*/
+			if (sin_2v(seg1.back().point - seg1[0].point, seg2.back().point - seg2[0].point) < 0) angle_12 = -angle_12;
 			angle_ave = angle1 + (1 - ratio)*angle_12;
 			length_ave = ratio*length_2p(seg1.back().point, seg1[0].point) + (1 - ratio)* length_2p(seg2.back().point, seg2[0].point);
 			cout << "angle1: " << angle1/PI*180 << " angle_12: " << angle_12 / PI * 180 << " length: " << length_2p(seg1.back().point, seg1[0].point) << "   " << length_2p(seg2.back().point, seg2[0].point) << "  " << length_ave << endl;
@@ -2067,6 +2090,7 @@ namespace Tiling_tiles {
 		{
 			circle(merge_ima, c1[anc1[cc]].point + tttsh, 2, Scalar(0, 255, 0));
 			circle(merge_ima, c2[anc2[cc]].point + tttsh, 2, Scalar(0, 255, 0));
+			//cout << c1[anc1[cc]].point << "  c2: " << c2[anc2[cc]].point << endl;
 		}
 		imshow("After merging: ", merge_ima);
 	}

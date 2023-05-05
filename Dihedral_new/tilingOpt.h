@@ -74,7 +74,7 @@ namespace Tiling_tiles {
 		int csize = con.size();
 		if (csize != con_ori.size())
 		{
-			cout << "Cannot set flags for conts with different size!" << endl;
+			cout << "Warning: Cannot set flags for conts with different size!" << endl;
 		}
 		else
 		{

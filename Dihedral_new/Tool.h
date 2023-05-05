@@ -47,6 +47,7 @@ double conotour_align(vector<Point2f>& cont1, vector<Point2f>& cont2, vector<pai
 
 vector<int>  cal_feature(vector<Point2f> contour_, int  n_min, int n_max, double angle_cos, bool show_result = false); //n_min, n_max 表示计算cos度数选取的点个数
 vector<Point2f> con_sample(vector<Point2f> contour_, vector<int> &feature_, int sam_num, bool show_result = false);
+vector<Point2f> con_resample(vector<Point2f> contour_, int sam_num, bool show_result = false);
 vector<Point2f> sampling_ave(vector<Point2f> contour_, int points_num);  //points_num是采样点的个数
 vector<Point2f> sampling_seg(vector<Point2f> &segment, int points_num);
 vector<int> relocate(vector<Point2f> anc_points, vector<Point2f> c2);

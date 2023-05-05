@@ -546,6 +546,20 @@ vector<Point2f> con_sample(vector<Point2f> contour_, vector<int> &feature_, int 
 	return contour_sam;
 }
 
+vector<Point2f> con_resample(vector<Point2f> contour_, int sam_num, bool show_result)
+{
+	int csize = contour_.size();
+	vector<int> fea = cal_feature(contour_, 1, 0.02*csize, cos(PI * 165 / 180), show_result);
+	vector<Point2f> fea_p;
+	FOR(i, 0, fea.size()) fea_p.push_back(contour_[fea[i]]);
+	vector<Point2f> contour_2 = sampling_ave(contour_, sam_num);
+	vector<int> fea_index = relocate(fea_p, contour_2);
+	cout <<"fea_index: "<< fea.size() << "    " << fea_index.size()<<"   "<< contour_2.size() << endl;
+	FOR(i, 0, fea_index.size()) contour_2[fea_index[i]] = fea_p[i];
+	return contour_2;
+
+}
+
 vector<Point2f> sampling_ave(vector<Point2f> contour_, int points_num)  //points_num是采样点的个数
 {
 	double length = arcLength(contour_, true);
@@ -1832,6 +1846,7 @@ double whole_con_opt(vector<Point2f>& cont, vector<int>& indexes, int type)
 {
 	double degree_opt = 0;
 	int index_size = indexes.size();
+	cout << indexes[0] << "  " << indexes[1] << "  " << indexes[2] << "  " << indexes[3] << endl;
 	int csize = cont.size();
 	vector<vector<Point2f>> four_edges;
 	FOR(i, 0, index_size - 1)
@@ -1843,7 +1858,7 @@ double whole_con_opt(vector<Point2f>& cont, vector<int>& indexes, int type)
 	vector<Point2f> edge;
 	for (int j = indexes[index_size - 1]; j <= indexes[0] + csize; j++)  edge.push_back(cont[j%csize]);
 	four_edges.push_back(edge);
-
+	cout << four_edges.size() << "   " << four_edges[0].size() << endl;
 	FOR(i, 0, four_edges.size())  degree_opt+=edge_nd_opt(four_edges[i], type);
 	vector<Point2f> new_c;
 	vector<int> new_index;
