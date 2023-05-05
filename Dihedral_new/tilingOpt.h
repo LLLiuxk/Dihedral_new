@@ -19,7 +19,7 @@
 #define AngleThres 165
 #define SCDisThres 0.35
 #define WindowsWidth 10
-#define path_margin 4
+#define path_margin 6
 #define handle_area_width 4
 #define DefaultPath "C:/Users/liuxk/OneDrive/Recent/DualNPR/"
 #define SavePath "D:/vs2015project/Dihedral_new/result/"
@@ -154,6 +154,7 @@ namespace Tiling_tiles {
 
 		void match_candidate(int inner_index);
 		void match_candidate_(int inner_index);
+		void filter_path(vector<pair<int, int>> path, vector<Point_f> con2, vector<Point_f> con_mid, vector<vector<double>> inner_tar, vector<vector<double>> cand_tar, int shift);
 
 		vector<pair<int, bool>> compare_TAR(vector<Point_f> contour_mid, int chosen_num, int window_width = WindowsWidth); //chosen_num  选择的最终结果的数目
 		void feature_match(vector<vector<double>> first_arr, vector<vector<double>> second_arr, vector<int> first_fea, vector<int> sec_fea, vector<pair<int, int>>& path, int &sec_shift, int width);

@@ -91,6 +91,34 @@ void draw_pair(Mat &drawing_, vector<Point2f> contour1, vector<Point2f> contour2
 	}
 }
 
+void draw_path(vector<Point2f> contour1, vector<Point2f> contour2, vector<int> fea1, vector<int> fea2, vector<pair<int, int>> path_fea)
+{
+	Mat fea_match = Mat(600, 1000, CV_8UC3, Scalar(255, 255, 255));
+	Point2f sh = Point2f(300, 300) - center_p(contour1);
+	Point2f shh2 = sh + Point2f(400, 0);
+	
+	draw_contour_points(fea_match, contour1, sh, 5, 2);
+	draw_contour_points(fea_match, contour2, shh2, 7, 2);
+	//----------show the feature------------
+	FOR(i, 0, fea1.size())
+		circle(fea_match, contour1[fea1[i]] + sh, 3, Scalar(0, 0, 255), -1);
+	FOR(i, 0, fea2.size())
+		circle(fea_match, contour2[fea2[i]] + shh2, 3, Scalar(0, 125, 255), -1);
+	circle(fea_match, contour1[fea1[0]] + sh, 5, Scalar(120, 0, 255), -1);
+	circle(fea_match, contour2[fea2[0]] + shh2, 5, Scalar(0, 125, 255), -1);
+	circle(fea_match, contour1[0] + sh, 6, Scalar(25, 200, 25), 2);
+	circle(fea_match, contour2[0] + shh2, 6, Scalar(25, 200, 25), 2);
+	FOR(i, 0, path_fea.size())
+	{
+		//int tsfsize = prototile_second.feature_points.size();
+		Point2f f1 = contour1[path_fea[i].first] + sh;
+		Point2f f2 = contour2[path_fea[i].second] + shh2;
+		line(fea_match, f1, f2, colorbar[6].second);
+	}
+	imshow("fea match", fea_match);
+	imwrite("fea match.png", fea_match);
+}
+
 void progress_bar(double index, double total)
 {
 	cout << "Loading: ";
@@ -762,7 +790,10 @@ double sin_2v(Point2f &v0, Point2f &v1)
 
 double angle_2v(Point2f &v0, Point2f &v1)   //angle from v0 to v1
 {
-	double angle = atan2(v1.y, v1.x) - atan2(v0.y, v0.x);
+	double cos_ = cos_2v(v0, v1);
+	double angle = acos(cos_);
+	double sin_ = sin_2v(v0, v1);
+	if (sin_ < 0) angle = -angle;
 	return angle;
 }
 
