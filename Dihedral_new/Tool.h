@@ -39,6 +39,7 @@ void progress_bar(double index, double total);
 //geometry tools
 //---------polygon process-----------
 Point2f center_p(vector<Point2f> contour_);
+double area_polygon(vector<Point2f> poly);
 vector<Point2f> Trans_contour(vector<Point2f> c1, Point2f trans_shift);
 vector<Point2f> Rotate_contour(vector<Point2f> src, Point2f center, double angle);
 vector<Point2f> Flip_contour(vector<Point2f> cont_s);
@@ -76,7 +77,7 @@ vector<Point2f> base_frame2(vector<Point2f> frame, int type); //one fixed point
 Point2f Polar_Car(Point2f origin, Point2f axis_p, double angle, double length);
 
 //----------cross points------------
-//Point2f intersection(Point2f a, Point2f b, Point2f c, Point2f d); //两条直线的交点
+Point2f intersection(Point2f a, Point2f b, Point2f c, Point2f d); //两条直线的交点
 int line_intersection(Point2f start1, Point2f end1, Point2f start2, Point2f end2, Point2f &cross_p);
 vector<Point2f> line_polygon(Point2f start1, Point2f end1, vector<Point2f> contour, bool closed = true);
 vector<Point2f> poly_poly(vector<Point2f> contour, vector<Point2f> contour_);
@@ -114,6 +115,7 @@ double whole_con_opt(vector<Point2f> &cont, vector<int> &indexes, int type);
 void contour_de_crossing(vector<Point2f> &contour_);  //交叉的优化
 void contour_fine_tuning(vector<Point2f> &contour_);  //过近的优化
 
+//contour triangulation
 vector<Point2f> triangulateContour(vector<Point2f>& con_ori, MatrixXd& V, MatrixXi& F);
 vector<Point2f> triangulate_2Contours(vector<Point2f>& cont1, vector<Point2f>& cont2, MatrixXd& V, MatrixXi& F);
 vector<Point2f> triangulate_Contours_bbx(vector<Point2f>& cont1, vector<int> anc1, MatrixXd& V, MatrixXi& F);
@@ -121,6 +123,16 @@ vector<Point2f> triangulate_bbx(vector<Point2f>& cont1, MatrixXd& V, MatrixXi& F
 int add_points(vector<Point2f>& contour, double sparse_ratio);
 int point_locate(vector<Point2f> con, Point2f p);
 
+//calculate the area of shape
+inline int dcmp(double x)
+{
+	if (x > eps) return 1;
+	return x < -eps ? -1 : 0;
+}
+double CPIA(vector<Point2f> a, vector<Point2f> b, int na, int nb);//ConvexPolygonIntersectArea
+double SPIA(vector<Point2f> a, vector<Point2f> b);//SimplePolygonIntersectArea 调用此函数
+double evaluation_area(vector<Point2f> c1, vector<Point2f> c2);
+double evaluation_area_pixels(vector<Point2f> c1, vector<Point2f> c2);
 
 template<typename T>
 T delete_vector(vector<T> &vec, int index_p)

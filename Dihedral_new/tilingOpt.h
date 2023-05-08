@@ -163,13 +163,9 @@ namespace Tiling_tiles {
 		vector<Point_f> morphing_dir(vector<Point_f> c_mid, vector<Point_f> c_cand, vector<pair<int, int>> path, double ratio);
 		void merge_contours(vector<Point_f> &c1, vector<Point_f> &c2, vector<int>& anc1, vector<int>& anc2, double ratio);
 		vector<Point2f> merge_segment(vector<Point2f> seg1, vector<Point2f> seg2, double ratio, double &num_error); 
+		double deform_evalue(vector<Point2f> con, vector<Point2f> ori_c);
 
 	public:
-		//double dis[202][202];//两组点之间的坐标差异
-		//double dis_cur[202][202];//两组点之间的曲率差异
-		//double distance[202][202];
-		//int step[202][202];//记录总的步数
-
 		int all_types;
 		int sampling_num;
 		int match_window_width;

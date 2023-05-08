@@ -142,6 +142,16 @@ Point2f center_p(vector<Point2f> contour_)
 	return  1.0 / contour_.size()*cen;
 }
 
+double area_polygon(vector<Point2f> poly)
+{
+	int n = poly.size();
+	if (n < 3) return 0.0;
+	double s = 0.0;
+	for (int i = 0; i < n; i++)
+		s += poly[(i + 1) % n].y * poly[i].x - poly[(i + 1) % n].x * poly[i].y;
+	return fabs(s) / 2.0;
+}
+
 vector<Point2f> Trans_contour(vector<Point2f> c1, Point2f trans_shift)
 {
 	vector<Point2f> c2;
@@ -991,6 +1001,15 @@ Point2f Polar_Car(Point2f origin, Point2f axis_p, double angle, double length)
 }
 
 //----------cross points------------
+Point2f intersection(Point2f a, Point2f b, Point2f c, Point2f d)
+{
+	Point2f p = a;
+	double t = ((a.x - c.x)*(c.y - d.y) - (a.y - c.y)*(c.x - d.x)) / ((a.x - b.x)*(c.y - d.y) - (a.y - b.y)*(c.x - d.x));
+	p.x += (b.x - a.x)*t;
+	p.y += (b.y - a.y)*t;
+	return p;
+}
+
 int line_intersection(Point2f start1, Point2f end1, Point2f start2, Point2f end2, Point2f &cross_p)
 {
 	Point2f s10 = end1 - start1;
@@ -1036,8 +1055,7 @@ int line_intersection(Point2f start1, Point2f end1, Point2f start2, Point2f end2
 	return 1;
 }
 
-vector<Point2f> 
-line_polygon(Point2f start1, Point2f end1, vector<Point2f> contour, bool closed)
+vector<Point2f> line_polygon(Point2f start1, Point2f end1, vector<Point2f> contour, bool closed)
 {
 	vector<Point2f> all_inter;
 	if (closed) contour.push_back(contour[0]);
@@ -1103,7 +1121,9 @@ vector<Point2f> poly_poly(vector<Point2f> contour, vector<Point2f> contour_)
 
 bool self_intersect(vector<Point2f> &contour_, int &first, int &second)
 {
+	//找index 距离最远的两个交叉点
 	int sizec = contour_.size();
+	int max_length = 0;
 	for (int i = 0; i < sizec - 2; i++)
 	{
 		int start_n;
@@ -1122,12 +1142,16 @@ bool self_intersect(vector<Point2f> &contour_, int &first, int &second)
 			Point2f crossp;
 			if (line_intersection(contour_[i], contour_[i + 1], contour_[j], contour_[(j + 1) % sizec], crossp) == 1)
 			{
-				first = i;
-				second = j;
-				return true;
+				if (abs(i - j) > max_length)
+				{
+					max_length = abs(i - j);
+					first = i;
+					second = j;
+				}
 			}
 		}
 	}
+	if (max_length != 0) return true;
 	first = -1;
 	second = -1;
 	return false;
@@ -2486,6 +2510,122 @@ int point_locate(vector<Point2f> con, Point2f p)
 	cout << "Not in the contour!" << endl;
 	return -1;
 }
+
+double CPIA(vector<Point2f> a, vector<Point2f> b, int na, int nb)//ConvexPolygonIntersectArea
+{
+	vector<Point2f> p(20), tmp(20);
+	int tn, sflag, eflag;
+	a[na] = a[0], b[nb] = b[0];
+	p = b;
+	//cout << "p size:" << p.size() << "   (" << p[0].x << "," << p[0].y << ")   (" << p[1].x << ", " << p[1].y << ")    (" << p[2].x << ", " << p[2].y << ")   " << p[3].x << endl;
+	//memcpy(p, &b, sizeof(Point2f)*(nb + 1));
+	for (int i = 0; i < na && nb > 2; i++)
+	{
+		sflag = dcmp(cross(a[i + 1], p[0], a[i]));
+		for (int j = tn = 0; j < nb; j++, sflag = eflag)
+		{
+			if (sflag >= 0) tmp[tn++] = p[j];
+			eflag = dcmp(cross(a[i + 1], p[j + 1], a[i]));
+			if ((sflag ^ eflag) == -2)
+				tmp[tn++] = intersection(a[i], a[i + 1], p[j], p[j + 1]); //求交点
+		}
+		p = tmp;
+		nb = tn;
+		p[nb] = p[0];
+	}
+	vector<Point2f> p_tem;
+	for (int m = 0; m < nb; m++)  p_tem.push_back(p[m]);
+	p.swap(p_tem);
+	if (nb < 3) return 0.0;
+	return area_polygon(p);
+}
+double SPIA(vector<Point2f> a, vector<Point2f> b)//SimplePolygonIntersectArea 调用此函数
+{
+	int na = a.size();
+	int nb = b.size();
+	int i, j;
+	vector<Point2f> t1(4), t2(4);
+	double res = 0, num1, num2;
+	//a.push_back(a[0]);
+	t1[0] = a[0], t2[0] = b[0];
+	for (i = 2; i < na; i++)
+	{
+		t1[1] = a[i - 1], t1[2] = a[i];
+		num1 = dcmp(cross(t1[1], t1[2], t1[0]));
+		//cout << "SPIA: (" << t1[0].x << "," << t1[0].y << ")   (" << t1[1].x << ", " << t1[1].y << ")    (" << t1[2].x << ", " << t1[2].y << ")   " << num1 << endl;
+		if (num1 < 0) swap(t1[1], t1[2]);
+		for (j = 2; j < nb; j++)
+		{
+			t2[1] = b[j - 1], t2[2] = b[j];
+			num2 = dcmp(cross(t2[1], t2[2], t2[0]));
+			//cout << "t2: (" << t2[0].x << "," << t2[0].y << ")   (" << t2[1].x << ", " << t2[1].y << ")    (" << t2[2].x << ", " << t2[2].y << ")   " << num2 << endl;
+			if (num2 < 0) swap(t2[1], t2[2]);
+			res += CPIA(t1, t2, 3, 3) * num1 * num2;
+		}
+	}
+	//cout << area_polygon(a) << "   " << area_polygon(b) << "    " << res << endl;
+	return res;//res为两凸多边形的交的面积
+}
+
+//计算简单多边形，不包括带洞多边形
+double evaluation_area(vector<Point2f> c1, vector<Point2f> c2)
+{
+	double intersect_a = SPIA(c1, c2);
+	double union_a = area_polygon(c1) + area_polygon(c2) - intersect_a;
+	//cout << "p1 area: " << area_polygon(c1) << "  p2: " << area_polygon(c2) << "   intersect: " << intersect_a << "    union:  " << union_a<<endl;
+	double area_score = (union_a - intersect_a) / union_a;
+	return area_score;
+}
+
+double evaluation_area_pixels(vector<Point2f> c1, vector<Point2f> c2)
+{
+	int raw = 600;
+	int col = 600;
+	Mat drawing_1 = Mat(raw, col, CV_8UC3, Scalar(255, 255, 255));
+	Mat drawing_2 = Mat(raw, col, CV_8UC3, Scalar(255, 255, 255));
+	Mat drawing_3 = Mat(raw, col, CV_8UC3, Scalar(255, 255, 255));
+	Point2f shift_1 = Point2f(0, 0);// Point2f(col / 2, raw / 2) - center_p(c1);
+									//Point2f shift_2 = Point2f(col / 2, raw / 2) - center_p(c2);
+	draw_poly(drawing_1, c1, shift_1, 0);
+	draw_poly(drawing_2, c2, shift_1, 0);
+	//imshow("poly1", drawing_1);
+	//imshow("poly2", drawing_2);
+	cvtColor(drawing_1, drawing_1, COLOR_BGR2GRAY);
+	threshold(drawing_1, drawing_1, 128, 1, cv::THRESH_BINARY);
+	cvtColor(drawing_2, drawing_2, COLOR_BGR2GRAY);
+	threshold(drawing_2, drawing_2, 128, 1, cv::THRESH_BINARY);
+	int poly1 = 0;//T并S-T交S
+	int poly2 = 0;//T并S
+	int poly_ = 0;//T交S
+	int pn1 = 0, pn2 = 0;
+	for (int i = 0; i < col; i++)
+	{
+		for (int j = 0; j < raw; j++)
+		{
+			if ((int)drawing_1.at<uchar>(i, j) == 0 && (int)drawing_2.at<uchar>(i, j) == 0)
+			{
+				poly_++;
+				poly2++;
+				drawing_3.at<Vec3b>(i, j) = Vec3b(255, 0, 0);
+			}
+			else if ((int)drawing_1.at<uchar>(i, j) == 0 || (int)drawing_2.at<uchar>(i, j) == 0)
+			{
+				poly1++;
+				poly2++;
+				drawing_3.at<Vec3b>(i, j) = Vec3b(5, 250, 0);
+			}
+			if ((int)drawing_1.at<uchar>(i, j) == 0) pn1++;
+			if ((int)drawing_2.at<uchar>(i, j) == 0) pn2++;
+		}
+	}
+	imshow("poly3", drawing_3);
+	cout << "p1 area: " << pn1 << "  p2: " << pn2 << "    intersect: " << (double)poly_ << "    union:  " << (double)poly2 << endl;
+	double area_score = (double)poly_ / poly2;
+	return area_score;
+}
+
+
+
 
 
 
