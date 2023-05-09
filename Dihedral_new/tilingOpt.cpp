@@ -464,6 +464,7 @@ namespace Tiling_tiles {
 			std::cout << "no right placement" << endl;
 			return;
 		}
+		std::cout << "---------------------------------------" << endl << "Matching Candadites" << endl << "---------------------------------------" << endl;
 		FOR(i, 0, 1)
 			//FOR(i, 0, all_inner_num)
 		{
@@ -495,7 +496,7 @@ namespace Tiling_tiles {
 				vector<int> anc_mid;
 				vector<int> anc_re;
 
-				for (double r = 0.1; r <= 0.9; r += 0.05) 
+				for (double r = 0; r <= 1.01; r += 0.05) 
 				{
 					//ratio越高，中间形状保持越多，对应的morphed_A的形状保持越多，eve2越高
 					cout << "ratio: " << r << "   ";
@@ -517,9 +518,16 @@ namespace Tiling_tiles {
 						cout << "Warning! Intersection Occur!" << endl;
 						//continue;
 					}
+					/*Mat overlap_map = Mat(800, 1800, CV_8UC3, Scalar(255, 255, 255));
+					draw_overlap(overlap_map, conf_trans(c_2), conf_trans(contour1), Point2f(0,0));
+					draw_overlap(overlap_map, conf_trans(c_2), conf_trans(contour2), Point2f(600, 0));
+					draw_overlap(overlap_map, conf_trans(contour1), conf_trans(contour2), Point2f(1200, 0));
+					imwrite("D:/vs2015project/Dihedral_new/maps/" + to_string(r) + "over.png", overlap_map);
+					cout<< evaluation_area(conf_trans(contour1), conf_trans(contour2))<<"    "<< evaluation_area(conf_trans(c_2), conf_trans(contour1))<<"    "<< evaluation_area(conf_trans(c_2), conf_trans(contour2))<<endl;*/
 					double score1 = deform_evalue(conf_trans(c_2), conf_trans(contour1));
 					double score2 = deform_evalue(conf_trans(c_2), conf_trans(contour2));
-					double score = sqrt(pow(score1, 2) + pow(score2, 2));
+					//double score = sqrt(pow(score1, 2) + pow(score2, 2));
+					double score = max(score1, score2);
 					cout << "score: "<< score << endl;
 					if (min_score > score)
 					{
@@ -531,52 +539,54 @@ namespace Tiling_tiles {
 						anc_re = a_re;
 					}
 				}
-				cout << "min ratio: " << ratio << "   min score: " << min_score << "   c1&c2 size:  " << contour1.size() << "  " << contour2.size() << "  contour_2.size: " << contour_2.size() << endl;
+				cout << endl << "min ratio: " << ratio << "   min score: " << min_score << "   c1&c2 size:  " << contour1.size() << "  " << contour2.size() << "  contour_2.size: " << contour_2.size() << endl << endl;
 				Mat pair_match = Mat(600, 1000, CV_8UC3, Scalar(255, 255, 255));
 				Point2f sh = Point2f(300, 300) - center_p(conf_trans(contour1));
 				draw_pair(pair_match, conf_trans(contour1), conf_trans(contour2), path, sh);
 				Point2f sh2 = Point2f(700, 300) - center_p(conf_trans(contour_2));
 				draw_contour_points(pair_match, conf_trans(contour_2), sh2, 3, 2);
 				imshow("correspond path", pair_match);
-
-				//vector<Point_f> con_re;
-				//vector<int> anc_mid;
-				//vector<int> anc_re;
-				//int csize = contour_2.size();
-				//FOR(t, 0, csize)
-				//{
-				//	if (contour_2[t].type == fixed_p)
-				//		anc_mid.push_back(t);
-				//}
-				//Mat draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
-				//if (translation_spec(contour_2, con_re, anc_mid, anc_re, draw2))
-				//{
-				//	cout << "OK! No intersection!" << endl;
-				//}
-
 				Mat two_c = Mat(1000, 1600, CV_8UC3, Scalar(255, 255, 255));
 				Point2f ima_sh = Point2f(400, 500) - center_p(conf_trans(contour_2));
 				draw_contour_points(two_c, conf_trans(contour_2), ima_sh, 5, 2);
 				draw_contour_points(two_c, conf_trans(con_re), ima_sh, 6, 2);
-				imshow("2 contours:", two_c);
 
+				//optimization for two contours
+				std::cout << "---------------------------------------" << endl << "Optimize The Dihedral Tessellation" << endl << "---------------------------------------" << endl;
 				contour_2 = contour_opt(contour_2, anc_mid, 1, 0, 1, 1, 1);
 				con_re = contour_opt(con_re, anc_re, 1, 1, 1, 1, 1);
-				cout << "size: " << contour_2.size() << "  " << con_re.size() << endl;
+				//cout << "size: " << contour_2.size() << "  " << con_re.size() << endl;
 				//将两个轮廓对齐
 				Point2f shift = contour_2[anc_mid[3]].point - con_re[anc_re[0]].point;
 				FOR(ii, 0, contour_2.size()) con_re[ii].point += shift;
 
-				FOR(gg, 0, 4)  cout << contour_2[anc_mid[gg]].point << "    " << con_re[anc_re[gg]].point << endl;
+				//FOR(gg, 0, 4)  cout << contour_2[anc_mid[gg]].point << "    " << con_re[anc_re[gg]].point << endl;
 				ima_sh = Point2f(1200, 500) - center_p(conf_trans(contour_2));
 				draw_contour_points(two_c, conf_trans(contour_2), ima_sh, 5, 2);
 				FOR(ii, 0, 4) draw_contour_points(two_c, conf_trans(con_re), ima_sh + contour_2[anc_mid[ii]].point - con_re[anc_re[(ii + 1) % 4]].point, 6, 2);
-				/*draw_contour_points(two_c, conf_trans(con_re), ima_sh, 6, 2);
-				draw_contour_points(two_c, conf_trans(con_re), ima_sh+ contour_2[anc_mid[2]].point - con_re[anc_re[3]].point, 6, 2);
-				draw_contour_points(two_c, conf_trans(con_re), ima_sh + contour_2[anc_mid[1]].point - con_re[anc_re[2]].point, 6, 2);
-				draw_contour_points(two_c, conf_trans(con_re), ima_sh + contour_2[anc_mid[0]].point - con_re[anc_re[1]].point, 6, 2);*/
 				imshow("2 contours:", two_c);
+
 				double merge_ratio = 0.5;
+				double min_mers = 1000;
+				for (double mr = 0.1; mr < 0.91; mr += 0.05)
+				{
+					vector<Point_f> cont2_new = contour_2;
+					vector<Point_f> conre_new = con_re;
+					vector<int> anc1 = anc_mid;
+					vector<int> anc2 = anc_re;
+					merge_contours(cont2_new, conre_new, anc1, anc2, mr);
+					double merge_s1 = deform_evalue(conf_trans(cont2_new), conf_trans(contour_2));
+					double merge_s2 = deform_evalue(conf_trans(conre_new), conf_trans(con_re));
+					//double merge_score = sqrt(pow(merge_s1, 2) + pow(merge_s2, 2));
+					double merge_score = max(merge_s1, merge_s2);
+					if (merge_score < min_mers) 
+					{
+						min_mers = merge_score;
+						merge_ratio = mr;
+					}
+					cout << "mr: "<<mr<<"   merge_score: " << merge_score << endl;
+				}
+				cout << endl << "min_ratio: " << merge_ratio << "   " << min_mers << endl << endl;
 				merge_contours(contour_2, con_re, anc_mid, anc_re, merge_ratio);
 
 				protoTile c1, c2;
@@ -2042,14 +2052,14 @@ namespace Tiling_tiles {
 			vector<Point_f> each_seg; 
 			vector<Point2f> each_seg_;
 			int seg_size = c1_seg[i].size();
-			cout << i << "  " << seg_size << "  " << c2_seg[(i + 2) % 4].size() << endl;
+			//cout << i << "  " << seg_size << "  " << c2_seg[(i + 2) % 4].size() << endl;
 			Point2f start1 = c1_seg[i][0].point;
 			Point2f start2 = c2_seg[(i + 2) % 4][0].point;
 			Point2f sh_ = start1 - start2;
 			each_seg_ = merge_segment(conf_trans(c1_seg[i]), conf_trans(c2_seg[(i + 2) % 4]), ratio, num_e);
 			degree_opt = edge_nd_opt(each_seg_, 1);
 			//degree_opt = edge_nd_degree(each_seg_, 1);
-			cout << "degree_opt: " << degree_opt << endl;
+			cout << "After degree_opt: " << degree_opt << endl;
 			for (auto p : each_seg_) each_seg.push_back(Point_f(p, general_p));
 			each_seg[0].type = fixed_p;
 			each_seg.back().type = fixed_p;
@@ -2145,21 +2155,28 @@ namespace Tiling_tiles {
 		double re = tar_mismatch(tar_c, tar_ori, path, shift, WindowsWidth);
 		//re = re / (1 + shape_com_mid + all_shape_complexity[index]);  //ori
 		re = re / (1 + sc + sc_ori - 5 * dis_sc - 2 * dis_iso);
-		re = 1 - 0.5*re / path.size();
+		re = 0.5*re / path.size();
+		//re = 1 - 0.5*re / path.size();
 		//cout << "tar_score: " << re << "    ";
 
-		//以下计算面积：T并S-T交S，之前两个ori_c已经对齐，所以可以直接计算, the higher the better
+		//以下计算面积：T并S-T交S，之前两个ori_c已经对齐，所以可以直接计算, the lower the better
+		Point2f sft= center_p(con) - center_p(ori_c);
+		FOR(i, 0, csize) ori_c[i] += sft;
 		double area_score = evaluation_area(con, ori_c);
 		//cout << "area_score: " << area_score << "  ";// << evaluation_area_pixels(con, ori_c) << "    ";
 
 		//计算惩罚项
-		double penalty_score = 0; //如果contour1有交叉，会扣除0.5分;contour2肯定不会有交叉
+		double penalty_score = 0; //如果contour1有交叉，会加分;contour2肯定不会有交叉
 		int inter_i, inter_j;
-		if (self_intersect(con, inter_i, inter_j)) penalty_score = abs(inter_j - inter_i) / csize;
+		if (self_intersect(con, inter_i, inter_j))
+		{
+			int margin_l = min(abs(inter_j - inter_i), abs(inter_i + csize - inter_i));
+			penalty_score = margin_l / csize;
+		}
 
 		double total_score = re + area_score + penalty_score;
 		//std::cout << "penalty_score: " << penalty_score <<"    ";
-		cout<<"total_score: " << total_score << "     ";
+		cout<<"total_score: " << total_score << endl;
 
 		return  total_score;
 	}

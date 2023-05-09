@@ -18,7 +18,7 @@ vector<pair<string, Scalar>> colorbar = {
 	{ "orange2", Scalar(3, 142, 249) },
 	{ "pink", Scalar(237, 171, 245) },
 	{ "lightorange2", Scalar(175, 211, 249) },
-	{ "lightpink", Scalar(244, 211, 247) } };
+	{ "lightpink", Scalar(244, 211, 247) } }; //17
 
 
 //draw tools
@@ -89,6 +89,30 @@ void draw_pair(Mat &drawing_, vector<Point2f> contour1, vector<Point2f> contour2
 	{
 		line(drawing_, contour1[p[i].first] + shift, contour2[p[i].second] + shift, colorbar[6].second);
 	}
+}
+
+void draw_overlap(Mat &drawing_, vector<Point2f> contour1, vector<Point2f> contour2, Point2f shift)
+{
+	Mat draw1 = Mat(800, 600, CV_8UC3, Scalar(255, 255, 255));
+	Mat draw2 = Mat(800, 600, CV_8UC3, Scalar(255, 255, 255));
+	Point2f sft = center_p(contour1) - center_p(contour2);
+	FOR(i, 0, contour1.size()) contour2[i] += sft;
+
+	Point2f sft2 = Point2f(300, 400) - center_p(contour1);
+	draw_poly(draw1, contour1, sft2, 14);
+	circle(draw1, center_p(contour1) + sft2, 2, Scalar(0, 0, 0), -1);
+	draw_poly(draw2, contour2, sft2, 11);
+	circle(draw2, center_p(contour2) + sft2, 2, Scalar(0, 0, 0), -1);
+	 double alpha = 0.5; // 定义透明度
+    Mat blend;
+    addWeighted(draw1, alpha, draw2, 1-alpha, 0, blend);
+
+	// 创建一个 Rect 类型的区域，指定要复制到目标图片的位置
+	Rect roi(shift.x, shift.y, blend.cols, blend.rows);
+
+	// 将原始图片复制到目标图片的指定位置
+	blend.copyTo(drawing_(roi));
+
 }
 
 void draw_path(vector<Point2f> contour1, vector<Point2f> contour2, vector<int> fea1, vector<int> fea2, vector<pair<int, int>> path_fea)
@@ -1843,7 +1867,7 @@ double edge_nd_opt(vector<Point2f>& edge, int type)
 	Point2f origin_p = edge[0];
 	Point2f end_p = edge[esize - 1];
 	double edge_colli_score = edge_nd_degree(edge, 0);
-	cout << " edge_colli_score: " << edge_colli_score << endl;
+	cout << "Edge_colli_score: " << edge_colli_score << "      ";
 	int count = 0;
 	int max_times = 15;
 	int win_width = 0.3*max_times + 1;
@@ -1886,7 +1910,7 @@ double edge_nd_opt(vector<Point2f>& edge, int type)
 			}
 		}
 		edge_colli_score = edge_nd_degree(edge, type);
-		cout << "count: " << count << endl;
+		//cout << "count: " << count << endl;
 	}
 	if (type == 1)
 	{
@@ -2573,7 +2597,7 @@ double evaluation_area(vector<Point2f> c1, vector<Point2f> c2)
 	double intersect_a = SPIA(c1, c2);
 	double union_a = area_polygon(c1) + area_polygon(c2) - intersect_a;
 	//cout << "p1 area: " << area_polygon(c1) << "  p2: " << area_polygon(c2) << "   intersect: " << intersect_a << "    union:  " << union_a<<endl;
-	double area_score = intersect_a / union_a;
+	double area_score = 1.0 - intersect_a / union_a;
 	return area_score;
 }
 

@@ -33,6 +33,7 @@ void draw_poly(Mat &drawing_, vector<Point2f> contour_s, Point2f shift, int colo
 void draw_contour(Mat &drawing_, vector<Point2f> contour_s, Point2f shift, int color = 0, int thickness = 1);
 void draw_contour_points(Mat &drawing_, vector<Point2f> contour_s, Point2f shift, int color = 0, int radius = 1);
 void draw_pair(Mat &drawing_, vector<Point2f> contour1, vector<Point2f> contour2, vector<pair<int, int>> p, Point2f shift, int color = 0, int thickness = 1);
+void draw_overlap(Mat &drawing_, vector<Point2f> contour1, vector<Point2f> contour2, Point2f shift);
 void draw_path(vector<Point2f> contour1, vector<Point2f> contour2, vector<int> fea1, vector<int> fea2, vector<pair<int, int>> path_fea);
 void progress_bar(double index, double total);
 
