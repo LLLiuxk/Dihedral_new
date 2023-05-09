@@ -1527,7 +1527,7 @@ double tar_mismatch(vector<vector<double>> first_arr, vector<vector<double>> sec
 				}
 			}
 		}
-		cout << shift<<"shift  min_mis: " << distance[first_num - 1][second_num - 1] << endl;
+		//cout << shift<<"shift  min_mis: " << distance[first_num - 1][second_num - 1] << endl;
 		if (distance[first_num - 1][second_num - 1] < min_mis)
 		{
 			path_min.swap(vector<pair<int, int>>());
@@ -2573,7 +2573,7 @@ double evaluation_area(vector<Point2f> c1, vector<Point2f> c2)
 	double intersect_a = SPIA(c1, c2);
 	double union_a = area_polygon(c1) + area_polygon(c2) - intersect_a;
 	//cout << "p1 area: " << area_polygon(c1) << "  p2: " << area_polygon(c2) << "   intersect: " << intersect_a << "    union:  " << union_a<<endl;
-	double area_score = (union_a - intersect_a) / union_a;
+	double area_score = intersect_a / union_a;
 	return area_score;
 }
 

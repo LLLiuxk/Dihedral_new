@@ -515,9 +515,11 @@ namespace Tiling_tiles {
 					if (!translation_spec(c_2, c_re, a_mid, a_re, draw2))
 					{
 						cout << "Warning! Intersection Occur!" << endl;
-						continue;
+						//continue;
 					}
-					double score = deform_evalue(conf_trans(c_2), conf_trans(c_re)) + deform_evalue(conf_trans(contour1), conf_trans(contour2));
+					double score1 = deform_evalue(conf_trans(c_2), conf_trans(contour1));
+					double score2 = deform_evalue(conf_trans(c_2), conf_trans(contour2));
+					double score = sqrt(pow(score1, 2) + pow(score2, 2));
 					cout << "score: "<< score << endl;
 					if (min_score > score)
 					{
@@ -2144,19 +2146,20 @@ namespace Tiling_tiles {
 		//re = re / (1 + shape_com_mid + all_shape_complexity[index]);  //ori
 		re = re / (1 + sc + sc_ori - 5 * dis_sc - 2 * dis_iso);
 		re = 1 - 0.5*re / path.size();
-		cout << "tar_score: " << re << "    ";
+		//cout << "tar_score: " << re << "    ";
 
-		//以下计算面积：T并S-T交S，需要先将重心重叠
+		//以下计算面积：T并S-T交S，之前两个ori_c已经对齐，所以可以直接计算, the higher the better
 		double area_score = evaluation_area(con, ori_c);
-		cout << "area_score: " << area_score << "  "<< evaluation_area_pixels(con, ori_c)<<"    ";
+		//cout << "area_score: " << area_score << "  ";// << evaluation_area_pixels(con, ori_c) << "    ";
 
 		//计算惩罚项
 		double penalty_score = 0; //如果contour1有交叉，会扣除0.5分;contour2肯定不会有交叉
 		int inter_i, inter_j;
-		if (self_intersect(con, inter_i, inter_j)) penalty_score = -abs(inter_j - inter_i) / csize;
+		if (self_intersect(con, inter_i, inter_j)) penalty_score = abs(inter_j - inter_i) / csize;
 
 		double total_score = re + area_score + penalty_score;
-		std::cout << "penalty_score: " << penalty_score << "    total_score: " << total_score << endl;
+		//std::cout << "penalty_score: " << penalty_score <<"    ";
+		cout<<"total_score: " << total_score << "     ";
 
 		return  total_score;
 	}

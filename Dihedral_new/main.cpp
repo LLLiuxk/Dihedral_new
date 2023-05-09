@@ -30,6 +30,7 @@ int main()
 		//44:6,19,24,31    71:4,14,22,32    70: 0,8,19,28    192: 0,9,18,27   157:6,12,23,31
 		vector<int> anc_points = { 1,12,27,36 };
 		tiling.tiliing_gen_specify2("13", anc_points);
+
 		/*Mat draw2 = Mat(600, 600, CV_8UC3, Scalar(255, 255, 255));
 		
 		vector<Point2f> old_edge = {Point2f(400,120),Point2f(350,150),Point2f(300,180),Point2f(250,200),Point2f(200,150),Point2f(150,120),Point2f(100,100)};
