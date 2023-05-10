@@ -496,7 +496,7 @@ namespace Tiling_tiles {
 				vector<int> anc_mid;
 				vector<int> anc_re;
 
-				for (double r = 0; r <= 1.01; r += 0.05) 
+				for (double r = 0.5; r <= 0.51; r += 0.05) 
 				{
 					//ratio越高，中间形状保持越多，对应的morphed_A的形状保持越多，eve2越高
 					cout << "ratio: " << r << "   ";
@@ -568,7 +568,7 @@ namespace Tiling_tiles {
 
 				double merge_ratio = 0.5;
 				double min_mers = 1000;
-				for (double mr = 0.1; mr < 0.91; mr += 0.05)
+				for (double mr = 0.45; mr < 0.46; mr += 0.05)
 				{
 					vector<Point_f> cont2_new = contour_2;
 					vector<Point_f> conre_new = con_re;
@@ -801,7 +801,7 @@ namespace Tiling_tiles {
 		{
 			//vector<int> t = { 26 };
 			//int tin = 0;
-			FOR(i, 192, 193)
+			FOR(i, 171, 172)
 			{			
 				//if (i != t[tin]) continue;
 				//else tin++;
@@ -1363,7 +1363,7 @@ namespace Tiling_tiles {
 		cand_fea_paths.swap(vector<vector<pair<int, int>>>());
 		path_shift.swap(vector<int>());
 
-		for (int j = 0; j < 1; j++) //只要候选图案里的前cand_num个
+		for (int j = 1; j < 2; j++) //只要候选图案里的前cand_num个
 		{
 			//将所有的结果保存下来
 			prototile_second = protoTile(contour_dataset[candidate_patterns[j].first]);
@@ -1559,8 +1559,10 @@ namespace Tiling_tiles {
 							double ang1 = angle_2v(con_mid_c[(one_pair.first - 1 + pcsize) % pcsize] - con_mid_c[one_pair.first], con_mid_c[(one_pair.first + 1) % pcsize] - con_mid_c[one_pair.first]);
 							double ang2 = angle_2v(con2_c[(waiting_merge[t] - 1 + pcsize) % pcsize] - con2_c[waiting_merge[t]], con2_c[(waiting_merge[t] + 1) % pcsize] - con2_c[waiting_merge[t]]);
 							//double dis_tar = tar_length_2p(inner_tar[one_pair.first], cand_tar[cand_index]) + 0.02*abs(dis_cos1 - dis_cos2);
-							double dis_tar = tar_length_2p(inner_tar[one_pair.first], cand_tar[cand_index]) + normal_r*abs(ang1 - ang2);
-							cout << "distar: " << dis_tar << "   " << tar_length_2p(inner_tar[one_pair.first], cand_tar[cand_index]) << "  ang1: " << ang1 << "    " << ang2 << "   " << normal_r*abs(ang1 - ang2) << endl;
+							double diss_angle = abs(ang1 - ang2);
+							if (ang1*ang2 < 0) diss_angle = 2 * PI - diss_angle;  //<0, 异号
+							double dis_tar = tar_length_2p(inner_tar[one_pair.first], cand_tar[cand_index]) + normal_r*diss_angle;
+							cout << "distar: " << dis_tar << "   " << tar_length_2p(inner_tar[one_pair.first], cand_tar[cand_index]) << "  ang1: " << ang1 / PI * 180 << "    " << ang2 / PI * 180 << "   " << normal_r*diss_angle << endl;
 							if (dis_tar < min_dis_tar)
 							{
 								min_dis_tar = dis_tar;

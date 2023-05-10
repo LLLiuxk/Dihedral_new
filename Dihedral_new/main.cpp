@@ -18,18 +18,20 @@ int main()
 
 	if (f == 0)
 	{
-		bool control_parameter = true;
+		bool control_parameter = false;
 		if (control_parameter)  tiling.load_para("para.txt");
-		else image_id = "192";
+		else image_id = "41";
 		tiling.tiliing_generation(image_id);
 
 	}
 	if (f == 1) //specify
 	{
-		// 5: 6,11,16,29   13: 1,12,27,36  14: 0,4,17,24   22: 8,19,28,36   28: 6,23,25,35  31: 0,15,18,27   37: 10,18,25,37
-		//44:6,19,24,31    71:4,14,22,32    70: 0,8,19,28    192: 0,9,18,27   157:6,12,23,31
-		vector<int> anc_points = { 4,14,22,32 };
-		tiling.tiliing_gen_specify2("71", anc_points);
+		// 5: 6,11,16,29     14: 0,4,17,24      28: 6,23,25,35  31: 0,15,18,27   37: 10,18,25,37
+		//       70: 0,8,19,28    192: 0,9,18,27   157:6,12,23,31
+		//Escher 22: 8,19,28,36    71: 4,14,22,32    172: 6,13,23,32    171: 7,19,29,33
+		//New  5: 6,11,16,29    13: 1,12,27,36    37: 10,18,25,37   44:6,19,24,31
+		vector<int> anc_points = { 6,19,24,39 };
+		tiling.tiliing_gen_specify2("44", anc_points);
 
 		/*Mat draw2 = Mat(600, 600, CV_8UC3, Scalar(255, 255, 255));
 		
