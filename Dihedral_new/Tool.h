@@ -94,6 +94,7 @@ void fileout(string filepath, vector<Point2f> contour_);
 void save_svg(string svg_path, vector<Point2f> contour, Scalar color, Point2f shift, double zoom_scale);
 void write_obj(string filepath, MatrixXd V, MatrixXi F);
 void write_para(string filepath, vector<int> indexs, vector<Point2f> new_places);
+void write_twoCon(string filepath, vector<int> in1, vector<Point2f> c1, vector<int> in2, vector<Point2f> c2);
 
 //compare two contours by TAR
 vector<vector<double>> compute_TAR(vector<Point2f> &contour_, double &shape_complexity, double frac = 0.5);

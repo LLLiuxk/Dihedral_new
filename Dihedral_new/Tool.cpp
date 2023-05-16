@@ -1408,6 +1408,32 @@ void write_para(string filepath, vector<int> indexs, vector<Point2f> new_places)
 
 }
 
+void write_twoCon(string filepath, vector<int> in1, vector<Point2f> c1, vector<int> in2, vector<Point2f> c2)
+{
+	ofstream outfile(filepath, ios::out);
+	if (!outfile.is_open())
+	{
+		cerr << "open error";
+		exit(1);
+	}
+	int anc_num = c1.size();
+	outfile << anc_num << endl;
+	FOR(i, 0, 4)
+		outfile << in1[i] << " ";
+	outfile << endl;
+	FOR(i, 0, anc_num)
+		outfile << c1[i].x << " " << c1[i].y << endl;
+
+	anc_num = c2.size();
+	outfile << anc_num << endl;
+	FOR(i, 0, 4)
+		outfile << in2[i] << " ";
+	outfile << endl;
+	FOR(i, 0, anc_num)
+		outfile << c2[i].x << " " << c2[i].y << endl;
+	outfile.close();
+}
+
 //compare two contours by TAR
 vector<vector<double>> compute_TAR(vector<Point2f> &contour_, double &shape_complexity, double frac)
 {
