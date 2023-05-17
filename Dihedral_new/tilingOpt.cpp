@@ -496,7 +496,7 @@ namespace Tiling_tiles {
 				vector<int> anc_mid;
 				vector<int> anc_re;
 
-				for (double r = 0.5; r <= 0.51; r += 0.05) 
+				for (double r = 0.1; r <= 0.91; r += 0.05) 
 				{
 					//ratio越高，中间形状保持越多，对应的morphed_A的形状保持越多，eve2越高
 					cout << "ratio: " << r << "   ";
@@ -560,7 +560,7 @@ namespace Tiling_tiles {
 				Point2f shift = contour_2[anc_mid[3]].point - con_re[anc_re[0]].point;
 				FOR(ii, 0, contour_2.size()) con_re[ii].point += shift;
 
-				//FOR(gg, 0, 4)  cout << contour_2[anc_mid[gg]].point << "    " << con_re[anc_re[gg]].point << endl;
+				FOR(gg, 0, 4)  cout << contour_2[anc_mid[gg]].point << "    " << con_re[anc_re[gg]].point << endl;
 				ima_sh = Point2f(1200, 500) - center_p(conf_trans(contour_2));
 				draw_contour_points(two_c, conf_trans(contour_2), ima_sh, 5, 2);
 				FOR(ii, 0, 4) draw_contour_points(two_c, conf_trans(con_re), ima_sh + contour_2[anc_mid[ii]].point - con_re[anc_re[(ii + 1) % 4]].point, 6, 2);
@@ -568,30 +568,32 @@ namespace Tiling_tiles {
 
 				double merge_ratio = 0.5;
 				double min_mers = 1000;
-				for (double mr = 0.45; mr < 0.46; mr += 0.05)
-				{
-					vector<Point_f> cont2_new = contour_2;
-					vector<Point_f> conre_new = con_re;
-					vector<int> anc1 = anc_mid;
-					vector<int> anc2 = anc_re;
-					merge_contours(cont2_new, conre_new, anc1, anc2, mr);
-					double merge_s1 = deform_evalue(conf_trans(cont2_new), conf_trans(contour_2));
-					double merge_s2 = deform_evalue(conf_trans(conre_new), conf_trans(con_re));
-					//double merge_score = sqrt(pow(merge_s1, 2) + pow(merge_s2, 2));
-					double merge_score = max(merge_s1, merge_s2);
-					if (merge_score < min_mers) 
-					{
-						min_mers = merge_score;
-						merge_ratio = mr;
-					}
-					cout << "mr: "<<mr<<"   merge_score: " << merge_score << endl;
-				}
+				//for (double mr = 0.2; mr < 0.81; mr += 0.05)
+				//{
+				//	vector<Point_f> cont2_new = contour_2;
+				//	vector<Point_f> conre_new = con_re;
+				//	vector<int> anc1 = anc_mid;
+				//	vector<int> anc2 = anc_re;
+				//	merge_contours(cont2_new, conre_new, anc1, anc2, mr);
+				//	double merge_s1 = deform_evalue(conf_trans(cont2_new), conf_trans(contour_2));
+				//	double merge_s2 = deform_evalue(conf_trans(conre_new), conf_trans(con_re));
+				//	//double merge_score = sqrt(pow(merge_s1, 2) + pow(merge_s2, 2));
+				//	double merge_score = max(merge_s1, merge_s2);
+				//	if (merge_score < min_mers) 
+				//	{
+				//		min_mers = merge_score;
+				//		merge_ratio = mr;
+				//	}
+				//	cout << "mr: "<<mr<<"   merge_score: " << merge_score << endl;
+				//}
 				cout << endl << "min_ratio: " << merge_ratio << "   " << min_mers << endl << endl;
 				merge_contours(contour_2, con_re, anc_mid, anc_re, merge_ratio);
+				FOR(gg, 0, 4)  cout << contour_2[anc_mid[gg]].point << "    " << con_re[anc_re[gg]].point << endl;
 
 				protoTile c1, c2;
 				c1.show_contour(conf_trans(con_re), anc_re);
 				c2.show_contour(conf_trans(contour_2), anc_mid);
+				write_twoCon("twoCon.txt", anc_re, conf_trans(con_re), anc_mid, conf_trans(contour_2));
 				RotationVis(c1, c2, AntiClockWise);
 			}
 		}
@@ -651,6 +653,7 @@ namespace Tiling_tiles {
 		double degree_after_opt = 0;
 		if (pers_trans)
 		{
+			cout << "Triangulation and ARAP deforming......" << endl;
 			vector<Point2f> frame = { contour_dst[anc_p[0]], contour_dst[anc_p[1]], contour_dst[anc_p[2]], contour_dst[anc_p[3]] };
 			//vector<Point2f> frame = { cont_re[anc_re[0]], cont_re[anc_re[1]], cont_re[anc_re[2]], cont_re[anc_re[3]] };
 			if (type == 2)
@@ -763,6 +766,7 @@ namespace Tiling_tiles {
 		}
 		if (coll_opt)
 		{
+			cout << "contour fine tuning......" << endl;
 			//contour_de_crossing(contour_dst);
 			contour_fine_tuning(contour_dst);
 			//con_re = set_flags(contour_dst, cont);
@@ -771,7 +775,7 @@ namespace Tiling_tiles {
 		}
 		if (deve_opt)
 		{
-			
+			cout << "contour deployability optimizing......" << endl;
 			//degree_after_opt = whole_con_opt(resam_dst, anc_re, 0);
 			degree_after_opt = whole_con_opt(contour_dst, anc_p, 0);
 			//con_re = set_flags(contour_dst, cont);
@@ -781,7 +785,7 @@ namespace Tiling_tiles {
 			FOR(m, 0, 4) circle(dep_opt, contour_dst[anc_p[m]] + Point2f(400, 400) - center_p(contour_dst), 3, Scalar(0, 255, 0));
 			imshow(to_string(times) + " After contour deployability optimization:", dep_opt);
 			//degree_after_opt = whole_con_opt(contour_dst, anc_mid, 0);
-			cout << "After developable optimation, the collision degree: " << degree_after_opt << endl;
+			cout << endl<<"After developable optimation, the collision degree: " << degree_after_opt << endl;
 			cout << "csize " << csize << "  " << contour_dst.size() << "  " << con_re.size() << endl;
 		}
 		return con_re;
@@ -1363,7 +1367,7 @@ namespace Tiling_tiles {
 		cand_fea_paths.swap(vector<vector<pair<int, int>>>());
 		path_shift.swap(vector<int>());
 
-		for (int j = 1; j < 2; j++) //只要候选图案里的前cand_num个
+		for (int j = 0; j < 1; j++) //只要候选图案里的前cand_num个
 		{
 			//将所有的结果保存下来
 			prototile_second = protoTile(contour_dataset[candidate_patterns[j].first]);

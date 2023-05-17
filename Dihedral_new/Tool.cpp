@@ -1846,7 +1846,7 @@ double edge_nd_degree(vector<Point2f> edge, int type)
 		for (int t = esize - 1; t >= 0; t--) edge_r.push_back(edge[t]);
 		edge.swap(edge_r);
 	}
-	int count = 1;
+	int count = 0; //计数共有多少点对存在碰撞，最少为1
 	Point2f origin_p = edge[0];
 	Point2f end_p = edge[esize - 1];
 	vector<double> Lengths;
@@ -1870,15 +1870,15 @@ double edge_nd_degree(vector<Point2f> edge, int type)
 				double angle_ = asin(sin_);
 				//cout << tan_unit << "   " << vec_unit <<"  "<< angle_<< endl;
 				total_angle += abs(angle_);
-				//if(sin_)
-				break;
+				count++;
+				//break;
 			}
 		}
-		if (col_flag == 1) count++;
+		//if (col_flag == 1) count++;
 	}
 	//double colli_possi = count	*1.0 / (esize - 2);
 	//cout << count << endl;
-	return total_angle / (count*0.5*PI);
+	return total_angle / ((count + 1)*0.5*PI);
 }
 
 double edge_nd_opt(vector<Point2f>& edge, int type)
@@ -1893,7 +1893,7 @@ double edge_nd_opt(vector<Point2f>& edge, int type)
 	Point2f origin_p = edge[0];
 	Point2f end_p = edge[esize - 1];
 	double edge_colli_score = edge_nd_degree(edge, 0);
-	cout << "Edge_colli_score: " << edge_colli_score << "      ";
+	cout << "Edge_colli score: " << edge_colli_score << "      ";
 	int count = 0;
 	int max_times = 15;
 	int win_width = 0.3*max_times + 1;
@@ -1920,7 +1920,7 @@ double edge_nd_opt(vector<Point2f>& edge, int type)
 					double ratio = max_r / win_width;
 					FOR(g, 0, win_width)
 					{
-						if (i - g > 0 && j + g < esize)
+						if (i - g > 0 && j + g < esize - 1)
 						{
 							Point2f rot_center = 0.5*(edge[i - g] + edge[j + g]);
 							Mat rot_mat = cv::getRotationMatrix2D(rot_center, (max_r - ratio*g)*angle_ / PI * 180, 1.0);
@@ -1929,8 +1929,8 @@ double edge_nd_opt(vector<Point2f>& edge, int type)
 							transform(src, dst, rot_mat);
 							edge[i - g] = dst[0];
 							edge[j + g] = dst[1];
+							//cout << "dst: " << dst.size() << "   i - g: " << i - g<<"   "<< dst[0] << "    j + g: " << j + g<<"   "<< dst[1] << endl;
 						}
-						//cout << "dst: " << dst.size() << "   " << dst[0] << "   " << dst[1] << endl;					
 					}
 				}
 			}
