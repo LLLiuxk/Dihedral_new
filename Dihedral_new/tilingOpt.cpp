@@ -553,8 +553,10 @@ namespace Tiling_tiles {
 
 				//optimization for two contours
 				std::cout << "---------------------------------------" << endl << "Optimize The Dihedral Tessellation" << endl << "---------------------------------------" << endl;
-				contour_2 = contour_opt(contour_2, anc_mid, 1, 0, 1, 1, 1);
-				con_re = contour_opt(con_re, anc_re, 1, 1, 1, 1, 1);
+				Clock_order = AntiClockWise;  //指示初始input形状旋转的方向
+				int Clock_order2 = abs(Clock_order - 1);
+				con_re = contour_opt(con_re, anc_re, 1, 1, 1, 1, 1, Clock_order);
+				contour_2 = contour_opt(contour_2, anc_mid, 1, 0, 1, 1, 1, Clock_order2);
 				//cout << "size: " << contour_2.size() << "  " << con_re.size() << endl;
 				//将两个轮廓对齐
 				Point2f shift = contour_2[anc_mid[3]].point - con_re[anc_re[0]].point;
@@ -568,39 +570,47 @@ namespace Tiling_tiles {
 
 				double merge_ratio = 0.5;
 				double min_mers = 1000;
-				//for (double mr = 0.2; mr < 0.81; mr += 0.05)
-				//{
-				//	vector<Point_f> cont2_new = contour_2;
-				//	vector<Point_f> conre_new = con_re;
-				//	vector<int> anc1 = anc_mid;
-				//	vector<int> anc2 = anc_re;
-				//	merge_contours(cont2_new, conre_new, anc1, anc2, mr);
-				//	double merge_s1 = deform_evalue(conf_trans(cont2_new), conf_trans(contour_2));
-				//	double merge_s2 = deform_evalue(conf_trans(conre_new), conf_trans(con_re));
-				//	//double merge_score = sqrt(pow(merge_s1, 2) + pow(merge_s2, 2));
-				//	double merge_score = max(merge_s1, merge_s2);
-				//	if (merge_score < min_mers) 
-				//	{
-				//		min_mers = merge_score;
-				//		merge_ratio = mr;
-				//	}
-				//	cout << "mr: "<<mr<<"   merge_score: " << merge_score << endl;
-				//}
+				for (double mr = 0.2; mr < 0.81; mr += 0.05)
+				{
+					vector<Point_f> cont2_new = contour_2;
+					vector<Point_f> conre_new = con_re;
+					vector<int> anc1 = anc_mid;
+					vector<int> anc2 = anc_re;
+					//merge_contours(cont2_new, conre_new, anc1, anc2, mr);
+					merge_contours(conre_new, cont2_new, anc2, anc1,  mr);
+					double merge_s1 = deform_evalue(conf_trans(cont2_new), conf_trans(contour_2));
+					double merge_s2 = deform_evalue(conf_trans(conre_new), conf_trans(con_re));
+					//double merge_score = sqrt(pow(merge_s1, 2) + pow(merge_s2, 2));
+					double merge_score = max(merge_s1, merge_s2);
+					if (merge_score < min_mers) 
+					{
+						min_mers = merge_score;
+						merge_ratio = mr;
+					}
+					cout << "mr: "<<mr<<"   merge_score: " << merge_score << endl;
+				}
 				cout << endl << "min_ratio: " << merge_ratio << "   " << min_mers << endl << endl;
-				merge_contours(contour_2, con_re, anc_mid, anc_re, merge_ratio);
-				FOR(gg, 0, 4)  cout << contour_2[anc_mid[gg]].point << "    " << con_re[anc_re[gg]].point << endl;
+				//merge_contours(contour_2, con_re, anc_mid, anc_re, merge_ratio);
+				merge_contours(con_re, contour_2,  anc_re, anc_mid, merge_ratio);
+				//FOR(gg, 0, 4)  cout << contour_2[anc_mid[gg]].point << "    " << con_re[anc_re[gg]].point << endl;
+				write_twoCon("twoCon.txt", anc_re, conf_trans(con_re), anc_mid, conf_trans(contour_2));
+				string command = "DDET.exe  " + to_string(Clock_order);
+				system(command.c_str());
+				vector<Point2f> con1 = conf_trans(con_re);
+				vector<Point2f> con2 = conf_trans(contour_2);
+				con1 = load_point_file("c1.txt");
+				con2 = load_point_file("c2.txt");
 
 				protoTile c1, c2;
-				c1.show_contour(conf_trans(con_re), anc_re);
-				c2.show_contour(conf_trans(contour_2), anc_mid);
-				write_twoCon("twoCon.txt", anc_re, conf_trans(con_re), anc_mid, conf_trans(contour_2));
-				RotationVis(c1, c2, AntiClockWise);
+				c1.show_contour(con1, anc_re);
+				c2.show_contour(con2, anc_mid);
+				RotationVis(c1, c2, Clock_order);
 			}
 		}
 	}
 
 
-	vector<Point_f> Tiling_opt::contour_opt(vector<Point_f> cont, vector<int>& anc_p, int type, int times, bool pers_trans , bool coll_opt, bool deve_opt) //type: 0=contours bbx; 1: square bbx
+	vector<Point_f> Tiling_opt::contour_opt(vector<Point_f> cont, vector<int>& anc_p, int type, int times, bool pers_trans , bool coll_opt, bool deve_opt, int cworder) //type: 0=contours bbx; 1: square bbx
 	{
 		vector<Point_f> con_re;
 		vector<Point2f> contour_dst = conf_trans(cont);
@@ -777,7 +787,7 @@ namespace Tiling_tiles {
 		{
 			cout << "contour deployability optimizing......" << endl;
 			//degree_after_opt = whole_con_opt(resam_dst, anc_re, 0);
-			degree_after_opt = whole_con_opt(contour_dst, anc_p, 0);
+			degree_after_opt = whole_con_opt(contour_dst, anc_p, cworder);
 			//con_re = set_flags(contour_dst, cont);
 			con_re = set_flags(contour_dst, con_re);
 			Mat dep_opt  = Mat(800, 800, CV_8UC3, Scalar(255, 255, 255));
@@ -865,7 +875,6 @@ namespace Tiling_tiles {
 		int count = 10;
 		while (count > 0)
 		{
-			Clock_order = clockorder;
 			int draw_col = 1000;
 			int draw_row = 1000;
 			double scale_ratio;
@@ -876,7 +885,7 @@ namespace Tiling_tiles {
 			c1.contour = Trans_contour(c1.contour, Point2f(draw_row / 2, draw_col / 2) - center_p(c1.contour));
 			c2.contour = Trans_contour(c2.contour, c1.contour[c1.anchor_points[0]] - c2.contour[c2.anchor_points[3]]);
 			//c2.contour = Rotate_contour(c2.contour, center_p(c2.contour), -1);
-			if (Clock_order == ClockWise)
+			if (clockorder == ClockWise)
 			{
 				cout << "ClockWise" << endl;
 				for (int degree = 0; degree < rot_deg; degree += 2)
@@ -900,7 +909,7 @@ namespace Tiling_tiles {
 					else waitKey(200);
 				}
 			}
-			else if (Clock_order == AntiClockWise)
+			else if (clockorder == AntiClockWise)
 			{
 				cout << "AntiClockWise" << endl;
 				for (int degree = 0; degree < rot_deg; degree += 2)
@@ -2063,7 +2072,7 @@ namespace Tiling_tiles {
 			Point2f start2 = c2_seg[(i + 2) % 4][0].point;
 			Point2f sh_ = start1 - start2;
 			each_seg_ = merge_segment(conf_trans(c1_seg[i]), conf_trans(c2_seg[(i + 2) % 4]), ratio, num_e);
-			degree_opt = edge_nd_opt(each_seg_, 1);
+			degree_opt = edge_nd_opt(each_seg_, Clock_order);
 			//degree_opt = edge_nd_degree(each_seg_, 1);
 			cout << "After degree_opt: " << degree_opt << endl;
 			for (auto p : each_seg_) each_seg.push_back(Point_f(p, general_p));
