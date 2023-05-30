@@ -8,7 +8,7 @@ namespace Tiling_tiles {
 
 	void Tiling_opt::tiliing_generation(string nameid)
 	{
-		load_dataset(true);
+		load_dataset(false);
 		string filepath = DefaultPath;
 		filepath = filepath + "contour/" + nameid + ".txt";
 		prototile_first = protoTile(filepath);
@@ -26,424 +26,45 @@ namespace Tiling_tiles {
 			std::cout << "no right placement" << endl;
 			return;
 		}
-		FOR(i, 0, 0)
-		//FOR(i, 0, all_inner_num)
+		std::cout << "---------------------------------------" << endl << "Matching Candadites" << endl << "---------------------------------------" << endl;
+		FOR(i, 0, all_inner_num)
 		{
-			match_candidate(i);
-			for (int j = 0; j < 1; j++)
-			{
-				Mat draw = Mat(1000, 1000, CV_8UC3, Scalar(255, 255, 255));
-				vector<pair<int, int>> path = cand_paths[j];
-				vector<Point_f> contour1 = prototile_mid.contour_f;
-				vector<Point_f> contour2 = candidate_contours[j];
-				Point2f sh = Point2f(300, 500) - center_p(conf_trans(contour1));
-				draw_pair(draw, conf_trans(contour1), conf_trans(contour2), path, sh);
-				
-				double con_sc;
-				vector<vector<double>> contour2_tar;
-				//求contour_对应的point_f和tar值
-				//contour2_tar = computeTAR(contour_, con_sc, 0.5);
-				double angle = 165;
-				double ratio_max = 100;
-				double result_score = 0;
-				double ratio = 0.5;
-				for (; ratio <= 90; ratio += 5)
-				{
-					//ratio越高，中间形状保持越多，对应的morphed_A的形状保持越多，eve2越高
-					double ratio_d = ratio / 100.0;
-					cout << "ratio_d: " << ratio_d << endl;
-					vector<Point_f> contour_2 = morphing_dir(contour1, contour2, path, ratio);
-					Point2f sh2 = Point2f(700, 500) - center_p(conf_trans(contour_2));
-					draw_contour_points(draw, conf_trans(contour_2), sh2, 3, 2);
-					imshow("correspond path", draw);
-					vector<Point_f> con_re;
-					vector<int> anc_mid;
-					vector<int> anc_re;
-					FOR(t, 0, contour_2.size())
-					{
-						if (contour_2[t].type == fixed_p)
-							anc_mid.push_back(t);
-					}
-					//vector<Point2f> frame = { contour_2[anc_mid[0]].point, contour_2[anc_mid[1]].point, contour_2[anc_mid[2]].point, contour_2[anc_mid[3]].point };
-					//vector<Point2f> frame_b = base_frame(frame, 3);
-					//Mat rot_mat = getPerspectiveTransform(frame, frame_b);// getAffineTransform(frame_1, frame_b_1);
-					//													  //cout << rot_mat << endl;
-					//vector<Point2f> contour_dst;
-					//perspectiveTransform(conf_trans(contour_2), contour_dst, rot_mat);
-					//
-					//whole_con_opt(contour_dst, anc_mid, 0);
-					//contour_2 = set_flags(contour_dst, contour_2);
+			match_candidate(i, savepath);
+			//for (int j = 0; j < 5; j++)
+			//{
+			//	vector<pair<int, int>> path = cand_paths[j];
+			//	vector<Point_f> contour1 = prototile_mid.contour_f;
+			//	vector<Point_f> contour2 = candidate_contours[j];
 
-					Mat draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
-					if (translation_placement(contour_2, con_re, anc_mid, anc_re, draw2))
-					{
-						cout << "OK!" << endl;
-					}
+			//	prototile_second = protoTile(contour2);
+			//	vector<pair<int, int>> path_fea = cand_fea_paths[j];
 
-					protoTile c1, c2;
-					c1.show_contour(conf_trans(contour_2), anc_mid);
-					c2.show_contour(conf_trans(con_re), anc_re);
-					RotationVis(c1, c2, AntiClockWise);
-				}
-				//for (; ratio <= 90; ratio += 5)
-				//{
-				//	//ratio越高，中间形状保持越多，对应的morphed_A的形状保持越多，eve2越高
-				//	double ratio_d = ratio / 100.0;
-				//	cout << "ratio_d: " << ratio_d << endl;
-				//	//这里final_pettern的点数不一定为200点，但是后续的计算中会重新采样
-				//	vector<Point2f> final_pettern = morphing(contour1, contour2, path, ratio_d);
-				//	vector<int> return_p;
-				//	vector<vector<Point2f>> four_place;
-				//	vector<Point2f> morphed_A = extract_contour(final_pettern, mid_inter_morphed, return_p, four_place, all_inner_conts[i].type);
-				//	return_p.swap(vector<int>());
-				//	four_place.swap(vector<vector<Point2f>>());
-				//	vector<Point2f> morphed_A_ori = extract_contour(prototile_mid->contour, mid_inter, return_p, four_place, all_inner_conts[i].type);
+			//	//show the path
+			//	draw_path(prototile_mid.contour, prototile_second.contour, prototile_mid.feature_points, prototile_second.feature_points, path_fea);
+			//	
+			//	double con_sc;
+			//	vector<vector<double>> contour2_tar;
+			//	//求contour_对应的point_f和tar值
+			//	//contour2_tar = computeTAR(contour_, con_sc, 0.5);
+			//	double angle = 165;
+			//	double ratio_max = 100;
+			//	double result_score = 0;
+			//	double ratio = 0.5;
+			//	double min_score = 1000;
+			//	vector<Point_f> contour_2;
+			//	vector<Point_f> con_re;
+			//	vector<int> anc_mid;
+			//	vector<int> anc_re;
 
-				//	double evaluation1 = evalua_deformation(final_pettern, contour_);
-				//	double evaluation2 = evalua_deformation(morphed_A, morphed_A_ori);
-				//	double score_ave = (1 - ratio_d)*evaluation2 + ratio_d*evaluation1;
-				//	if (score_ave > result_score)
-				//	{
-				//		result_score = score_ave;
-				//		ratio_max = ratio_d;
-				//	}
-				//}
-
-				//vector<Point_f> final_pettern = morphing(contour1, contour2, path, ratio_max);
-
-				//vector<int> return_p;
-				//vector<vector<Point2f>> four_place;
-				//vector<Point2f> morphed_A = extract_contour(final_pettern, mid_inter_morphed, return_p, four_place, all_inner_conts[i].type);
-				////vector<int> return_p2;
-				////vector<vector<Point2f>> four_place2;
-				////vector<Point2f> morphed_A_ori = extract_contour(prototile_mid->contour, mid_inter, return_p2, four_place2, all_inner_conts[i].type);
-
-				//cout << "ratio_max: " << ratio_max << "  --  result_score:  " << result_score << endl;
-				//Mat drawing_pro = Mat(800, 3200, CV_8UC3, Scalar(255, 255, 255));
-				//draw_poly(drawing_pro, prototile_mid->contour, Point2f(400, 400));
-				//draw_poly(drawing_pro, contour_, Point2f(1200, 400));
-				//draw_poly(drawing_pro, final_pettern, Point2f(2000, 400));
-				//prototile_tem->loadPoints(final_pettern);
-				//draw_poly(drawing_pro, morphed_A, Point2f(2800, 400));
-				//string filename = rootname + "\\" + int2string(i) + "_Candidate_" + int2string(j) + "_" + double2string(ratio_max) + "_" + double2string(result_score) + ".png";
-				//imwrite(filename, drawing_pro);
-
-				////halftone generate
-				//if (!contour_is_simple(morphed_A) || !contour_is_simple(final_pettern))
-				//{
-				//	cout << "--------------Warning!!!-------------"
-				//		<< endl << "The " << j << " candidate patterns are not simple! No results!" << endl << endl;
-				//	continue;
-				//}
-				//int halftone_num = 5000;
-				//double l_offset = 2;
-				//double scale_t = 0.5;
-				//Mat drawing_tesse = Mat(halftone_num, halftone_num, CV_8UC3, Scalar(255, 255, 255));
-				//vector<vector<Point2f>> all_tiles = tesse_all(morphed_A, return_p, all_inner_conts[i].type, halftone_num, l_offset, scale_t);
-				//int alltilesnum = all_tiles.size();
-				//cout << "The num of tiles in final tesse result: " << alltilesnum << endl;
-				//for (int m = 0; m < alltilesnum; m++)
-				//{
-				//	//框架图
-				//	//vector<Point2f> tile_dilate = contour_dilate(all_tiles[m], 5);
-				//	//vector<Point2f> tile_erode = contour_erode(all_tiles[m], 8);
-				//	////draw_poly(drawing_tesse, tile_dilate, center_p(tile_dilate));
-				//	////draw_poly(drawing_tesse, tile_erode, center_p(tile_erode), 1);
-				//	draw_poly(drawing_tesse, all_tiles[m], center_p(all_tiles[m]));
-				//}
-				//string filename2 = rootname + "\\" + int2string(i) + "_TessellationResult_" + int2string(j) + ".png";
-				//imwrite(filename2, drawing_tesse);
-			}
+			//}
 		}
 
 
 	}
+
+
 
 	void Tiling_opt::tiliing_gen_specify(string nameid, vector<int> anc_points)
-	{
-		load_dataset(false);
-		string filepath = DefaultPath;
-		filepath = filepath + "contour/" + nameid + ".txt";
-		prototile_first = protoTile(filepath);
-		string savepath = SavePath;
-		savepath = savepath.substr(0, savepath.length() - 7)+"result_spe/";
-		savepath += nameid;
-		const char *na = savepath.c_str();
-		if (_access(na, 0) != -1) printf("The  file/dir had been Exisit \n");
-		else	_mkdir(na);
-		vector<int> cand_points = prototile_first.getCandPoints(prototile_first.contour_f);
-		int trans = Tanslation_rule_spec(cand_points, prototile_first.contour_f, savepath, anc_points);
-		//int flips = Flipping_rule(p_p_index, cont_orig, rootname);
-		int all_inner_num = all_inner_conts.size();
-		if (all_inner_num == 0)
-		{
-			std::cout << "no right placement" << endl;
-			return;
-		}
-		FOR(i, 0, 1)
-			//FOR(i, 0, all_inner_num)
-		{
-			match_candidate_(i);
-			//feature_match();
-			for (int j = 0; j < 1; j++)
-			{
-				vector<pair<int, int>> path = cand_paths[j];
-				cout << "path num: " << path.size() << endl;
-				vector<Point_f> contour1 = prototile_mid.contour_f;
-				vector<Point_f> contour2 = candidate_contours[j];
-				prototile_second = protoTile(contour2);
-				vector<pair<int, int>> path_fea = cand_fea_paths[j];
-
-				//show the path
-				Point2f sh = Point2f(300, 300) - center_p(conf_trans(contour1));
-				Point2f shh2 = sh + Point2f(400, 0);
-				Mat fea_match = Mat(600, 1000, CV_8UC3, Scalar(255, 255, 255));
-				draw_contour_points(fea_match, prototile_mid.contour, sh, 5, 2);
-				draw_contour_points(fea_match, prototile_second.contour, shh2, 7, 2);
-				FOR(i, 0, prototile_mid.feature_points.size())
-					circle(fea_match, prototile_mid.contour[prototile_mid.feature_points[i]]+ sh, 3, Scalar(0, 0, 255), -1);
-				FOR(i, 0, prototile_second.feature_points.size())
-					circle(fea_match, prototile_second.contour[prototile_second.feature_points[i]] + shh2, 3, Scalar(0, 125, 255), -1);
-				circle(fea_match, prototile_mid.contour[prototile_mid.feature_points[0]]+ sh, 5, Scalar(120, 0, 255), -1);
-				circle(fea_match, prototile_second.contour[prototile_second.feature_points[0]] + shh2, 5, Scalar(0, 125, 255), -1);
-				circle(fea_match, prototile_mid.contour[0] + sh, 6, Scalar(25, 200, 25), 2);
-				circle(fea_match, prototile_second.contour[0] + shh2, 6, Scalar(25, 200, 25), 2);
-				FOR(i, 0, path_fea.size())
-				{
-					//int tsfsize = prototile_second.feature_points.size();
-					Point2f f1 = prototile_mid.contour[path_fea[i].first] + sh;
-					Point2f f2 = prototile_second.contour[path_fea[i].second] + shh2;
-					line(fea_match, f1, f2, colorbar[6].second);
-				}
-				imshow("fea match", fea_match);
-				//----------show the feature------------
-
-				double con_sc;
-				vector<vector<double>> contour2_tar;
-				//求contour_对应的point_f和tar值
-				//contour2_tar = computeTAR(contour_, con_sc, 0.5);
-				double angle = 165;
-				double ratio_max = 100;
-				double result_score = 0;
-				double ratio = 0.5;
-				vector<Point_f> contour_2 = morphing(contour1, contour2, path_fea, ratio);
-				cout << "contour_2.size:  " << contour_2.size() << "   " << contour1.size() << endl;
-				//FOR(mm, 0, contour_2.size()) cout << contour_2[mm].type << "   " << contour1[mm].type << endl;
-				//vector<Point_f> contour_2 = morphing_dir(contour1, contour2, path, ratio);
-				Mat pair_match = Mat(600, 1000, CV_8UC3, Scalar(255, 255, 255));
-				draw_pair(pair_match, conf_trans(contour1), conf_trans(contour2), path, sh);
-				Point2f sh2 = Point2f(700, 300) - center_p(conf_trans(contour_2));
-				draw_contour_points(pair_match, conf_trans(contour_2), sh2, 3, 2);
-				imshow("correspond path", pair_match);
-
-				//calculate two deformed shapes
-				vector<Point_f> con_re;
-				vector<int> anc_mid;
-				vector<int> anc_re;
-				int csize = contour_2.size();
-				FOR(t, 0, csize)
-				{
-					if (contour_2[t].type == fixed_p)
-						anc_mid.push_back(t);
-				}
-				Mat draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
-				if (translation_spec(contour_2, con_re, anc_mid, anc_re, draw2))
-				{
-					cout << "OK! No intersection!" << endl;
-				}
-
-				vector<Point2f> contour_dst = conf_trans(contour_2);
-				vector<Point2f> cont_re = conf_trans(con_re);
-				Mat two_c = Mat(800, 800, CV_8UC3, Scalar(255, 255, 255));
-				draw_contour_points(two_c, contour_dst, Point2f(400, 400) - center_p(contour_dst), 5, 2);
-				draw_contour_points(two_c, cont_re, Point2f(400, 400) - center_p(contour_dst), 6, 2);
-				imshow("2 contours:", two_c);
-				MatrixXd V;
-				MatrixXi F;
-				//vector<Point2f> tt = triangulate_2Contours(contour_dst, cont_re,V,F);
-				//vector<Point2f> tt = triangulate_Contours_bbx(cont_re, anc_re, V, F);
-				//vector<Point2f> tt = triangulate_Contours_bbx(contour_dst, anc_mid, V, F);
-				vector<Point2f> tt = triangulate_bbx(contour_dst, V, F);
-				Mat image = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
-				Point stf(0, 600);
-				for (size_t i = 0; i < F.rows(); i++)
-				{
-					Point pt1(V.row(F(i, 0)).x(), V.row(F(i, 0)).y());
-					Point pt2(V.row(F(i, 1)).x(), V.row(F(i, 1)).y());
-					Point pt3(V.row(F(i, 2)).x(), V.row(F(i, 2)).y());
-					//cout << F(i, 0) << "   " << F(i, 1) << "   " << F(i, 2) << endl;
-					//cout << pt1 << "    " << pt2 << "   " << pt3 << endl;
-					line(image, pt1+ stf, pt2+ stf, Scalar(0, 255, 0), 1, LINE_AA);
-					line(image, pt2+ stf, pt3+ stf, Scalar(0, 255, 0), 1, LINE_AA);
-					line(image, pt3+ stf, pt1+ stf, Scalar(0, 255, 0), 1, LINE_AA);
-				}
-				//imwrite("Triangulation.png", image);
-				imshow("Triangulation", image);
-				double degree_after_opt = 0;
-				if (pers_trans)
-				{
-					vector<Point2f> frame = { contour_dst[anc_mid[0]], contour_dst[anc_mid[1]], contour_dst[anc_mid[2]], contour_dst[anc_mid[3]] };
-					//vector<Point2f> frame = { cont_re[anc_re[0]], cont_re[anc_re[1]], cont_re[anc_re[2]], cont_re[anc_re[3]] };
-					int min_type = 0;
-					double min_l = 10000;
-					vector<Point2f> frame_b;// = base_frame(frame, 0);
-					FOR(f_type, 0, 4)
-					{
-						vector<Point2f> frame_bb = base_frame(frame, f_type);
-						vector<pair<int, int>> path_min = { make_pair(0,0),make_pair(1,1),make_pair(2,2),make_pair(3,3) };
-						double alige_e = conotour_align(frame, frame_bb, path_min);
-						if (alige_e < min_l)
-						{
-							min_l = alige_e;
-							min_type = f_type;
-							frame_b = frame_bb;
-						}
-					}
-					cout << "frame_type: " << frame_type[min_type] << "   " << min_l << endl;
-					vector<int> anc_mid_;
-					FOR(g, 0, 4)
-					{
-						cout << "frame[g]: " << frame[g] << endl;
-						anc_mid_.push_back(point_locate(tt, frame[g]));
-					}
-						
-					// 构建handle area
-					//vector<int> handle_area;
-					//vector<Point2f> handle_points;
-					//FOR(index_num, 0, anc_mid.size())
-					//{
-					//	Point2f shift_new = frame_b[index_num] - frame[index_num];
-					//	int area_width = handle_area_width;
-					//	vector<Point2f> handle_one;
-					//	FOR(width_n, -area_width, area_width + 1) 
-					//	//for (int width_n = -area_width; width_n < area_width + 1; width_n += 2)
-					//	{
-					//		int index_ = (anc_mid[index_num] + width_n + csize) % csize;
-					//		handle_area.push_back(index_);
-					//		//handle_points.push_back(contour_2[index_].point + shift_new);
-					//		handle_one.push_back(contour_2[index_].point + shift_new);
-					//	}
-					//	//cout << "handle_one before: " << handle_one[0] << "  " << handle_one[1] << "  " << handle_one[1] << endl;
-					//	int cen_index = handle_one.size() / 2;
-					//	Point2f cen_line = handle_one[0] + handle_one[handle_one.size() - 1] - 2*handle_one[cen_index];
-					//	double cos1 = cos_2v(cen_line, shift_new);
-					//	double sin1 = sin_2v(cen_line, shift_new);
-					//	double angle = acos(cos1) / PI * 180;
-					//	if (sin1 < 0) angle = -angle;		
-					//	if (abs(angle)>90) angle = 0.5*(angle - angle / abs(angle) * 180);
-					//	else angle = 0.5*angle;
-					//	//cout << cen_line << " " << shift_new << cos1 << "  " << angle << endl;
-					//	handle_one = Rotate_contour(handle_one, handle_one[cen_index], angle);
-					//	//cout << "handle_one after: " << handle_one[0] << "  " << handle_one[1] << "  " << handle_one[1] << endl;
-					//	for(auto p: handle_one)
-					//		handle_points.push_back(p);
-					//}
-					Mat draw_ = Mat(800, 800, CV_8UC3, Scalar(255, 255, 255));
-					Point2f sh1=Point2f(400, 400)-center_p(cont_re);
-					draw_contour(draw_, cont_re, sh1, 5);
-					FOR(m, 0, 4) circle(draw_, frame[m] + sh1, 3, Scalar(125, 0, 0));
-					//
-					//MatrixXd V;
-					//MatrixXi F;
-					//vector<Point2f> con = contour_dst;
-					////fileout("D:/vs2015project/Dihedral_new/Dihedral_new/mid_shape.txt", con);
-					//int consize = con.size();
-					//triangulateContour(con, V, F);
-
-					//vector<Point2f> ttt = { tt[0],tt[1],tt[2],tt[3] };
-					//Mat rot_mat = getPerspectiveTransform(frame, frame_b);// getAffineTransform(frame_1, frame_b_1);
-					//perspectiveTransform(ttt, frame_b, rot_mat);
-					/*vector<int> amid_ = { anc_mid_[0] + 4,anc_mid_[1] + 4,anc_mid_[2] + 4,anc_mid_[3] + 4 };
-					anc_mid_ = amid_;*/
-
-					string parap = ParaPath;
-					string obj_path = parap +"mid_result.obj";
-					string para_path = parap + "deform_para.txt";
-					string deformed_c = parap + "deformed_c.txt";
-					write_obj(obj_path, V, F);
-					write_para(para_path, anc_mid_, frame_b);
-					//write_para(para_path, anc_mid, frame_b);
-					//write_para(para_path, handle_area, handle_points);
-					string command = "D:/vs2015project/Dihedral_new/Dihedral_new/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c; 
-					//string command = "D:/vs2015project/ARAP_Deform/x64/Debug/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c;
-					cout << command << endl;
-					system(command.c_str());
-					contour_dst = load_point_file(deformed_c);
-					vector<Point2f> con_tem;
-					FOR(m, 0, csize) con_tem.push_back(contour_dst[m]);
-					contour_dst = con_tem;
-
-					draw_contour(draw_, contour_dst, sh1, 8);
-					FOR(m, 0, 4) circle(draw_, frame_b[m] + sh1, 3, Scalar(0, 255, 0));
-					imshow("After align handle points:", draw_);
-					con_re = set_flags(contour_dst, con_re);
-					//Mat draw_ = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
-					//vector<Point2f> frame = { contour_2[anc_mid[0]].point, contour_2[anc_mid[1]].point, contour_2[anc_mid[2]].point, contour_2[anc_mid[3]].point };
-					//vector<Point2f> frame_b = base_frame(frame, 0);
-					//Point2f sh1(0, 400);
-					//draw_contour(draw_, contour_dst, sh1, 5);
-					//FOR(m, 0, 4) circle(draw_, frame[m] + sh1, 3, Scalar(125, 0, 0));
-					//Mat rot_mat = getPerspectiveTransform(frame, frame_b);// getAffineTransform(frame_1, frame_b_1);
-					//perspectiveTransform(contour_dst, contour_dst, rot_mat);
-					//draw_contour(draw_, contour_dst, sh1, 8);
-					//FOR(m, 0, 4) circle(draw_, frame_b[m] + sh1, 3, Scalar(0, 255, 0));
-					//imshow("123123", draw_);
-				}
-				/*contour_2 = set_flags(contour_dst, contour_2);
-				Mat draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
-				int first = 0, second = 0;
-				if (self_intersect(contour_dst, first, second)) cout << "Bad  intersection!" << endl;
-				if (translation_spec(contour_2, con_re, anc_mid, anc_re, draw2))
-				{
-					cout << "OK! No intersection!" << endl;
-				}
-				contour_dst = conf_trans(con_re);*/
-				//con_re = set_flags(contour_dst, con_re);
-				if (coll_opt)
-				{
-					//contour_de_crossing(contour_dst);
-					contour_fine_tuning(contour_dst);
-					con_re = set_flags(contour_dst, con_re);
-				}
-				if (deve_opt)
-				{
-					vector<Point2f> resam_dst = sampling_ave(contour_dst, contour_dst.size());
-					vector<Point2f> resam_ = { contour_dst[anc_re[0]],contour_dst[anc_re[1]], contour_dst[anc_re[2]], contour_dst[anc_re[3]] };
-					anc_re = relocate(resam_, resam_dst);
-					FOR(ii, 0, 4) 
-					{
-						resam_dst[anc_re[ii]] = resam_[ii];
-						cout << resam_[ii] << "   " << resam_dst[anc_re[ii]] << endl;
-					}
-
-					degree_after_opt = whole_con_opt(resam_dst, anc_re, 0);
-					//degree_after_opt = whole_con_opt(contour_dst, anc_re, 0);
-					//degree_after_opt = whole_con_opt(contour_dst, anc_mid, 0);
-					cout << "After developable optimation, the collision degree: " << degree_after_opt << endl;
-					vector<Point_f> con_resam;
-					FOR(ii, 0, resam_dst.size()) con_resam.push_back(Point_f(resam_dst[ii], general_p));
-					FOR(jj, 0, anc_re.size()) con_resam[anc_re[jj]].type = fixed_p;
-					con_re = con_resam;
-				}
-				
-				draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
-				if (translation_spec(con_re, contour_2, anc_re, anc_mid, draw2))
-				{
-					cout << "OK! No intersection!" << endl;
-				}			
-				else cout << "Bad result with intersection!" << endl;
-				protoTile c1, c2;
-				c1.show_contour(conf_trans(con_re), anc_re);
-				c2.show_contour(conf_trans(contour_2), anc_mid);
-				RotationVis(c1, c2, AntiClockWise);
-
-			}
-		}
-
-
-	}
-
-	void Tiling_opt::tiliing_gen_specify2(string nameid, vector<int> anc_points)
 	{
 		load_dataset(false);
 		string filepath = DefaultPath;
@@ -673,7 +294,7 @@ namespace Tiling_tiles {
 			}
 			int min_type = 0;
 			double min_l = 10000;
-			vector<Point2f> frame_b = base_frame(frame, 0);
+			vector<Point2f> frame_b = base_frame(frame, min_type);
 			FOR(f_type, 0, 4)
 			{
 				vector<Point2f> frame_bb = base_frame(frame, f_type);
@@ -1225,9 +846,9 @@ namespace Tiling_tiles {
 		return !self_inter;
 	}
 
-	void Tiling_opt::match_candidate(int inner_index)
+	void Tiling_opt::match_candidate(int inner_index, string rootname)
 	{
-		inPat inner= all_inner_conts[inner_index];
+		inPat inner = all_inner_conts[inner_index];
 		prototile_mid = protoTile(inner.in_contour);
 		int cand_num = 10;
 		vector<pair<int, bool>> candidate_patterns = compare_TAR(prototile_mid.contour_f, cand_num);//当前中间图案对应的候选图案
@@ -1236,11 +857,16 @@ namespace Tiling_tiles {
 
 		double sc_inner = 0;
 		vector<vector<double>> inner_tar = compute_TAR(prototile_mid.contour, sc_inner);
-
+		//vector<vector<Point_f>> candidate_contour;
+		//vector<vector<pair<int, int>>> cand_path;
 		candidate_contours.swap(vector<vector<Point_f>>());
 		cand_paths.swap(vector<vector<pair<int, int>>>());
+		cand_fea_paths.swap(vector<vector<pair<int, int>>>());
+		path_shift.swap(vector<int>());
 
-		for (int j = 0; j < cand_num; j++) //只要候选图案里的前cand_num个
+		Mat draw_cands = Mat(600, 3000, CV_8UC3, Scalar(255, 255, 255));
+		draw_poly(draw_cands, conf_trans(inner.in_contour), Point2f(250, 300) - center_p(conf_trans(inner.in_contour)), 5);
+		for (int j = 0; j < 5; j++) //只要候选图案里的前cand_num个
 		{
 			//将所有的结果保存下来
 			prototile_second = protoTile(contour_dataset[candidate_patterns[j].first]);
@@ -1251,6 +877,7 @@ namespace Tiling_tiles {
 				cand_tar = all_con_tars_flip[candidate_patterns[j].first];
 				prototile_second.Flip_contour(prototile_second.contour_f);
 				prototile_second.contour = conf_trans(prototile_second.contour_f);
+				prototile_second.feature_points = prototile_second.getFeatures(prototile_second.contour_f);
 			}
 			else
 			{
@@ -1268,28 +895,20 @@ namespace Tiling_tiles {
 			int shift = 0;
 			int width = match_window_width; //
 			double re = tar_mismatch_fea(inner_tar, cand_tar, mid_index, sec_f, path, shift, width);
-			//double re = tar_mismatch(inner_tar, cand_tar, path, shift, width);
 			vector<pair<int, int>> path_min = path;
-			/*for (int n = 0; n < path.size(); n++)
-			if (prototile_mid->contour_f[path[n].first].type>1)
-			path_min.push_back(path[n]);*/
-
 			vector<Point_f> contour_tem_f;
 			int c2size = prototile_second.contour_f.size();
+			//移动点顺序
 			for (int i = shift; i < shift + c2size; i++)
 			{
 				contour_tem_f.push_back(prototile_second.contour_f[i % c2size]);
 			}
 			prototile_second.contour_f = contour_tem_f;
+
 			vector<Point2f> contour_cand = conf_trans(prototile_second.contour_f);
 			//std::cout << "Mid num: "<<prototile_mid.contour.size() << "   sec num: " << c2size << "  after shifting: " << contour_cand.size() << endl;
 
-			double scale = arcLength(prototile_mid.contour, true) / arcLength(contour_cand, true);
-			//std::cout << "scale: " << scale << endl;
-			for (int i = 0; i < contour_cand.size(); i++)
-			{
-				contour_cand[i] = contour_cand[i] * scale;
-			}
+			//移动到重心重叠的地方
 			Point2f cen1 = center_p(prototile_mid.contour);
 			Point2f cen2 = center_p(contour_cand);
 			Point2f shift2 = cen1 - cen2;
@@ -1297,6 +916,13 @@ namespace Tiling_tiles {
 			{
 				contour_cand[i] = contour_cand[i] + shift2;
 			}
+			//two types of calculating the scale: i.based on the arclength  ii.based in uniform scale
+			double scale = arcLength(prototile_mid.contour, true) / arcLength(contour_cand, true);
+			for (int i = 0; i < contour_cand.size(); i++)
+			{
+				contour_cand[i] = contour_cand[i] * scale;
+			}
+
 			double length_min = 1000000;
 			int angle_min = 0;
 			int times = 0;
@@ -1304,19 +930,14 @@ namespace Tiling_tiles {
 			Point2f sh_al = Point2f(0, 0);
 			Point2f shift_t = Point2f(1000, 1000);
 			vector<Point2f> contour_tem;
-			//Point2f v0 = contour_inner[0] - cen1;
-			//Point2f v1 = contour_cand[0] - cen1;
-			//double angle1 = acos(cos_two_vector(v0, v1)) / PI * 180;
-			//if (sin_two_vector(v0, v1) < 0) angle1 = -angle1;
-
 			//cout << j << "  path_min_size:  " << path_min.size() << "  cent:" << cen2 << endl;
-			while (times < 3 || length_2p(shift_t, Point2f(0, 0)) > 100 || angle_min > 10)
+			while (times < 3 || length_2p(shift_t, Point2f(0, 0)) > 10 || angle_min > 10)// 
 			{
 				length_min = 1000000;
 				angle_min = 0;
 				cen2 = center_p(contour_cand);
 				//找到距离最近的角度
-				for (int angle = 0; angle < 360; angle = angle + 5)
+				for (int angle = 0; angle < 360; angle = angle + 2)
 				{
 					double leng = 0;
 					Mat rot_mat(2, 3, CV_32FC1);
@@ -1324,19 +945,22 @@ namespace Tiling_tiles {
 					cv::transform(contour_cand, contour_tem, rot_mat);
 					for (int m = 0; m < path_min.size(); m++)
 					{
-						leng += length_2p(prototile_mid.contour[path_min[m].first], contour_tem[path_min[m].second]);
+						leng += pow(length_2p(prototile_mid.contour[path_min[m].first], contour_tem[path_min[m].second]), 2);
+						/*leng += length_2p(prototile_mid.contour[path_min[m].first], contour_tem[path_min[m].second]);*/
 					}
+					leng = sqrt(leng);
 					if (leng < length_min)
 					{
 						angle_min = angle;
 						length_min = leng;
 					}
 				}
+				//cout << "angle_min: " << angle_min << "   length_min:  " << length_min << endl;
 				Mat rot_mat1(2, 3, CV_32FC1);
 				rot_mat1 = getRotationMatrix2D(cen2, angle_min, 1);
 				cv::transform(contour_cand, contour_tem, rot_mat1);
 				angl_al += angle_min;
-				//contour_cand = contour_mid;
+				//contour_cand = contour_tem;
 				//移动重心
 				shift_t = Point2f(0, 0);
 				for (int m = 0; m < path_min.size(); m++)
@@ -1350,12 +974,24 @@ namespace Tiling_tiles {
 				}
 				sh_al += shift_t;
 				times++;
+				//cout << "angle_al: " << angl_al << "   --  " << length_min << "    sh_al: " << sh_al << "   shift_t: " << shift_t << endl;
 			}
 			//cout << "angle_al: " << angl_al << "   --  " << length_min << "    sh_al: " << sh_al << endl;
 			prototile_second.contour = contour_cand;
-			candidate_contours.push_back(set_flags(contour_cand, prototile_second.contour_f));
+			prototile_second.contour_f = set_flags(contour_cand, prototile_second.contour_f);
+			candidate_contours.push_back(prototile_second.contour_f);
 			cand_paths.push_back(path);
+
+			//filter out inappropriate matches
+			filter_path(path, prototile_second.contour_f, prototile_mid.contour_f, inner_tar, cand_tar, shift);
+
+			Point2f shift_cand = Point2f(500 * j + 750, 300)-center_p(contour_cand);
+			draw_poly(draw_cands, contour_cand, shift_cand);
 		}
+		string filename = rootname + "/cands/";
+		_mkdir(filename.c_str());
+		filename = filename + to_string(inner_index) + "_candidates.png";
+		cv::imwrite(filename, draw_cands);
 	}
 
 	void Tiling_opt::match_candidate_(int inner_index)
@@ -1521,7 +1157,7 @@ namespace Tiling_tiles {
 		vector<pair<int, int>> path_fea;
 		int path_size = path.size();
 		int sec_size = con2.size();
-		cout << path_size << "   " << sec_size << endl;
+		//cout << path_size << "   " << sec_size << endl;
 		int mar = path_margin;
 		int last_index = -mar;
 		int last_m = -1;
@@ -1535,9 +1171,9 @@ namespace Tiling_tiles {
 			if (con_mid[one_pair.first].type == fixed_p || con_mid[one_pair.first].type == fea_p)  //must have a match
 			{
 				vector<int> waiting_merge;
-				cout << " last_m:  " << last_m << "  last_index  " << last_index << endl;
+				//cout << " last_m:  " << last_m << "  last_index  " << last_index << endl;
 				if (abs(last_m - last_index) > mar) last_index = last_index - (last_m + sec_size);
-				cout << "last_index  " << last_index << endl;
+				//cout << "last_index  " << last_index << endl;
 				FOR(n, 1 - mar, mar)
 				{
 					int tem_sec = (sec_index + n + sec_size) % sec_size;
@@ -1575,7 +1211,7 @@ namespace Tiling_tiles {
 							double diss_angle = abs(ang1 - ang2);
 							if (ang1*ang2 < 0) diss_angle = 2 * PI - diss_angle;  //<0, 异号
 							double dis_tar = tar_length_2p(inner_tar[one_pair.first], cand_tar[cand_index]) + normal_r*diss_angle;
-							cout << "distar: " << dis_tar << "   " << tar_length_2p(inner_tar[one_pair.first], cand_tar[cand_index]) << "  ang1: " << ang1 / PI * 180 << "    " << ang2 / PI * 180 << "   " << normal_r*diss_angle << endl;
+							//cout << "distar: " << dis_tar << "   " << tar_length_2p(inner_tar[one_pair.first], cand_tar[cand_index]) << "  ang1: " << ang1 / PI * 180 << "    " << ang2 / PI * 180 << "   " << normal_r*diss_angle << endl;
 							if (dis_tar < min_dis_tar)
 							{
 								min_dis_tar = dis_tar;
@@ -1583,7 +1219,7 @@ namespace Tiling_tiles {
 							}
 						}
 					}
-					cout << "fea m: " << m << "   min_index: " << min_index << "    " << waiting_merge[min_index] << endl;
+					//cout << "fea m: " << m << "   min_index: " << min_index << "    " << waiting_merge[min_index] << endl;
 					if (con_mid[one_pair.first].type == fixed_p)
 					{
 						if (!path_fea.empty() && path_fea.back().second >= waiting_merge[min_index] && abs(path_fea.back().second - waiting_merge[min_index])<2*path_margin)
@@ -2197,3 +1833,287 @@ namespace Tiling_tiles {
 	}
 
 }
+
+
+
+//void Tiling_opt::tiliing_gen_specify2(string nameid, vector<int> anc_points)
+//{
+//	load_dataset(false);
+//	string filepath = DefaultPath;
+//	filepath = filepath + "contour/" + nameid + ".txt";
+//	prototile_first = protoTile(filepath);
+//	string savepath = SavePath;
+//	savepath = savepath.substr(0, savepath.length() - 7) + "result_spe/";
+//	savepath += nameid;
+//	const char *na = savepath.c_str();
+//	if (_access(na, 0) != -1) printf("The  file/dir had been Exisit \n");
+//	else	_mkdir(na);
+//	vector<int> cand_points = prototile_first.getCandPoints(prototile_first.contour_f);
+//	int trans = Tanslation_rule_spec(cand_points, prototile_first.contour_f, savepath, anc_points);
+//	//int flips = Flipping_rule(p_p_index, cont_orig, rootname);
+//	int all_inner_num = all_inner_conts.size();
+//	if (all_inner_num == 0)
+//	{
+//		std::cout << "no right placement" << endl;
+//		return;
+//	}
+//	FOR(i, 0, 1)
+//		//FOR(i, 0, all_inner_num)
+//	{
+//		match_candidate_(i);
+//		//feature_match();
+//		for (int j = 0; j < 1; j++)
+//		{
+//			vector<pair<int, int>> path = cand_paths[j];
+//			cout << "path num: " << path.size() << endl;
+//			vector<Point_f> contour1 = prototile_mid.contour_f;
+//			vector<Point_f> contour2 = candidate_contours[j];
+//			prototile_second = protoTile(contour2);
+//			vector<pair<int, int>> path_fea = cand_fea_paths[j];
+//
+//			//show the path
+//			Point2f sh = Point2f(300, 300) - center_p(conf_trans(contour1));
+//			Point2f shh2 = sh + Point2f(400, 0);
+//			Mat fea_match = Mat(600, 1000, CV_8UC3, Scalar(255, 255, 255));
+//			draw_contour_points(fea_match, prototile_mid.contour, sh, 5, 2);
+//			draw_contour_points(fea_match, prototile_second.contour, shh2, 7, 2);
+//			FOR(i, 0, prototile_mid.feature_points.size())
+//				circle(fea_match, prototile_mid.contour[prototile_mid.feature_points[i]] + sh, 3, Scalar(0, 0, 255), -1);
+//			FOR(i, 0, prototile_second.feature_points.size())
+//				circle(fea_match, prototile_second.contour[prototile_second.feature_points[i]] + shh2, 3, Scalar(0, 125, 255), -1);
+//			circle(fea_match, prototile_mid.contour[prototile_mid.feature_points[0]] + sh, 5, Scalar(120, 0, 255), -1);
+//			circle(fea_match, prototile_second.contour[prototile_second.feature_points[0]] + shh2, 5, Scalar(0, 125, 255), -1);
+//			circle(fea_match, prototile_mid.contour[0] + sh, 6, Scalar(25, 200, 25), 2);
+//			circle(fea_match, prototile_second.contour[0] + shh2, 6, Scalar(25, 200, 25), 2);
+//			FOR(i, 0, path_fea.size())
+//			{
+//				//int tsfsize = prototile_second.feature_points.size();
+//				Point2f f1 = prototile_mid.contour[path_fea[i].first] + sh;
+//				Point2f f2 = prototile_second.contour[path_fea[i].second] + shh2;
+//				line(fea_match, f1, f2, colorbar[6].second);
+//			}
+//			imshow("fea match", fea_match);
+//			//----------show the feature------------
+//
+//			double con_sc;
+//			vector<vector<double>> contour2_tar;
+//			//求contour_对应的point_f和tar值
+//			//contour2_tar = computeTAR(contour_, con_sc, 0.5);
+//			double angle = 165;
+//			double ratio_max = 100;
+//			double result_score = 0;
+//			double ratio = 0.5;
+//			vector<Point_f> contour_2 = morphing(contour1, contour2, path_fea, ratio);
+//			cout << "contour_2.size:  " << contour_2.size() << "   " << contour1.size() << endl;
+//			//FOR(mm, 0, contour_2.size()) cout << contour_2[mm].type << "   " << contour1[mm].type << endl;
+//			//vector<Point_f> contour_2 = morphing_dir(contour1, contour2, path, ratio);
+//			Mat pair_match = Mat(600, 1000, CV_8UC3, Scalar(255, 255, 255));
+//			draw_pair(pair_match, conf_trans(contour1), conf_trans(contour2), path, sh);
+//			Point2f sh2 = Point2f(700, 300) - center_p(conf_trans(contour_2));
+//			draw_contour_points(pair_match, conf_trans(contour_2), sh2, 3, 2);
+//			imshow("correspond path", pair_match);
+//
+//			//calculate two deformed shapes
+//			vector<Point_f> con_re;
+//			vector<int> anc_mid;
+//			vector<int> anc_re;
+//			int csize = contour_2.size();
+//			FOR(t, 0, csize)
+//			{
+//				if (contour_2[t].type == fixed_p)
+//					anc_mid.push_back(t);
+//			}
+//			Mat draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
+//			if (translation_spec(contour_2, con_re, anc_mid, anc_re, draw2))
+//			{
+//				cout << "OK! No intersection!" << endl;
+//			}
+//
+//			vector<Point2f> contour_dst = conf_trans(contour_2);
+//			vector<Point2f> cont_re = conf_trans(con_re);
+//			Mat two_c = Mat(800, 800, CV_8UC3, Scalar(255, 255, 255));
+//			draw_contour_points(two_c, contour_dst, Point2f(400, 400) - center_p(contour_dst), 5, 2);
+//			draw_contour_points(two_c, cont_re, Point2f(400, 400) - center_p(contour_dst), 6, 2);
+//			imshow("2 contours:", two_c);
+//			MatrixXd V;
+//			MatrixXi F;
+//			//vector<Point2f> tt = triangulate_2Contours(contour_dst, cont_re,V,F);
+//			//vector<Point2f> tt = triangulate_Contours_bbx(cont_re, anc_re, V, F);
+//			//vector<Point2f> tt = triangulate_Contours_bbx(contour_dst, anc_mid, V, F);
+//			vector<Point2f> tt = triangulate_bbx(contour_dst, V, F);
+//			Mat image = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
+//			Point stf(0, 600);
+//			for (size_t i = 0; i < F.rows(); i++)
+//			{
+//				Point pt1(V.row(F(i, 0)).x(), V.row(F(i, 0)).y());
+//				Point pt2(V.row(F(i, 1)).x(), V.row(F(i, 1)).y());
+//				Point pt3(V.row(F(i, 2)).x(), V.row(F(i, 2)).y());
+//				//cout << F(i, 0) << "   " << F(i, 1) << "   " << F(i, 2) << endl;
+//				//cout << pt1 << "    " << pt2 << "   " << pt3 << endl;
+//				line(image, pt1 + stf, pt2 + stf, Scalar(0, 255, 0), 1, LINE_AA);
+//				line(image, pt2 + stf, pt3 + stf, Scalar(0, 255, 0), 1, LINE_AA);
+//				line(image, pt3 + stf, pt1 + stf, Scalar(0, 255, 0), 1, LINE_AA);
+//			}
+//			//imwrite("Triangulation.png", image);
+//			imshow("Triangulation", image);
+//			double degree_after_opt = 0;
+//			if (pers_trans)
+//			{
+//				vector<Point2f> frame = { contour_dst[anc_mid[0]], contour_dst[anc_mid[1]], contour_dst[anc_mid[2]], contour_dst[anc_mid[3]] };
+//				//vector<Point2f> frame = { cont_re[anc_re[0]], cont_re[anc_re[1]], cont_re[anc_re[2]], cont_re[anc_re[3]] };
+//				int min_type = 0;
+//				double min_l = 10000;
+//				vector<Point2f> frame_b;// = base_frame(frame, 0);
+//				FOR(f_type, 0, 4)
+//				{
+//					vector<Point2f> frame_bb = base_frame(frame, f_type);
+//					vector<pair<int, int>> path_min = { make_pair(0,0),make_pair(1,1),make_pair(2,2),make_pair(3,3) };
+//					double alige_e = conotour_align(frame, frame_bb, path_min);
+//					if (alige_e < min_l)
+//					{
+//						min_l = alige_e;
+//						min_type = f_type;
+//						frame_b = frame_bb;
+//					}
+//				}
+//				cout << "frame_type: " << frame_type[min_type] << "   " << min_l << endl;
+//				vector<int> anc_mid_;
+//				FOR(g, 0, 4)
+//				{
+//					cout << "frame[g]: " << frame[g] << endl;
+//					anc_mid_.push_back(point_locate(tt, frame[g]));
+//				}
+//
+//				// 构建handle area
+//				//vector<int> handle_area;
+//				//vector<Point2f> handle_points;
+//				//FOR(index_num, 0, anc_mid.size())
+//				//{
+//				//	Point2f shift_new = frame_b[index_num] - frame[index_num];
+//				//	int area_width = handle_area_width;
+//				//	vector<Point2f> handle_one;
+//				//	FOR(width_n, -area_width, area_width + 1) 
+//				//	//for (int width_n = -area_width; width_n < area_width + 1; width_n += 2)
+//				//	{
+//				//		int index_ = (anc_mid[index_num] + width_n + csize) % csize;
+//				//		handle_area.push_back(index_);
+//				//		//handle_points.push_back(contour_2[index_].point + shift_new);
+//				//		handle_one.push_back(contour_2[index_].point + shift_new);
+//				//	}
+//				//	//cout << "handle_one before: " << handle_one[0] << "  " << handle_one[1] << "  " << handle_one[1] << endl;
+//				//	int cen_index = handle_one.size() / 2;
+//				//	Point2f cen_line = handle_one[0] + handle_one[handle_one.size() - 1] - 2*handle_one[cen_index];
+//				//	double cos1 = cos_2v(cen_line, shift_new);
+//				//	double sin1 = sin_2v(cen_line, shift_new);
+//				//	double angle = acos(cos1) / PI * 180;
+//				//	if (sin1 < 0) angle = -angle;		
+//				//	if (abs(angle)>90) angle = 0.5*(angle - angle / abs(angle) * 180);
+//				//	else angle = 0.5*angle;
+//				//	//cout << cen_line << " " << shift_new << cos1 << "  " << angle << endl;
+//				//	handle_one = Rotate_contour(handle_one, handle_one[cen_index], angle);
+//				//	//cout << "handle_one after: " << handle_one[0] << "  " << handle_one[1] << "  " << handle_one[1] << endl;
+//				//	for(auto p: handle_one)
+//				//		handle_points.push_back(p);
+//				//}
+//				Mat draw_ = Mat(800, 800, CV_8UC3, Scalar(255, 255, 255));
+//				Point2f sh1 = Point2f(400, 400) - center_p(cont_re);
+//				draw_contour(draw_, cont_re, sh1, 5);
+//				FOR(m, 0, 4) circle(draw_, frame[m] + sh1, 3, Scalar(125, 0, 0));
+//				//
+//				//MatrixXd V;
+//				//MatrixXi F;
+//				//vector<Point2f> con = contour_dst;
+//				////fileout("D:/vs2015project/Dihedral_new/Dihedral_new/mid_shape.txt", con);
+//				//int consize = con.size();
+//				//triangulateContour(con, V, F);
+//
+//				//vector<Point2f> ttt = { tt[0],tt[1],tt[2],tt[3] };
+//				//Mat rot_mat = getPerspectiveTransform(frame, frame_b);// getAffineTransform(frame_1, frame_b_1);
+//				//perspectiveTransform(ttt, frame_b, rot_mat);
+//				/*vector<int> amid_ = { anc_mid_[0] + 4,anc_mid_[1] + 4,anc_mid_[2] + 4,anc_mid_[3] + 4 };
+//				anc_mid_ = amid_;*/
+//
+//				string parap = ParaPath;
+//				string obj_path = parap + "mid_result.obj";
+//				string para_path = parap + "deform_para.txt";
+//				string deformed_c = parap + "deformed_c.txt";
+//				write_obj(obj_path, V, F);
+//				write_para(para_path, anc_mid_, frame_b);
+//				//write_para(para_path, anc_mid, frame_b);
+//				//write_para(para_path, handle_area, handle_points);
+//				string command = "D:/vs2015project/Dihedral_new/Dihedral_new/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c;
+//				//string command = "D:/vs2015project/ARAP_Deform/x64/Debug/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c;
+//				cout << command << endl;
+//				system(command.c_str());
+//				contour_dst = load_point_file(deformed_c);
+//				vector<Point2f> con_tem;
+//				FOR(m, 0, csize) con_tem.push_back(contour_dst[m]);
+//				contour_dst = con_tem;
+//
+//				draw_contour(draw_, contour_dst, sh1, 8);
+//				FOR(m, 0, 4) circle(draw_, frame_b[m] + sh1, 3, Scalar(0, 255, 0));
+//				imshow("After align handle points:", draw_);
+//				con_re = set_flags(contour_dst, con_re);
+//				//Mat draw_ = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
+//				//vector<Point2f> frame = { contour_2[anc_mid[0]].point, contour_2[anc_mid[1]].point, contour_2[anc_mid[2]].point, contour_2[anc_mid[3]].point };
+//				//vector<Point2f> frame_b = base_frame(frame, 0);
+//				//Point2f sh1(0, 400);
+//				//draw_contour(draw_, contour_dst, sh1, 5);
+//				//FOR(m, 0, 4) circle(draw_, frame[m] + sh1, 3, Scalar(125, 0, 0));
+//				//Mat rot_mat = getPerspectiveTransform(frame, frame_b);// getAffineTransform(frame_1, frame_b_1);
+//				//perspectiveTransform(contour_dst, contour_dst, rot_mat);
+//				//draw_contour(draw_, contour_dst, sh1, 8);
+//				//FOR(m, 0, 4) circle(draw_, frame_b[m] + sh1, 3, Scalar(0, 255, 0));
+//				//imshow("123123", draw_);
+//			}
+//			/*contour_2 = set_flags(contour_dst, contour_2);
+//			Mat draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
+//			int first = 0, second = 0;
+//			if (self_intersect(contour_dst, first, second)) cout << "Bad  intersection!" << endl;
+//			if (translation_spec(contour_2, con_re, anc_mid, anc_re, draw2))
+//			{
+//			cout << "OK! No intersection!" << endl;
+//			}
+//			contour_dst = conf_trans(con_re);*/
+//			//con_re = set_flags(contour_dst, con_re);
+//			if (coll_opt)
+//			{
+//				//contour_de_crossing(contour_dst);
+//				contour_fine_tuning(contour_dst);
+//				con_re = set_flags(contour_dst, con_re);
+//			}
+//			if (deve_opt)
+//			{
+//				vector<Point2f> resam_dst = sampling_ave(contour_dst, contour_dst.size());
+//				vector<Point2f> resam_ = { contour_dst[anc_re[0]],contour_dst[anc_re[1]], contour_dst[anc_re[2]], contour_dst[anc_re[3]] };
+//				anc_re = relocate(resam_, resam_dst);
+//				FOR(ii, 0, 4)
+//				{
+//					resam_dst[anc_re[ii]] = resam_[ii];
+//					cout << resam_[ii] << "   " << resam_dst[anc_re[ii]] << endl;
+//				}
+//
+//				degree_after_opt = whole_con_opt(resam_dst, anc_re, 0);
+//				//degree_after_opt = whole_con_opt(contour_dst, anc_re, 0);
+//				//degree_after_opt = whole_con_opt(contour_dst, anc_mid, 0);
+//				cout << "After developable optimation, the collision degree: " << degree_after_opt << endl;
+//				vector<Point_f> con_resam;
+//				FOR(ii, 0, resam_dst.size()) con_resam.push_back(Point_f(resam_dst[ii], general_p));
+//				FOR(jj, 0, anc_re.size()) con_resam[anc_re[jj]].type = fixed_p;
+//				con_re = con_resam;
+//			}
+//
+//			draw2 = Mat(1200, 1600, CV_8UC3, Scalar(255, 255, 255));
+//			if (translation_spec(con_re, contour_2, anc_re, anc_mid, draw2))
+//			{
+//				cout << "OK! No intersection!" << endl;
+//			}
+//			else cout << "Bad result with intersection!" << endl;
+//			protoTile c1, c2;
+//			c1.show_contour(conf_trans(con_re), anc_re);
+//			c2.show_contour(conf_trans(contour_2), anc_mid);
+//			RotationVis(c1, c2, AntiClockWise);
+//
+//		}
+//	}
+//}

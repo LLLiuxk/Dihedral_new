@@ -139,7 +139,7 @@ namespace Tiling_tiles {
 	
 		void tiliing_generation(string nameid);
 		void tiliing_gen_specify(string nameid, vector<int> anc_points);
-		void tiliing_gen_specify2(string nameid, vector<int> anc_points);
+		//void tiliing_gen_specify2(string nameid, vector<int> anc_points);
 		vector<Point_f> contour_opt(vector<Point_f> cont, vector<int>& anc_p, int type, int times, bool pers_trans=true,	bool coll_opt = false, bool deve_opt = false, int cworder= ClockWise); //type: 0=contours bbx; 1: square bbx		
 		void load_dataset(bool input_images);
 		void load_para(string filename);
@@ -152,7 +152,7 @@ namespace Tiling_tiles {
 		bool translation_placement(vector<Point_f> &contour_s, vector<Point_f> &extracted, vector<int> indexes, vector<int> &ex_indexes, Mat &countname);
 		bool translation_spec(vector<Point_f> &contour_s, vector<Point_f> &extracted, vector<int> indexes, vector<int> &ex_indexes, Mat &countname);
 
-		void match_candidate(int inner_index);
+		void match_candidate(int inner_index, string rootname);
 		void match_candidate_(int inner_index);
 		void filter_path(vector<pair<int, int>> path, vector<Point_f> con2, vector<Point_f> con_mid, vector<vector<double>> inner_tar, vector<vector<double>> cand_tar, int shift);
 
