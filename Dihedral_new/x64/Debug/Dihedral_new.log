@@ -1,151 +1,169 @@
-﻿  Tool.cpp
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(31): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(58): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(78): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(97): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(138): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(166): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(257): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(355): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(359): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(385): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(386): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(414): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(420): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(450): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(525): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(562): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(616): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(650): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(684): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(685): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(686): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(687): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(698): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(710): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(720): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(774): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(943): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(999): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1031): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1032): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1061): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1167): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1168): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1172): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1222): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1307): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1322): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1324): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1363): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1384): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1385): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1479): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1480): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1647): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1685): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1686): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1723): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1767): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1780): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1834): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1835): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1852): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1872): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1902): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1906): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1933): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1990): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2018): warning C4244: “=”: 从“__int64”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2023): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2037): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2042): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2066): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2086): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2102): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2130): warning C4244: “=”: 从“__int64”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2135): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2149): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2154): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2185): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2250): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2278): warning C4244: “=”: 从“__int64”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2283): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2297): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2302): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2340): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2353): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2375): warning C4244: “=”: 从“__int64”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2379): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2395): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2410): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-  tilingOpt.cpp
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.h(74): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(23): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(42): warning C4101: “con_sc”: 未引用的局部变量
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(171): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(237): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(263): warning C4018: “<”: 有符号/无符号不匹配
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(265): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(266): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(267): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(404): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(215): warning C4101: “con_sc”: 未引用的局部变量
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(455): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(522): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(500): warning C4101: “con_sc”: 未引用的局部变量
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(603): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(636): warning C4018: “<”: 有符号/无符号不匹配
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(638): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(639): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(640): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(805): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(849): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(910): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(911): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(965): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(966): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1018): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1113): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1224): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1242): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1361): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1374): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1475): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1476): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1531): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1620): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1659): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1673): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1688): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1689): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1758): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1759): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1760): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1791): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1820): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1854): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1869): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1923): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1982): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(2021): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(2081): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-  protoTile.cpp
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.h(74): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\prototile.cpp(43): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\prototile.cpp(44): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\prototile.cpp(52): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\prototile.cpp(62): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\prototile.cpp(99): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\prototile.cpp(118): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\prototile.cpp(154): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-  main.cpp
-d:\vs2015project\dihedral_new\dihedral_new\tilingopt.h(74): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\main.cpp(72): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\main.cpp(96): warning C4018: “<”: 有符号/无符号不匹配
-d:\vs2015project\dihedral_new\dihedral_new\main.cpp(98): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\main.cpp(99): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\main.cpp(100): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-d:\vs2015project\dihedral_new\dihedral_new\main.cpp(13): warning C4101: “midtime”: 未引用的局部变量
-  正在生成代码...
-  Dihedral_new.vcxproj -> D:\vs2015project\Dihedral_new\x64\Debug\Dihedral_new.exe
+﻿生成启动时间为 2023/5/31 12:35:29。
+     1>项目“D:\vs2015project\Dihedral_new\Dihedral_new\Dihedral_new.vcxproj”在节点 2 上(Build 个目标)。
+     1>ClCompile:
+         D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /IC:\local\opencv\build\include /IC:\local\opencv\build\include\opencv /IC:\local\opencv\build\include\opencv2 /I"C:\local\eigen-3.3.8" /ZI /nologo /W3 /WX- /sdl /Od /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"x64\Debug\\" /Fd"x64\Debug\vc140.pdb" /Gd /TP /errorReport:prompt Tool.cpp main.cpp protoTile.cpp tilingOpt.cpp
+         tilingOpt.cpp
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.h(74): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(23): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(82): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(130): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(106): warning C4101: “con_sc”: 未引用的局部变量
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(238): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(271): warning C4018: “<”: 有符号/无符号不匹配
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(273): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(274): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(275): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(463): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(506): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(567): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(568): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(622): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(623): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(675): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(770): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(887): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(900): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(988): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1033): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1046): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1158): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1159): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1198): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1312): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1351): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1365): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1380): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1381): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1450): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1451): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1452): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1483): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1505): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1538): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1553): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1607): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1666): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1705): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1766): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.cpp(1805): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+         protoTile.cpp
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.h(74): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\prototile.cpp(43): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\prototile.cpp(44): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\prototile.cpp(52): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\prototile.cpp(62): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\prototile.cpp(99): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\prototile.cpp(118): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\prototile.cpp(154): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+         main.cpp
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingopt.h(74): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\main.cpp(81): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\main.cpp(105): warning C4018: “<”: 有符号/无符号不匹配
+     1>d:\vs2015project\dihedral_new\dihedral_new\main.cpp(107): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\main.cpp(108): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\main.cpp(109): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\main.cpp(13): warning C4101: “midtime”: 未引用的局部变量
+         Tool.cpp
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(31): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(58): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(78): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(111): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(149): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(171): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(200): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(228): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(319): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(417): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(421): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(447): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(448): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(476): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(482): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(512): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(587): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(613): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(614): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(638): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(692): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(726): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(760): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(761): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(762): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(763): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(774): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(786): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(796): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(853): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1022): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1032): warning C4244: “+=”: 从“double”转换到“float”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1033): warning C4244: “+=”: 从“double”转换到“float”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1086): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1118): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1119): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1149): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1260): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1261): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1265): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1315): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1400): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1419): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1427): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1441): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1443): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1482): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1503): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1504): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1598): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1599): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1766): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1804): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1805): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1842): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1886): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1899): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1953): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1955): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1972): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(1992): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2022): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2026): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2053): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2110): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2138): warning C4244: “=”: 从“__int64”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2143): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2157): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2162): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2186): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2206): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2222): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2250): warning C4244: “=”: 从“__int64”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2255): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2269): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2274): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2305): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2370): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2398): warning C4244: “=”: 从“__int64”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2403): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2417): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2422): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2460): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2473): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2495): warning C4244: “=”: 从“__int64”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2499): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2515): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2530): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2594): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>d:\vs2015project\dihedral_new\dihedral_new\tool.cpp(2595): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+         正在生成代码...
+       Link:
+         D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"D:\vs2015project\Dihedral_new\x64\Debug\Dihedral_new.exe" /INCREMENTAL /NOLOGO /LIBPATH:C:\local\opencv\build\x64\vc14\lib opencv_world460d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"D:\vs2015project\Dihedral_new\x64\Debug\Dihedral_new.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\vs2015project\Dihedral_new\x64\Debug\Dihedral_new.lib" /MACHINE:X64 x64\Debug\main.obj
+         x64\Debug\protoTile.obj
+         x64\Debug\tilingOpt.obj
+         x64\Debug\Tool.obj
+         LINK : 没有找到 D:\vs2015project\Dihedral_new\x64\Debug\Dihedral_new.exe 或上一个增量链接没有生成它；正在执行完全链接
+         Dihedral_new.vcxproj -> D:\vs2015project\Dihedral_new\x64\Debug\Dihedral_new.exe
+     1>已完成生成项目“D:\vs2015project\Dihedral_new\Dihedral_new\Dihedral_new.vcxproj”(Build 个目标)的操作。
+
+已成功生成。
+
+已用时间 00:00:07.01

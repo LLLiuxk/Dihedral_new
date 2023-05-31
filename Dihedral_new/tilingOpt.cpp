@@ -94,7 +94,6 @@ namespace Tiling_tiles {
 			for (int j = 0; j < 1; j++)
 			{
 				vector<pair<int, int>> path = cand_paths[j];
-				cout << "path num: " << path.size() << endl;
 				vector<Point_f> contour1 = prototile_mid.contour_f;
 				vector<Point_f> contour2 = candidate_contours[j];
 				prototile_second = protoTile(contour2);
@@ -768,13 +767,14 @@ namespace Tiling_tiles {
 	bool Tiling_opt::translation_spec(vector<Point_f> &contour_s, vector<Point_f> &extracted, vector<int> indexes, vector<int> &ex_indexes, Mat &countname)
 	{
 		int csize = contour_s.size();
+		//cout << "contour_s size: " << csize << endl;
 		Point2f line1 = contour_s[indexes[2]].point - contour_s[indexes[0]].point;
 		Point2f line2 = contour_s[indexes[3]].point - contour_s[indexes[1]].point;
 		vector<Point2f> shifting;
 		shifting.push_back(line1);
 		shifting.push_back(line1 + line2);
 		shifting.push_back(line2);
-		
+
 		// 提取平移围成的轮廓
 		vector<vector<Point_f>> four_place;
 		four_place.push_back(contour_s);
@@ -787,7 +787,6 @@ namespace Tiling_tiles {
 			}
 			four_place.push_back(one_loca);
 		}
-
 		Point2f cent_cont = center_p(conf_trans(contour_s));
 		Point2f shift2 = Point2f(400, 600) - cent_cont;
 		draw_contour_points(countname, conf_trans(contour_s), shift2);
@@ -814,7 +813,6 @@ namespace Tiling_tiles {
 				//circle(drawing_ttt, four_place[0][t], 2, Scalar(0, 255, 0), -1);
 			}
 		}
-
 		//for (int t = indexes[3]; t > indexes[2]; t--)                   //translation的提取规律为1的4-3, 2的1-4, 3的2-1, 4的3-2
 		//{
 		//	extracted.push_back(four_place[0][t]);
@@ -851,6 +849,7 @@ namespace Tiling_tiles {
 		inPat inner = all_inner_conts[inner_index];
 		prototile_mid = protoTile(inner.in_contour);
 		int cand_num = 10;
+		int cal_cand_num = 5;
 		vector<pair<int, bool>> candidate_patterns = compare_TAR(prototile_mid.contour_f, cand_num);//当前中间图案对应的候选图案
 		cout << "This is the " << inner_index << "th inner contour" << endl <<
 			"candidate_patterns size: " << candidate_patterns.size() << endl;
@@ -866,10 +865,12 @@ namespace Tiling_tiles {
 
 		Mat draw_cands = Mat(600, 3000, CV_8UC3, Scalar(255, 255, 255));
 		draw_poly(draw_cands, conf_trans(inner.in_contour), Point2f(250, 300) - center_p(conf_trans(inner.in_contour)), 5);
-		for (int j = 0; j < 5; j++) //只要候选图案里的前cand_num个
+		cal_cand_num = min(cal_cand_num, (int)candidate_patterns.size());
+		for (int j = 0; j < cal_cand_num; j++) //只要候选图案里的前cal_cand_num个
 		{
 			//将所有的结果保存下来
 			prototile_second = protoTile(contour_dataset[candidate_patterns[j].first]);
+
 			vector<vector<double>> cand_tar;
 			if (candidate_patterns[j].second)
 			{
@@ -982,6 +983,7 @@ namespace Tiling_tiles {
 			candidate_contours.push_back(prototile_second.contour_f);
 			cand_paths.push_back(path);
 
+			cout << "The " << j << "th cands' path order:" << endl;
 			//filter out inappropriate matches
 			filter_path(path, prototile_second.contour_f, prototile_mid.contour_f, inner_tar, cand_tar, shift);
 
@@ -1141,7 +1143,7 @@ namespace Tiling_tiles {
 			prototile_second.contour_f = set_flags(contour_cand, prototile_second.contour_f);
 			candidate_contours.push_back(prototile_second.contour_f);
 			cand_paths.push_back(path);
-			
+
 			//filter out inappropriate matches
 			filter_path(path, prototile_second.contour_f, prototile_mid.contour_f, inner_tar, cand_tar, shift);
 			
@@ -1164,8 +1166,8 @@ namespace Tiling_tiles {
 		FOR(m, 0, path_size)
 		{
 			//if (m > 0) last_first = path[m - 1].first;
-			//cout << "m: " << m << "   " << path[m].first << "  " << path[m].second << endl;
-			//cout << "m: " <<m<< "   " << prototile_mid.contour_f[path[m].first].type <<"  "<< prototile_second.contour_f[path[m].second].type << endl;
+			//cout << "m: " << m << "   " << path[m].first << "  " << path[m].second << endl
+			//	<< "   type:  "<<prototile_mid.contour_f[path[m].first].type << "  " << prototile_second.contour_f[path[m].second].type << endl;
 			pair<int, int> one_pair = path[m];
 			int sec_index = one_pair.second;
 			if (con_mid[one_pair.first].type == fixed_p || con_mid[one_pair.first].type == fea_p)  //must have a match
@@ -1194,7 +1196,7 @@ namespace Tiling_tiles {
 				{
 					vector<Point2f> con_mid_c = conf_trans(con_mid);
 					vector<Point2f> con2_c = conf_trans(con2);
-					FOR(mm, 0, waiting_merge.size()) cout << one_pair.first << "  " << waiting_merge[mm] << endl;
+					//FOR(mm, 0, waiting_merge.size()) cout << one_pair.first << "  waiting_merge[mm]: " << waiting_merge[mm] << endl;
 					int pcsize = con_mid_c.size();
 					int min_index = 0;
 					if (waiting_merge.size() > 1)
@@ -1222,12 +1224,14 @@ namespace Tiling_tiles {
 					//cout << "fea m: " << m << "   min_index: " << min_index << "    " << waiting_merge[min_index] << endl;
 					if (con_mid[one_pair.first].type == fixed_p)
 					{
-						if (!path_fea.empty() && path_fea.back().second >= waiting_merge[min_index] && abs(path_fea.back().second - waiting_merge[min_index])<2*path_margin)
+						int wait_chosen = waiting_merge[min_index];
+						if (!path_fea.empty() &&path_fea.back().second >= waiting_merge[min_index] && abs(path_fea.back().second - waiting_merge[min_index])<2*path_margin)
 						{
-							path_fea.pop_back();
-						}
-						path_fea.push_back(make_pair(one_pair.first, waiting_merge[min_index]));
-						last_index = waiting_merge[min_index];
+							if (con_mid[path_fea.back().first].type == fixed_p)  wait_chosen = wait_chosen + (one_pair.first - path_fea.back().first);  //与最后的type都是3，新的匹配位置往后推
+							else path_fea.pop_back();     //最后的type不是3，pop
+						}				
+						path_fea.push_back(make_pair(one_pair.first, wait_chosen));
+						last_index = wait_chosen;
 						last_m = one_pair.first;
 						//cout << "fixed: " << one_pair.first << "   " << one_pair.second << endl;
 					}
@@ -1369,7 +1373,7 @@ namespace Tiling_tiles {
 			all_total_mid.push_back(all_final[t]);
 			std::cout << "order: " << all_final[t].first << "  flip: " << all_final[t].second << " value: " << all_result[t] << " complxeity: " << all_shape_complexity[all_final[t].first] << "     mid sc:" << shape_com_mid << endl;
 		}
-		cout << "The num of ones beyond ShapeComplexity DisThres: " << ttrt << endl;
+		cout << ttrt<< "  patterns beyond ShapeComplexity DisThres: "  << endl;
 		return all_total_mid;
 	}
 
@@ -1485,7 +1489,9 @@ namespace Tiling_tiles {
 		double num_e = 0;
 		FOR(seg_index, 0, fpsize)
 		{
-			if (seg_index == fpsize - 1) contour1_seg[seg_index].back().type = 4;
+			if (seg_index == fpsize - 1) {
+				contour1_seg[seg_index].back().type = 4;
+			}
 			vector<Point_f> morph_seg = morph_segment(contour1_seg[seg_index], contour2_seg[seg_index], start_new, ratio, num_e);
 			final_con.insert(final_con.end(), morph_seg.begin(), morph_seg.end() - 1);
 			start_new = morph_seg.back();
@@ -1500,7 +1506,7 @@ namespace Tiling_tiles {
 		//FOR(j, 0, final_con.size()) cout << final_con[j].point << endl;
 		string save = SavePath;
 		imshow("frame.png", draw_seg);
-
+		//imwrite("frame.png", draw_seg);
 		Mat draw_result = Mat(600, 600, CV_8UC3, Scalar(255, 255, 255));
 		Point2f shift1 = Point2f(0.5*draw_result.cols, 0.5*draw_result.rows) - cen1;
 		int dd = 0;
@@ -1521,7 +1527,7 @@ namespace Tiling_tiles {
 
 	vector<Point_f> Tiling_opt::morph_segment(vector<Point_f> seg1, vector<Point_f> seg2, Point_f start, double ratio, double &num_error) //start 是上一个的尾端，是固定的
 	{
-		Point_f end = Point_f(ratio*seg1.back().point + (1- ratio)*seg2.back().point, seg1.back().type);//seg1.back();  //如果end.type==3, end 不需要变
+		Point_f end = Point_f(ratio*seg1.back().point + (1- ratio)*seg2.back().point, seg1.back().type);//seg1.back();  //如果end.type==4, end 不需要变以保证首尾相连
 		double length_ave = length_2p(start.point, end.point);
 		double angle_ave;
 		//cout << "1----start: " << start.point << "     --end: " << end.point <<"  type:"<< end.type<< endl;
@@ -1586,9 +1592,8 @@ namespace Tiling_tiles {
 			contour_morphed.push_back(ratio*seg_sam1[j] + (1 - ratio)*seg_sam2[j]);
 		}
 		//reassign type of point_f
-		vector<Point2f> contour_final= contour_morphed;
 		vector<Point_f> contour_final_;
-		FOR(m, 0, contour_final.size())  contour_final_.push_back(p2fea(contour_final[m], 0));
+		FOR(m, 0, contour_morphed.size())  contour_final_.push_back(p2fea(contour_morphed[m], 0));
 		contour_final_[0].type = seg1[0].type;
 		contour_final_.back().type = seg1.back().type;
 
@@ -1799,7 +1804,7 @@ namespace Tiling_tiles {
 		double iso_c = isoperimetric_inequality(con);
 		double iso_ori = isoperimetric_inequality(ori_c);
 		double dis_iso = abs(iso_c - iso_ori) / (0.5*iso_c +0.5* iso_ori);
-
+		//cout << "dis_iso: " << dis_iso << endl;
 		vector<pair<int, int>> path;
 		int shift = 0;
 		int csize = con.size();
