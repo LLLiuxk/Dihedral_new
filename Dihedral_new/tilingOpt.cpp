@@ -220,10 +220,13 @@ namespace Tiling_tiles {
 				vector<Point2f> con2 = conf_trans(contour_2);
 				con1 = load_point_file("c1.txt");
 				con2 = load_point_file("c2.txt");
+				vector<vector<Point2f>> tex1 = load_texture("texture1.txt");
+				vector<vector<Point2f>> tex2 = load_texture("texture2.txt");
+
 
 				protoTile c1, c2;
-				c1.show_contour(con1, anc_re);
-				c2.show_contour(con2, anc_mid);
+				c1.set_contour(con1, anc_re, tex1);
+				c2.set_contour(con2, anc_mid, tex2);
 				RotationVis(c1, c2, Clock_order);
 			}
 		}
@@ -489,73 +492,123 @@ namespace Tiling_tiles {
 		//       |_______|  |_______|   |_______|
 		//       1                2  1               2  1                2
 		//
-		cout << "c1: "<<c1.contour.size() << c1.contour[0] << " " << c1.contour[1] << " " << c1.contour[2] << " " << c1.contour[3]<<  endl;
-		cout << "c2: "<<c2.contour.size() << c2.contour[0] << " " << c2.contour[1] << " " << c2.contour[2] << " " << c2.contour[3] << endl;
+		cout << "c1: "<<c1.contour.size() << "   "<<c1.contour[c1.anchor_points[0]] << "  " << c1.contour[c1.anchor_points[1]]
+			<< " " << c1.contour[c1.anchor_points[2]] << "   " << c1.contour[c1.anchor_points[3]]<<  endl;
+		cout << "c2: "<<c2.contour.size() << "   " << c2.contour[c2.anchor_points[0]] << " " << c2.contour[c2.anchor_points[1]] 
+			<< " " << c2.contour[c2.anchor_points[2]] << " " << c2.contour[c2.anchor_points[3]] << endl;
 		int rot_deg = 46;
-		int count = 10;
-		while (count > 0)
+		vector<Mat> images;
+		int draw_col = 1000;
+		int draw_row = 1000;
+		double scale_ratio = 0.65;
+		c1.scale(scale_ratio);
+		c2.scale(scale_ratio);
+		//对齐到图案中央
+		c1.Trans_proTile(Point2f(draw_row / 2, draw_col / 2) - center_p(c1.contour));
+		c2.Trans_proTile(c1.contour[c1.anchor_points[0]] - c2.contour[c2.anchor_points[3]]);
+
+		//protoTile c3 = c2;
+		//c3.Trans_proTile(c1.contour[c1.anchor_points[3]] - c2.contour[c2.anchor_points[0]]);
+
+		//Mat drawing = Mat(draw_row, draw_col, CV_8UC3, Scalar(255, 255, 255));
+		//c1.draw_proTile(drawing, colorbar[0].second, Point2f(0, 0));
+		//c2.draw_proTile(drawing, colorbar[4].second, Point2f(0, 0));
+		//c3.draw_proTile(drawing, colorbar[4].second, Point2f(0, 0));
+
+		//imshow("hhahaha", drawing);
+		//cout << "scale: " << scale_ratio << endl;
+
+		int add_degree = 2;
+		if (clockorder == ClockWise)
 		{
-			int draw_col = 1000;
-			int draw_row = 1000;
-			double scale_ratio;
-			if (count == 10) scale_ratio = 0.65;
-			else scale_ratio = 1.0;
-			c1.scale(scale_ratio);
-			c2.scale(scale_ratio);
-			c1.contour = Trans_contour(c1.contour, Point2f(draw_row / 2, draw_col / 2) - center_p(c1.contour));
-			c2.contour = Trans_contour(c2.contour, c1.contour[c1.anchor_points[0]] - c2.contour[c2.anchor_points[3]]);
-			//c2.contour = Rotate_contour(c2.contour, center_p(c2.contour), -1);
-			if (clockorder == ClockWise)
+			cout << "ClockWise" << endl;
+			for (int degree = 0; degree < rot_deg; degree += add_degree)
 			{
-				cout << "ClockWise" << endl;
-				for (int degree = 0; degree < rot_deg; degree += 2)
-				{
-					Mat drawing = Mat(draw_row, draw_col, CV_8UC3, Scalar(255, 255, 255));
-					vector<Point2f> c1_r = Rotate_contour(c1.contour, c1.contour[c1.anchor_points[1]], -degree);
-					vector<Point2f> c2_r = Rotate_contour(c2.contour, c2.contour[c2.anchor_points[2]], degree);
-					vector<Point2f> c3_r = Trans_contour(c2_r, c1_r[c1.anchor_points[3]] - c2_r[c2.anchor_points[0]]);
-					//from top to bottom, from left to right
-					draw_contour(drawing, c1_r, c2_r[c2.anchor_points[3]] - c1_r[c1.anchor_points[2]], 0);
-					draw_contour(drawing, c2_r, c1_r[c1.anchor_points[0]] - c2_r[c2.anchor_points[1]], 4);
-					draw_contour(drawing, c1_r, c3_r[c2.anchor_points[3]] - c1_r[c1.anchor_points[2]], 0);
-					draw_contour(drawing, c2_r, Point2f(0, 0), 4);
-					draw_contour(drawing, c1_r, Point2f(0, 0), 0);
-					draw_contour(drawing, c3_r, Point2f(0, 0), 4);
-					draw_contour(drawing, c1_r, c2_r[c2.anchor_points[1]] - c1_r[c1.anchor_points[0]], 0);
-					draw_contour(drawing, c2_r, c1_r[c1.anchor_points[2]] - c2_r[c2.anchor_points[3]], 4);
-					draw_contour(drawing, c1_r, c3_r[c2.anchor_points[1]] - c1_r[c1.anchor_points[0]], 0);
-					imshow("Rotation Visualization", drawing);
-					if (degree == 0) waitKey(1000);
-					else waitKey(200);
-				}
+				Mat drawing = Mat(draw_row, draw_col, CV_8UC3, Scalar(255, 255, 255));
+				c1.Rotate_proTile(c1.contour[c1.anchor_points[1]], -add_degree);
+				c2.Rotate_proTile(c2.contour[c2.anchor_points[2]], add_degree);
+				protoTile c3 = c2;
+				c3.Trans_proTile(c1.contour[c1.anchor_points[3]] - c2.contour[c2.anchor_points[0]]);
+				//from top to bottom, from left to right
+				
+				c1.draw_proTile(drawing, colorbar[4].second, Point2f(0, 0));
+				c2.draw_proTile(drawing, colorbar[4].second, Point2f(0, 0));
+				c3.draw_proTile(drawing, colorbar[4].second, Point2f(0, 0));
+				//draw_contour(drawing, c1_r, c2_r[c2.anchor_points[3]] - c1_r[c1.anchor_points[2]], 0);
+				//draw_contour(drawing, c2_r, c1_r[c1.anchor_points[0]] - c2_r[c2.anchor_points[1]], 4);
+				//draw_contour(drawing, c1_r, c3_r[c2.anchor_points[3]] - c1_r[c1.anchor_points[2]], 0);
+				/*draw_contour(drawing, c2_r, Point2f(0, 0), 4);
+				draw_contour(drawing, c1_r, Point2f(0, 0), 0);
+				draw_contour(drawing, c3_r, Point2f(0, 0), 4);*/
+				//draw_contour(drawing, c1_r, c2_r[c2.anchor_points[1]] - c1_r[c1.anchor_points[0]], 0);
+				//draw_contour(drawing, c2_r, c1_r[c1.anchor_points[2]] - c2_r[c2.anchor_points[3]], 4);
+				//draw_contour(drawing, c1_r, c3_r[c2.anchor_points[1]] - c1_r[c1.anchor_points[0]], 0);
+				
+				//vector<Point2f> c1_r = Rotate_contour(c1.contour, c1.contour[c1.anchor_points[1]], -degree);
+				//vector<Point2f> c2_r = Rotate_contour(c2.contour, c2.contour[c2.anchor_points[2]], degree);
+				//vector<Point2f> c3_r = Trans_contour(c2_r, c1_r[c1.anchor_points[3]] - c2_r[c2.anchor_points[0]]);
+				////from top to bottom, from left to right
+				//draw_contour(drawing, c1_r, c2_r[c2.anchor_points[3]] - c1_r[c1.anchor_points[2]], 0);
+				//draw_contour(drawing, c2_r, c1_r[c1.anchor_points[0]] - c2_r[c2.anchor_points[1]], 4);
+				//draw_contour(drawing, c1_r, c3_r[c2.anchor_points[3]] - c1_r[c1.anchor_points[2]], 0);
+				//draw_contour(drawing, c2_r, Point2f(0, 0), 4);
+				//draw_contour(drawing, c1_r, Point2f(0, 0), 0);
+				//draw_contour(drawing, c3_r, Point2f(0, 0), 4);
+				//draw_contour(drawing, c1_r, c2_r[c2.anchor_points[1]] - c1_r[c1.anchor_points[0]], 0);
+				//draw_contour(drawing, c2_r, c1_r[c1.anchor_points[2]] - c2_r[c2.anchor_points[3]], 4);
+				//draw_contour(drawing, c1_r, c3_r[c2.anchor_points[1]] - c1_r[c1.anchor_points[0]], 0);
+				imshow("Rotation Visualization", drawing);
+				if (degree == 0) waitKey(1000);
+				else waitKey(200);
 			}
-			else if (clockorder == AntiClockWise)
-			{
-				cout << "AntiClockWise" << endl;
-				for (int degree = 0; degree < rot_deg; degree += 2)
-				{
-					Mat drawing = Mat(draw_row, draw_col, CV_8UC3, Scalar(255, 255, 255));
-					vector<Point2f> c1_r = Rotate_contour(c1.contour, c1.contour[c1.anchor_points[0]], degree);
-					vector<Point2f> c2_r = Rotate_contour(c2.contour, c2.contour[c2.anchor_points[3]], -degree);
-					vector<Point2f> c3_r = Trans_contour(c2_r, c1_r[c1.anchor_points[2]] - c2_r[c2.anchor_points[1]]);
-					//from top to bottom, from left to right
-					draw_contour(drawing, c1_r, c2_r[c2.anchor_points[0]] - c1_r[c1.anchor_points[1]], 0);
-					draw_contour(drawing, c2_r, c1_r[c1.anchor_points[3]] - c2_r[c2.anchor_points[2]], 4);
-					draw_contour(drawing, c1_r, c3_r[c2.anchor_points[0]] - c1_r[c1.anchor_points[1]], 0);
-					draw_contour(drawing, c2_r, Point2f(0, 0), 4);
-					draw_contour(drawing, c1_r, Point2f(0, 0), 0);
-					draw_contour(drawing, c3_r, Point2f(0, 0), 4);
-					draw_contour(drawing, c1_r, c2_r[c2.anchor_points[2]] - c1_r[c1.anchor_points[3]], 0);
-					draw_contour(drawing, c2_r, c1_r[c1.anchor_points[1]] - c2_r[c2.anchor_points[0]], 4);
-					draw_contour(drawing, c1_r, c3_r[c2.anchor_points[2]] - c1_r[c1.anchor_points[3]], 0);
-					//draw_contour(drawing, c2_r, shift2, 3);
-					imshow("Rotation Visualization", drawing);
-					if (degree == 0) waitKey(1000);
-					waitKey(200);
-				}
-			}
-			count--;
 		}
+		else if (clockorder == AntiClockWise)
+		{
+			cout << "AntiClockWise" << endl;
+			for (int degree = 0; degree < rot_deg; degree += add_degree)
+			{
+				Mat drawing = Mat(draw_row, draw_col, CV_8UC3, Scalar(255, 255, 255));
+				protoTile c3 = c2;
+				c3.Trans_proTile(c1.contour[c1.anchor_points[2]] - c2.contour[c2.anchor_points[1]]);
+				//from top to bottom, from left to right
+				c1.draw_proTile(drawing, colorbar[0].second, c2.contour[c2.anchor_points[0]] - c1.contour[c1.anchor_points[1]]);
+				c2.draw_proTile(drawing, colorbar[4].second, c1.contour[c1.anchor_points[3]] - c2.contour[c2.anchor_points[2]]);
+				c1.draw_proTile(drawing, colorbar[0].second, c3.contour[c2.anchor_points[0]] - c1.contour[c1.anchor_points[1]]);
+				c2.draw_proTile(drawing, colorbar[4].second, Point2f(0, 0));
+				c1.draw_proTile(drawing, colorbar[0].second, Point2f(0, 0));
+				c3.draw_proTile(drawing, colorbar[4].second, Point2f(0, 0));
+				c1.draw_proTile(drawing, colorbar[0].second, c2.contour[c2.anchor_points[2]] - c1.contour[c1.anchor_points[3]]);
+				c2.draw_proTile(drawing, colorbar[4].second, c1.contour[c1.anchor_points[1]] - c2.contour[c2.anchor_points[0]]);
+				c1.draw_proTile(drawing, colorbar[0].second, c3.contour[c2.anchor_points[2]] - c1.contour[c1.anchor_points[3]]);
+
+				c1.Rotate_proTile(c1.contour[c1.anchor_points[0]], add_degree);
+				c2.Rotate_proTile(c2.contour[c2.anchor_points[3]], -add_degree);
+				
+			
+				
+
+				//Mat drawing = Mat(draw_row, draw_col, CV_8UC3, Scalar(255, 255, 255));
+				//vector<Point2f> c1_r = Rotate_contour(c1.contour, c1.contour[c1.anchor_points[0]], degree);
+				//vector<Point2f> c2_r = Rotate_contour(c2.contour, c2.contour[c2.anchor_points[3]], -degree);
+				//vector<Point2f> c3_r = Trans_contour(c2_r, c1_r[c1.anchor_points[2]] - c2_r[c2.anchor_points[1]]);
+				////from top to bottom, from left to right
+				//draw_contour(drawing, c1_r, c2_r[c2.anchor_points[0]] - c1_r[c1.anchor_points[1]], 0);
+				//draw_contour(drawing, c2_r, c1_r[c1.anchor_points[3]] - c2_r[c2.anchor_points[2]], 4);
+				//draw_contour(drawing, c1_r, c3_r[c2.anchor_points[0]] - c1_r[c1.anchor_points[1]], 0);
+				//draw_contour(drawing, c2_r, Point2f(0, 0), 4);
+				//draw_contour(drawing, c1_r, Point2f(0, 0), 0);
+				//draw_contour(drawing, c3_r, Point2f(0, 0), 4);
+				//draw_contour(drawing, c1_r, c2_r[c2.anchor_points[2]] - c1_r[c1.anchor_points[3]], 0);
+				//draw_contour(drawing, c2_r, c1_r[c1.anchor_points[1]] - c2_r[c2.anchor_points[0]], 4);
+				//draw_contour(drawing, c1_r, c3_r[c2.anchor_points[2]] - c1_r[c1.anchor_points[3]], 0);
+				//draw_contour(drawing, c2_r, shift2, 3);
+				imshow("Rotation Visualization", drawing);
+				images.push_back(drawing);
+				if (degree == 0) waitKey(1000);
+				waitKey(200);
+			}
+		}
+		write_avi(images, "output.avi");
 		//imwrite("D://Rotation Visualization.png", drawing);
 	}
 
@@ -876,8 +929,7 @@ namespace Tiling_tiles {
 			{
 				//std::cout << "it is flip" << endl;
 				cand_tar = all_con_tars_flip[candidate_patterns[j].first];
-				prototile_second.Flip_contour(prototile_second.contour_f);
-				prototile_second.contour = conf_trans(prototile_second.contour_f);
+				prototile_second.Flip_proTile();
 				prototile_second.feature_points = prototile_second.getFeatures(prototile_second.contour_f);
 			}
 			else
@@ -1023,8 +1075,7 @@ namespace Tiling_tiles {
 			{
 				//std::cout << "it is flip" << endl;
 				cand_tar = all_con_tars_flip[candidate_patterns[j].first];
-				prototile_second.Flip_contour(prototile_second.contour_f);
-				prototile_second.contour = conf_trans(prototile_second.contour_f);
+				prototile_second.Flip_proTile();
 				prototile_second.feature_points = prototile_second.getFeatures(prototile_second.contour_f);
 			}
 			else
@@ -2115,8 +2166,8 @@ namespace Tiling_tiles {
 //			}
 //			else cout << "Bad result with intersection!" << endl;
 //			protoTile c1, c2;
-//			c1.show_contour(conf_trans(con_re), anc_re);
-//			c2.show_contour(conf_trans(contour_2), anc_mid);
+//			c1.set_contour(conf_trans(con_re), anc_re);
+//			c2.set_contour(conf_trans(contour_2), anc_mid);
 //			RotationVis(c1, c2, AntiClockWise);
 //
 //		}

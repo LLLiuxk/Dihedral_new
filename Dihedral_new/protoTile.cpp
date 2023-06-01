@@ -54,6 +54,9 @@ namespace Tiling_tiles {
 		{
 			contour[i] = scale * (contour[i] - cen) + cen;
 		}
+		FOR(i, textures.size(), i++)
+			FOR(j, textures[i].size(), j++) 
+			textures[i][j] = scale * (textures[i][j] - cen) + cen;
 	}
 
 	vector<Point_f> protoTile::set_flags(vector<Point2f> con, vector<int> fea)
@@ -72,41 +75,75 @@ namespace Tiling_tiles {
 	}
 
 
-	void protoTile::Trans_contour(vector<Point_f> &c1, Point2f trans_shift)
+	void protoTile::Trans_proTile(Point2f trans_shift)
 	{
-		for (int i = 0; i < c1.size(); i++)
+		for (int i = 0; i < contour_f.size(); i++)
 		{
-			c1[i].point+= trans_shift;
+			contour_f[i].point+= trans_shift;
 		}
+		for (int i = 0; i < contour.size(); i++)
+		{
+			contour[i] += trans_shift;
+		}
+		for (int i = 0; i < textures.size(); i++)
+		{
+			for (int j = 0; j < textures[i].size(); j++)
+			{
+				textures[i][j] += trans_shift;
+			}
+		}		
 	}
 
-	void protoTile::Rotate_contour(vector<Point_f> &c1, Point2f center, double angle)
+	void protoTile::Rotate_proTile(Point2f center, double angle)
 	{
-		vector<Point2f> src = conf_trans(c1);
-		vector<Point2f> dst;
 		cv::Mat rot_mat = cv::getRotationMatrix2D(center, angle, 1.0);
 		/*cv::warpAffine(src, dst, rot_mat, src.size());*/
-		cv::transform(src, dst, rot_mat);
-		FOR(i, 0, c1.size())
+		cv::transform(contour, contour, rot_mat);
+		FOR(i, 0, contour_f.size())
 		{
-			c1[i].point= dst[i];
+			contour_f[i].point= contour[i];
+		}
+		for (int i = 0; i < textures.size(); i++)
+		{
+			cv::transform(textures[i], textures[i], rot_mat);
 		}
 	}
 
-	void protoTile::Flip_contour(vector<Point_f> &c1)
+	void protoTile::Flip_proTile()
 	{
-		Point2f ccen = center_p(conf_trans(c1));
-		int cont_size = c1.size();
+		Point2f ccen = center_p(contour);
+		int cont_size = contour_f.size();
 		//flip horizontal
 		for (int i = 0; i < cont_size; i++)
 		{
-			c1[i].point.x = 2 * ccen.x - c1[i].point.x;
+			contour_f[i].point.x = 2 * ccen.x - contour_f[i].point.x;
 		}
 		for (int i = 0; i < cont_size / 2; i++)
 		{
-			Point_f mid = c1[i];
-			c1[i] = c1[cont_size - 1 - i];
-			c1[cont_size - 1 - i] = mid;
+			Point_f mid = contour_f[i];
+			contour_f[i] = contour_f[cont_size - 1 - i];
+			contour_f[cont_size - 1 - i] = mid;
+		}
+
+		cont_size = contour.size();
+		//flip horizontal
+		for (int i = 0; i < cont_size; i++)
+		{
+			contour[i].x = 2 * ccen.x - contour[i].x;
+		}
+		for (int i = 0; i < cont_size / 2; i++)
+		{
+			Point2f mid = contour[i];
+			contour[i] = contour[cont_size - 1 - i];
+			contour[cont_size - 1 - i] = mid;
+		}
+
+		for (int i = 0; i < textures.size(); i++)
+		{
+			for (int j = 0; j < textures[i].size(); j++)
+			{
+				textures[i][j].x = 2 * ccen.x - textures[i][j].x;
+			}
 		}
 	}
 
@@ -162,9 +199,30 @@ namespace Tiling_tiles {
 		return fea_index;
 	}
 
-	void protoTile::show_contour(vector<Point2f> c, vector<int> anchor_p)
+	void protoTile::set_contour(vector<Point2f> c, vector<int> anchor_p, vector<vector<Point2f>> tex)
 	{
 		contour = c;
 		anchor_points = anchor_p;
+		textures = tex;
 	}
+
+	void protoTile::draw_proTile(Mat &drawing_, Scalar color, Point2f shift)
+	{
+		int thickness = 2;
+		int n = contour.size();
+		for (int t = 0; t < n; t++)
+		{
+			int lineType = 8;
+			line(drawing_, contour[t] + shift, contour[(t + 1) % n] + shift,  color, thickness, lineType);
+		}
+		for (int i = 0; i < textures.size(); i++)
+		{
+			for (int t = 0; t < textures[i].size() -1; t++)
+			{
+				int lineType = 8;
+				line(drawing_, textures[i][t] + shift, contour[t + 1] + shift, color, thickness, lineType);
+			}
+		}
+	}
+
 }

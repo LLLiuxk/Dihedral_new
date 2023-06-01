@@ -110,18 +110,19 @@ namespace Tiling_tiles {
 	
 		//void set_contour(vector<Point2f> c); // 给定轮廓并重采样
 		//void set_anchors(vector<int> anchor_p);
-		//void show_contour(vector<Point2f> c, vector<int> anchor_p);
+		//void set_contour(vector<Point2f> c, vector<int> anchor_p);
 		void feature(int  n_min, int n_max, double angle_cos, bool show = true);
 		void resample(int sam_num, bool show = true);
 		void scale(double scale);
 		vector<Point_f>  set_flags(vector<Point2f> con, vector<int> fea);
 
-		void Trans_contour(vector<Point_f> &c1, Point2f trans_shift);
-		void Rotate_contour(vector<Point_f>& c1, Point2f center, double angle);
-		void Flip_contour(vector<Point_f>& c1);
+		void Trans_proTile(Point2f trans_shift);
+		void Rotate_proTile(Point2f center, double angle);
+		void Flip_proTile();
 		vector<int> getCandPoints(vector<Point_f> &contour_f);
 		vector<int> getFeatures(vector<Point_f> &contour_f);
-		void show_contour(vector<Point2f> c, vector<int> anchor_p);
+		void set_contour(vector<Point2f> c, vector<int> anchor_p, vector<vector<Point2f>> tex);
+		void draw_proTile(Mat &drawing_, Scalar color, Point2f shift);
 
 		vector<Point2f> contour;
 		vector<Point_f> contour_f;

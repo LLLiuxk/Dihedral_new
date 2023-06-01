@@ -14,22 +14,32 @@ int main()
 	start = clock();
 	Tiling_opt tiling;
 	
-	int f = 0;
+	int f = 1;
 
 	if (f == 0)
 	{
-		bool control_parameter = true;
+		/*bool control_parameter = true;
 		if (control_parameter)  tiling.load_para("para.txt");
 		else image_id = "29";
-		tiling.tiliing_generation(image_id);
+		tiling.tiliing_generation(image_id);*/
 
-		//for (int g =14; g <= 60; g++)
+		//for (int g =101; g <= 173; g++)
 		//{
 		//	image_id = to_string(g);
 		//	cout << image_id << endl;
 		//	Tiling_opt tiling_;
 		//	tiling_.tiliing_generation(image_id);
 		//}
+
+		vector<vector<Point2f>> tex = load_texture("texture1.txt");
+		vector<Mat> images;
+		for (int g = 0; g < tex.size(); g++)
+		{
+			Mat image = Mat(600, 600, CV_8UC3, Scalar(255, 255, 255));
+			draw_contour(image, tex[g], Point2f(0, 0));
+			images.push_back(image);
+		}
+		write_avi( images, "output.avi");
 
 	}
 	if (f == 1) //specify
@@ -38,8 +48,8 @@ int main()
 		//       70: 0,8,19,28    192: 0,9,18,27   157:6,12,23,31
 		//Escher 22: 8,19,28,36    71: 4,14,22,32    172: 6,13,23,32    bad:171: 7,19,29,33
 		//New  5: 6,11,16,29    13: 1,12,27,36    37: 10,18,25,37   44:6,19,24,31   53:0,12,17,36
-		vector<int> anc_points = { 0,12,17,36 };
-		tiling.tiliing_gen_specify("53", anc_points);
+		vector<int> anc_points = { 4,14,22,32 };
+		tiling.tiliing_gen_specify("71", anc_points);
 
 		/*Mat draw2 = Mat(600, 600, CV_8UC3, Scalar(255, 255, 255));
 		

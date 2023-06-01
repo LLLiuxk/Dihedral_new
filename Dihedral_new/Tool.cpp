@@ -1317,6 +1317,40 @@ vector<Point2f> load_point_file(string filepath)
 	in.close();
 	return con_point;
 }
+vector<vector<Point2f>> load_texture(string filepath)
+{
+	vector<vector<Point2f>> textures;
+	//读取一个存有轮廓点的文件，格式对应上一步计算轮廓点保存的文件
+	ifstream in(filepath);
+	if (!in.is_open())
+	{
+		cout << filepath << "        Error opening file!" << endl;
+		return textures;
+	}
+	//string line_;
+	//getline(in, line_);
+	//int anc_num = stoi(line_);
+	//cout << anc_num << endl;
+	int tex_num;
+	in >> tex_num;
+	for (int i = 0; i < tex_num; i++)
+	{
+		vector<Point2f> tex_one;
+		int tex_size;
+		in >> tex_size;
+		for (int j = 0; j < tex_size; j++)
+		{
+			double x, y;
+			in >> x;
+			in >> y;
+			tex_one.push_back(Point2f(x, y));
+		}
+		textures.push_back(tex_one);
+	}
+	
+	in.close();
+	return textures;
+}
 
 void fileout(string filepath, vector<Point2f> contour_)
 {
@@ -1355,6 +1389,28 @@ void save_svg(string svg_path, vector<Point2f> contour, Scalar color, Point2f sh
 	//write tail
 	outfile << "</svg>" << endl;
 	outfile.close();
+}
+
+void write_avi(vector<Mat> images, string filename)
+{
+	// Initialize the VideoWriter for GIF output
+	int fourcc = VideoWriter::fourcc('M', 'J', 'P', 'G');
+	double fps = 1.0;
+	Size frameSize = images[0].size();
+	VideoWriter writer(filename, fourcc, fps, frameSize);
+
+	if (!writer.isOpened()) {
+		cerr << "Failed to open output file: " << filename << endl;
+		return;
+	}
+
+	// Write each image as a frame in the GIF
+	for (const Mat& image : images) {
+		writer.write(image);
+	}
+	// Release the VideoWriter and close the output file
+	writer.release();
+	cout << "Video saved successfully: " << filename << endl;
 }
 
 void write_obj(string filepath, MatrixXd V, MatrixXi F)
