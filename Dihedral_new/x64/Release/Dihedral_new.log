@@ -1,64 +1,50 @@
-﻿生成启动时间为 2023/6/1 22:05:49。
-     1>项目“D:\vs2015project\Dihedral_new\Dihedral_new\Dihedral_new.vcxproj”在节点 2 上(Build 个目标)。
-     1>ClCompile:
-         D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /IC:\local\opencv\build\include /IC:\local\opencv\build\include\opencv /IC:\local\opencv\build\include\opencv2 /I"C:\local\eigen-3.3.8" /Zi /nologo /W3 /WX- /sdl /O2 /Oi /GL /D NDEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"x64\Release\\" /Fd"x64\Release\vc140.pdb" /Gd /TP /errorReport:prompt tilingOpt.cpp
-         tilingOpt.cpp
-     1>d:\vs2015project\dihedral_new\dihedral_new\tilingOpt.h(74): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(23): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(82): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(129): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(105): warning C4101: “con_sc”: 未引用的局部变量
-     1>tilingOpt.cpp(240): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(273): warning C4018: “<”: 有符号/无符号不匹配
-     1>tilingOpt.cpp(275): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(276): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(277): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(465): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(507): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
-     1>tilingOpt.cpp(619): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(620): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(674): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(675): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(727): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(822): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(940): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(953): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1042): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
-     1>tilingOpt.cpp(1086): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1099): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1211): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1212): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1251): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1367): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1406): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1420): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1435): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1436): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1505): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1506): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1507): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1538): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-     1>tilingOpt.cpp(1562): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-     1>tilingOpt.cpp(1595): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-     1>tilingOpt.cpp(1610): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1663): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1722): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1761): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1822): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1861): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-       Link:
-         D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"D:\vs2015project\Dihedral_new\x64\Release\Dihedral_new.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:C:\local\opencv\build\x64\vc14\lib opencv_world460.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"D:\vs2015project\Dihedral_new\x64\Release\Dihedral_new.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG:incremental /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\vs2015project\Dihedral_new\x64\Release\Dihedral_new.lib" /MACHINE:X64 x64\Release\main.obj
-         x64\Release\protoTile.obj
-         x64\Release\tilingOpt.obj
-         x64\Release\Tool.obj
-         正在生成代码
-         2 of 2884 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
-           0 functions were new in current compilation
-           25 functions had inline decision re-evaluated but remain unchanged
-         已完成代码的生成
-         Dihedral_new.vcxproj -> D:\vs2015project\Dihedral_new\x64\Release\Dihedral_new.exe
-     1>已完成生成项目“D:\vs2015project\Dihedral_new\Dihedral_new\Dihedral_new.vcxproj”(Build 个目标)的操作。
-
-已成功生成。
-
-已用时间 00:00:03.52
+﻿  tilingOpt.cpp
+d:\vs2015project\dihedral_new\dihedral_new\tilingOpt.h(74): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(23): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(82): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(129): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(105): warning C4101: “con_sc”: 未引用的局部变量
+tilingOpt.cpp(240): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(273): warning C4018: “<”: 有符号/无符号不匹配
+tilingOpt.cpp(275): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+tilingOpt.cpp(276): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+tilingOpt.cpp(277): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+tilingOpt.cpp(465): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(507): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
+tilingOpt.cpp(585): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(586): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(640): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(641): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(693): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(788): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(906): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(919): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(1008): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
+tilingOpt.cpp(1052): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(1065): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(1177): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(1178): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(1217): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(1333): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(1372): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(1386): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(1401): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(1402): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(1471): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(1472): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(1473): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(1504): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+tilingOpt.cpp(1528): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+tilingOpt.cpp(1561): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+tilingOpt.cpp(1576): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+tilingOpt.cpp(1629): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(1688): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(1727): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+tilingOpt.cpp(1788): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+tilingOpt.cpp(1827): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+  正在生成代码
+  0 of 2884 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  已完成代码的生成
+  Dihedral_new.vcxproj -> D:\vs2015project\Dihedral_new\x64\Release\Dihedral_new.exe

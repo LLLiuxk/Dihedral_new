@@ -39,7 +39,7 @@ int main()
 			draw_contour(image, tex[g], Point2f(0, 0));
 			images.push_back(image);
 		}
-		write_avi( images, "output.avi");
+		write_avi( images, "output.avi",1);
 
 	}
 	if (f == 1) //specify

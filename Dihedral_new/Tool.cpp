@@ -1391,11 +1391,10 @@ void save_svg(string svg_path, vector<Point2f> contour, Scalar color, Point2f sh
 	outfile.close();
 }
 
-void write_avi(vector<Mat> images, string filename)
+void write_avi(vector<Mat> images, string filename, double fps)
 {
 	// Initialize the VideoWriter for GIF output
 	int fourcc = VideoWriter::fourcc('M', 'J', 'P', 'G');
-	double fps = 1.0;
 	Size frameSize = images[0].size();
 	VideoWriter writer(filename, fourcc, fps, frameSize);
 
