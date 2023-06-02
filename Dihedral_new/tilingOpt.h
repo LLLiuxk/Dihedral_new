@@ -21,8 +21,10 @@
 #define WindowsWidth 10
 #define path_margin 6
 #define handle_area_width 4
+#define CutMargin 2
 #define DefaultPath "C:/Users/liuxk/OneDrive/Recent/DualNPR/"
 #define SavePath "D:/vs2015project/Dihedral_new/result/"
+#define SaveSpecPath "D:/vs2015project/Dihedral_new/result_spe/"
 #define ParaPath "D:/vs2015project/Dihedral_new/Dihedral_new/"
 
 extern string image_id;
@@ -122,7 +124,7 @@ namespace Tiling_tiles {
 		vector<int> getCandPoints(vector<Point_f> &contour_f);
 		vector<int> getFeatures(vector<Point_f> &contour_f);
 		void set_contour(vector<Point2f> c, vector<int> anchor_p, vector<vector<Point2f>> tex);
-		void draw_proTile(Mat &drawing_, Scalar color, Point2f shift);
+		void draw_proTile(Mat &drawing_, Scalar color, Point2f shift, int cut_margin = 0);
 
 		vector<Point2f> contour;
 		vector<Point_f> contour_f;
@@ -144,7 +146,7 @@ namespace Tiling_tiles {
 		vector<Point_f> contour_opt(vector<Point_f> cont, vector<int>& anc_p, int type, int times, bool pers_trans=true,	bool coll_opt = false, bool deve_opt = false, int cworder= ClockWise); //type: 0=contours bbx; 1: square bbx		
 		void load_dataset(bool input_images);
 		void load_para(string filename);
-		void RotationVis(protoTile c1, protoTile c2, int clockorder);
+		void RotationVis(protoTile c1, protoTile c2, int clockorder, string save_path);
 
 		//tiling rules
 		int Tanslation_rule(vector<int> cand_points, vector<Point_f> &contour_s, string rootname);

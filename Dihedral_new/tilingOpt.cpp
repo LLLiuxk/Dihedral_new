@@ -70,9 +70,8 @@ namespace Tiling_tiles {
 		string filepath = DefaultPath;
 		filepath = filepath + "contour/" + nameid + ".txt";
 		prototile_first = protoTile(filepath);
-		string savepath = SavePath;
-		savepath = savepath.substr(0, savepath.length() - 7) + "result_spe/";
-		savepath += nameid;
+		string savepath = SaveSpecPath;
+		savepath = savepath +nameid+"/";
 		const char *na = savepath.c_str();
 		if (_access(na, 0) != -1) printf("The  file/dir had been Exisit \n");
 		else	_mkdir(na);
@@ -213,21 +212,22 @@ namespace Tiling_tiles {
 				//merge_contours(contour_2, con_re, anc_mid, anc_re, merge_ratio);
 				merge_contours(con_re, contour_2,  anc_re, anc_mid, merge_ratio);
 				//FOR(gg, 0, 4)  cout << contour_2[anc_mid[gg]].point << "    " << con_re[anc_re[gg]].point << endl;
-				write_twoCon("twoCon.txt", anc_re, conf_trans(con_re), anc_mid, conf_trans(contour_2));
-				string command = "DDET.exe  " + to_string(Clock_order);
+				write_twoCon(savepath + "twoCon.txt", anc_re, conf_trans(con_re), anc_mid, conf_trans(contour_2));
+				string command = "DDET.exe  " + to_string(Clock_order) + "  "+ savepath;
 				system(command.c_str());
 				vector<Point2f> con1 = conf_trans(con_re);
 				vector<Point2f> con2 = conf_trans(contour_2);
-				con1 = load_point_file("c1.txt");
-				con2 = load_point_file("c2.txt");
-				vector<vector<Point2f>> tex1 = load_texture("texture1.txt");
-				vector<vector<Point2f>> tex2 = load_texture("texture2.txt");
+				con1 = load_point_file(savepath + "c1.txt");
+				con2 = load_point_file(savepath + "c2.txt");
+				vector<vector<Point2f>> tex1 = load_texture(savepath + "texture1.txt");
+				vector<vector<Point2f>> tex2 = load_texture(savepath + "texture2.txt");
 
 
 				protoTile c1, c2;
 				c1.set_contour(con1, anc_re, tex1);
 				c2.set_contour(con2, anc_mid, tex2);
-				RotationVis(c1, c2, Clock_order);
+				RotationVis(c1, c2, Clock_order, savepath);
+
 			}
 		}
 	}
@@ -484,7 +484,7 @@ namespace Tiling_tiles {
 	}
 
 
-	void Tiling_opt::RotationVis(protoTile c1, protoTile c2, int clockorder)
+	void Tiling_opt::RotationVis(protoTile c1, protoTile c2, int clockorder, string save_path)
 	{
 		//       0_______3 0_______3  0________3
 		//       |                |  |                 |   |                | 
@@ -519,63 +519,69 @@ namespace Tiling_tiles {
 		//cout << "scale: " << scale_ratio << endl;
 
 		int add_degree = 1;
+		int cut_mar = CutMargin;
 		if (clockorder == ClockWise)
 		{
 			cout << "ClockWise" << endl;
 			for (int degree = 0; degree < rot_deg; degree += add_degree)
 			{
+				if (degree != 0) cut_mar = 0;
 				Mat drawing = Mat(draw_row, draw_col, CV_8UC3, Scalar(255, 255, 255));
 				protoTile c3 = c2;
 				c3.Trans_proTile(c1.contour[c1.anchor_points[3]] - c2.contour[c2.anchor_points[0]]);			
 				//from top to bottom, from left to right
-				c1.draw_proTile(drawing, colorbar[0].second, c2.contour[c2.anchor_points[3]] - c1.contour[c1.anchor_points[2]]);
-				c2.draw_proTile(drawing, colorbar[4].second, c1.contour[c1.anchor_points[0]] - c2.contour[c2.anchor_points[1]]);
-				c1.draw_proTile(drawing, colorbar[0].second, c3.contour[c2.anchor_points[3]] - c1.contour[c1.anchor_points[2]]);
-				c2.draw_proTile(drawing, colorbar[4].second, Point2f(0, 0));
-				c1.draw_proTile(drawing, colorbar[0].second, Point2f(0, 0));
-				c3.draw_proTile(drawing, colorbar[4].second, Point2f(0, 0));
-				c1.draw_proTile(drawing, colorbar[0].second, c2.contour[c2.anchor_points[1]] - c1.contour[c1.anchor_points[0]]);
-				c2.draw_proTile(drawing, colorbar[4].second, c1.contour[c1.anchor_points[2]] - c2.contour[c2.anchor_points[3]]);
-				c1.draw_proTile(drawing, colorbar[0].second, c3.contour[c2.anchor_points[1]] - c1.contour[c1.anchor_points[0]]);
+				c1.draw_proTile(drawing, colorbar[0].second, c2.contour[c2.anchor_points[3]] - c1.contour[c1.anchor_points[2]], -cut_mar);
+				c2.draw_proTile(drawing, colorbar[4].second, c1.contour[c1.anchor_points[0]] - c2.contour[c2.anchor_points[1]], cut_mar);
+				c1.draw_proTile(drawing, colorbar[0].second, c3.contour[c2.anchor_points[3]] - c1.contour[c1.anchor_points[2]], -cut_mar);
+				c2.draw_proTile(drawing, colorbar[4].second, Point2f(0, 0), cut_mar);
+				c1.draw_proTile(drawing, colorbar[0].second, Point2f(0, 0), -cut_mar);
+				c3.draw_proTile(drawing, colorbar[4].second, Point2f(0, 0), cut_mar);
+				c1.draw_proTile(drawing, colorbar[0].second, c2.contour[c2.anchor_points[1]] - c1.contour[c1.anchor_points[0]], -cut_mar);
+				c2.draw_proTile(drawing, colorbar[4].second, c1.contour[c1.anchor_points[2]] - c2.contour[c2.anchor_points[3]], cut_mar);
+				c1.draw_proTile(drawing, colorbar[0].second, c3.contour[c2.anchor_points[1]] - c1.contour[c1.anchor_points[0]], -cut_mar);
 
 				c1.Rotate_proTile(c1.contour[c1.anchor_points[1]], -add_degree);
 				c2.Rotate_proTile(c2.contour[c2.anchor_points[2]], add_degree);
 				
 				imshow("Rotation Visualization", drawing);
-				if (degree == 0) waitKey(1000);
-				else waitKey(200);
+				images.push_back(drawing);
+				if (degree == 0) waitKey(800);
+				else waitKey(100);
 			}
 		}
 		else if (clockorder == AntiClockWise)
 		{
 			cout << "AntiClockWise" << endl;
+
 			for (int degree = 0; degree < rot_deg; degree += add_degree)
 			{
+				if (degree != 0) cut_mar = 0;
 				Mat drawing = Mat(draw_row, draw_col, CV_8UC3, Scalar(255, 255, 255));
 				protoTile c3 = c2;
 				c3.Trans_proTile(c1.contour[c1.anchor_points[2]] - c2.contour[c2.anchor_points[1]]);
 				//from top to bottom, from left to right
-				c1.draw_proTile(drawing, colorbar[0].second, c2.contour[c2.anchor_points[0]] - c1.contour[c1.anchor_points[1]]);
-				c2.draw_proTile(drawing, colorbar[4].second, c1.contour[c1.anchor_points[3]] - c2.contour[c2.anchor_points[2]]);
-				c1.draw_proTile(drawing, colorbar[0].second, c3.contour[c2.anchor_points[0]] - c1.contour[c1.anchor_points[1]]);
-				c2.draw_proTile(drawing, colorbar[4].second, Point2f(0, 0));
-				c1.draw_proTile(drawing, colorbar[0].second, Point2f(0, 0));
-				c3.draw_proTile(drawing, colorbar[4].second, Point2f(0, 0));
-				c1.draw_proTile(drawing, colorbar[0].second, c2.contour[c2.anchor_points[2]] - c1.contour[c1.anchor_points[3]]);
-				c2.draw_proTile(drawing, colorbar[4].second, c1.contour[c1.anchor_points[1]] - c2.contour[c2.anchor_points[0]]);
-				c1.draw_proTile(drawing, colorbar[0].second, c3.contour[c2.anchor_points[2]] - c1.contour[c1.anchor_points[3]]);
+				c1.draw_proTile(drawing, colorbar[0].second, c2.contour[c2.anchor_points[0]] - c1.contour[c1.anchor_points[1]], cut_mar);
+				c2.draw_proTile(drawing, colorbar[4].second, c1.contour[c1.anchor_points[3]] - c2.contour[c2.anchor_points[2]], -cut_mar);
+				c1.draw_proTile(drawing, colorbar[0].second, c3.contour[c2.anchor_points[0]] - c1.contour[c1.anchor_points[1]], cut_mar);
+				c2.draw_proTile(drawing, colorbar[4].second, Point2f(0, 0), -cut_mar);
+				c1.draw_proTile(drawing, colorbar[0].second, Point2f(0, 0), cut_mar);
+				c3.draw_proTile(drawing, colorbar[4].second, Point2f(0, 0), -cut_mar);
+				c1.draw_proTile(drawing, colorbar[0].second, c2.contour[c2.anchor_points[2]] - c1.contour[c1.anchor_points[3]], cut_mar);
+				c2.draw_proTile(drawing, colorbar[4].second, c1.contour[c1.anchor_points[1]] - c2.contour[c2.anchor_points[0]], -cut_mar);
+				c1.draw_proTile(drawing, colorbar[0].second, c3.contour[c2.anchor_points[2]] - c1.contour[c1.anchor_points[3]], cut_mar);
 
 				c1.Rotate_proTile(c1.contour[c1.anchor_points[0]], add_degree);
 				c2.Rotate_proTile(c2.contour[c2.anchor_points[3]], -add_degree);
 				
 				imshow("Rotation Visualization", drawing);
 				images.push_back(drawing);
-				if (degree == 0) waitKey(1000);
-				waitKey(200);
+				if (degree == 0) waitKey(800);
+				waitKey(100);
 			}
 		}
-		write_avi(images, "output.avi",5);
-		//imwrite("D://Rotation Visualization.png", drawing);
+		write_avi(images, save_path + "output.avi", 5);
+		imwrite(save_path + "Rotation Visualization.png", images[0]);
+		imshow("Rotation Visualization2222", images[0]);
 	}
 
 
@@ -673,7 +679,7 @@ namespace Tiling_tiles {
 			FOR(jj, 0, 4) circle(drawing1, contour_s[indexes[jj]].point + shift2, 3, Scalar(0, 0, 255), -1);
 			circle(drawing1, contour_s[0].point + shift2, 4, Scalar(255, 0, 55), -1);
 
-			string filename = rootname + "/" + to_string(all_inner_conts.size() - 1) + "transPlacingResult.png";
+			string filename = rootname + to_string(all_inner_conts.size() - 1) + "transPlacingResult.png";
 			cv::imwrite(filename, drawing1);
 			cv::imshow("Initial tiling placement: ", drawing1);
 		}

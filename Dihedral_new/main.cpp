@@ -48,8 +48,8 @@ int main()
 		//       70: 0,8,19,28    192: 0,9,18,27   157:6,12,23,31
 		//Escher 22: 8,19,28,36    71: 4,14,22,32    172: 6,13,23,32    bad:171: 7,19,29,33
 		//New  5: 6,11,16,29    13: 1,12,27,36    37: 10,18,25,37   44:6,19,24,31   53:0,12,17,36
-		vector<int> anc_points = { 4,14,22,32 };
-		tiling.tiliing_gen_specify("71", anc_points);
+		vector<int> anc_points = { 8,19,28,36 };
+		tiling.tiliing_gen_specify("22", anc_points);
 
 		/*Mat draw2 = Mat(600, 600, CV_8UC3, Scalar(255, 255, 255));
 		

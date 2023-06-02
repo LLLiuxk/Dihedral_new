@@ -54,9 +54,14 @@ namespace Tiling_tiles {
 		{
 			contour[i] = scale * (contour[i] - cen) + cen;
 		}
-		FOR(i, textures.size(), i++)
-			FOR(j, textures[i].size(), j++) 
-			textures[i][j] = scale * (textures[i][j] - cen) + cen;
+		FOR(i, 0, textures.size())
+		{
+			FOR(j, 0, textures[i].size())
+			{
+				textures[i][j] = scale * (textures[i][j] - cen) + cen;
+				//cout << textures[i][j] << endl;
+			}
+		}
 	}
 
 	vector<Point_f> protoTile::set_flags(vector<Point2f> con, vector<int> fea)
@@ -206,21 +211,45 @@ namespace Tiling_tiles {
 		textures = tex;
 	}
 
-	void protoTile::draw_proTile(Mat &drawing_, Scalar color, Point2f shift)
+	void protoTile::draw_proTile(Mat &drawing_, Scalar color, Point2f shift, int cut_margin)
 	{
 		int thickness = 2;
+		int lineType = 8;
 		int n = contour.size();
-		for (int t = 0; t < n; t++)
+		if (cut_margin == 0) 
 		{
-			int lineType = 8;
-			line(drawing_, contour[t] + shift, contour[(t + 1) % n] + shift,  color, thickness, lineType);
+			for (int t = 0; t < n; t++)
+			{
+				line(drawing_, contour[t] + shift, contour[(t + 1) % n] + shift, color, thickness, lineType);
+			}
 		}
+		else
+		{
+			for (int t = 0; t < n; t++)
+			{
+				Scalar green(0, 255, 100);
+				line(drawing_, contour[t] + shift, contour[(t + 1) % n] + shift, green, thickness, lineType);
+			}
+			for (int anc_in = 0; anc_in < 4; anc_in++)
+			{
+				int anc_index = anchor_points[anc_in];
+				//cout << anc_index << "   " << cut_margin << endl;
+				for (int m = 0; m < abs(cut_margin); m++)
+				{
+					int add_m = (anc_index + cut_margin / abs(cut_margin)*m + n) % n;
+					int add_m1 = (anc_index + cut_margin / abs(cut_margin)*(m + 1) + n) % n;
+					//cout << add_m<<"   "<< (anc_index + add_m) % n<<"   "<<(anc_index + m) % n << "   " << contour[(anc_index + m) % n] << endl;
+					line(drawing_, contour[add_m] + shift, contour[add_m1] + shift, color, thickness, lineType);
+				}
+			}
+		}
+
 		for (int i = 0; i < textures.size(); i++)
 		{
 			for (int t = 0; t < textures[i].size() -1; t++)
 			{
 				int lineType = 8;
-				line(drawing_, textures[i][t] + shift, contour[t + 1] + shift, color, thickness, lineType);
+				line(drawing_, textures[i][t] + shift, textures[i][t + 1] + shift, color, thickness, lineType);
 			}
 		}
 	}
