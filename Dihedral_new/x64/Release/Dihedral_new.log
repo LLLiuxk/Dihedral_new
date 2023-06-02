@@ -1,72 +1,101 @@
-﻿生成启动时间为 2023/6/2 23:35:09。
-     1>项目“D:\vs2015project\Dihedral_new\Dihedral_new\Dihedral_new.vcxproj”在节点 2 上(Build 个目标)。
-     1>ClCompile:
-         D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /IC:\local\opencv\build\include /IC:\local\opencv\build\include\opencv /IC:\local\opencv\build\include\opencv2 /I"C:\local\eigen-3.3.8" /Zi /nologo /W3 /WX- /sdl /O2 /Oi /GL /D NDEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"x64\Release\\" /Fd"x64\Release\vc140.pdb" /Gd /TP /errorReport:prompt main.cpp tilingOpt.cpp
-         main.cpp
-     1>d:\vs2015project\dihedral_new\dihedral_new\tilingOpt.h(76): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>main.cpp(101): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>main.cpp(125): warning C4018: “<”: 有符号/无符号不匹配
-     1>main.cpp(127): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-     1>main.cpp(128): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-     1>main.cpp(129): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-     1>main.cpp(13): warning C4101: “midtime”: 未引用的局部变量
-         tilingOpt.cpp
-     1>d:\vs2015project\dihedral_new\dihedral_new\tilingOpt.h(76): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(23): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(81): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(128): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(104): warning C4101: “con_sc”: 未引用的局部变量
-     1>tilingOpt.cpp(240): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(273): warning C4018: “<”: 有符号/无符号不匹配
-     1>tilingOpt.cpp(275): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(276): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(277): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(465): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(507): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
-     1>tilingOpt.cpp(591): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(592): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(646): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(647): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(699): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(794): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(912): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(925): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1014): warning C4244: “参数”: 从“int”转换到“float”，可能丢失数据
-     1>tilingOpt.cpp(1058): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1071): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1183): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1184): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1223): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1339): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1378): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1392): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1407): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1408): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1477): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1478): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1479): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1510): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-     1>tilingOpt.cpp(1534): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-     1>tilingOpt.cpp(1567): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
-     1>tilingOpt.cpp(1582): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1635): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1694): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1733): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1794): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
-     1>tilingOpt.cpp(1833): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
-       Link:
-         D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"D:\vs2015project\Dihedral_new\x64\Release\Dihedral_new.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:C:\local\opencv\build\x64\vc14\lib opencv_world460.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"D:\vs2015project\Dihedral_new\x64\Release\Dihedral_new.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG:incremental /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\vs2015project\Dihedral_new\x64\Release\Dihedral_new.lib" /MACHINE:X64 x64\Release\main.obj
-         x64\Release\protoTile.obj
-         x64\Release\tilingOpt.obj
-         x64\Release\Tool.obj
-         正在生成代码
-         32 of 2886 functions ( 1.1%) were compiled, the rest were copied from previous compilation.
-           0 functions were new in current compilation
-           27 functions had inline decision re-evaluated but remain unchanged
-         已完成代码的生成
-         Dihedral_new.vcxproj -> D:\vs2015project\Dihedral_new\x64\Release\Dihedral_new.exe
-     1>已完成生成项目“D:\vs2015project\Dihedral_new\Dihedral_new\Dihedral_new.vcxproj”(Build 个目标)的操作。
-
-已成功生成。
-
-已用时间 00:00:04.39
+﻿  Tool.cpp
+Tool.cpp(31): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(58): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(78): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(111): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
+Tool.cpp(149): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+Tool.cpp(171): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(200): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(228): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(319): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(417): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(421): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(447): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(448): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(476): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+Tool.cpp(482): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(512): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(587): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(613): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(614): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+Tool.cpp(638): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(692): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(726): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(760): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+Tool.cpp(761): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+Tool.cpp(762): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+Tool.cpp(763): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+Tool.cpp(774): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+Tool.cpp(786): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(796): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(853): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+Tool.cpp(1022): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+Tool.cpp(1032): warning C4244: “+=”: 从“double”转换到“float”，可能丢失数据
+Tool.cpp(1033): warning C4244: “+=”: 从“double”转换到“float”，可能丢失数据
+Tool.cpp(1086): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(1118): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(1119): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(1149): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(1260): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+Tool.cpp(1261): warning C4244: “初始化”: 从“float”转换到“int”，可能丢失数据
+Tool.cpp(1265): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(1315): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+Tool.cpp(1346): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+Tool.cpp(1449): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(1455): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(1511): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(1531): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(1550): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(1558): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(1572): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(1574): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+Tool.cpp(1613): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(1634): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(1635): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(1729): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(1730): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(1897): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(1935): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(1936): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(1973): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(2017): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(2030): warning C4244: “初始化”: 从“double”转换到“int”，可能丢失数据
+Tool.cpp(2084): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(2086): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(2103): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(2123): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(2153): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(2157): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(2184): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(2241): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
+Tool.cpp(2269): warning C4244: “=”: 从“__int64”转换到“int”，可能丢失数据
+Tool.cpp(2274): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(2288): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+Tool.cpp(2293): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(2317): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(2337): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(2353): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
+Tool.cpp(2381): warning C4244: “=”: 从“__int64”转换到“int”，可能丢失数据
+Tool.cpp(2386): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(2400): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+Tool.cpp(2405): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(2436): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(2501): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
+Tool.cpp(2529): warning C4244: “=”: 从“__int64”转换到“int”，可能丢失数据
+Tool.cpp(2534): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(2548): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+Tool.cpp(2553): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(2591): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+Tool.cpp(2604): warning C4244: “参数”: 从“float”转换到“int”，可能丢失数据
+Tool.cpp(2626): warning C4244: “=”: 从“__int64”转换到“int”，可能丢失数据
+Tool.cpp(2630): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(2646): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(2661): warning C4244: “参数”: 从“double”转换到“float”，可能丢失数据
+Tool.cpp(2725): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+Tool.cpp(2726): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+  正在生成代码
+  2 of 2887 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  已完成代码的生成
+  Dihedral_new.vcxproj -> D:\vs2015project\Dihedral_new\x64\Release\Dihedral_new.exe

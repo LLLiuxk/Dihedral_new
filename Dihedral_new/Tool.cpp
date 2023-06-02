@@ -1443,13 +1443,80 @@ void write_obj(string filepath, MatrixXd V, MatrixXi F)
 	outfile.close();
 }
 
-void contour2obj(string filepath)
+void contour2obj(string savepath, vector<Point2f> contour, Point2f shift, double height)
 {
-	vector<Point2f> con = load_point_file(filepath);
+	double H = height;//模型厚度
+	int sizec = contour.size();
+	vector<vector<int>> face;
+	vector<int> f;
 	MatrixXd V;
 	MatrixXi F;
-	triangulateContour(con, V, F);
+	vector<Point2f> contour_add = triangulateContour(contour, V, F, 0.15);
+	int add_size = contour_add.size();
 
+	string save_path = savepath+"c1.obj";
+	ofstream outfile1(save_path, ios::out);
+	//注意在生成.obj文件的时候，面的信息是由顶点下标+1组成的，是从1开始的！！！并不是由0开始！！！
+	if (!outfile1)
+	{
+		cerr << "open error";
+		exit(1);
+	}
+
+	outfile1 << "#List of geometric vertices, with (x,y,z) coordinates" << endl;
+
+	for (int i = 0; i < add_size; i++)
+	{
+		contour_add[i] += shift;
+		outfile1 << "v" << " " << contour_add[i].x << " " << contour_add[i].y << " " << H << endl;
+	}
+	for (int i = 0; i < add_size; i++)
+	{
+		outfile1 << "v" << " " << contour_add[i].x << " " << contour_add[i].y << " " << 0 << endl;
+	}
+	outfile1 << "#Polygonal face element" << endl;
+
+	for (int i = 0; i < sizec; i++)
+	{
+		f.push_back(i + 1);
+		f.push_back((i + 1) % sizec + 1);
+		f.push_back((i + 1) % sizec + add_size + 1);
+		face.push_back(f);
+		f.swap(vector<int>());
+
+		f.push_back((i + 1) % sizec + add_size + 1);
+		f.push_back(i + add_size + 1);
+		f.push_back(i + 1);
+		face.push_back(f);
+		f.swap(vector<int>());
+	}
+	for (int i = 0; i < F.rows(); i++)
+	{
+		f.push_back(F(i, 0) + 1);
+		f.push_back(F(i, 1) + 1);
+		f.push_back(F(i, 2) + 1);
+		face.push_back(f);
+		f.swap(vector<int>());
+
+		f.push_back(F(i, 0) + add_size + 1);
+		f.push_back(F(i, 2) + add_size + 1);
+		f.push_back(F(i, 1) + add_size + 1);
+		face.push_back(f);
+		f.swap(vector<int>());
+	}
+
+	for (int i = 0; i < face.size(); i++)
+	{
+		outfile1 << "f";//注意在生成.obj文件的时候，面的信息是由顶点下标+1组成的，是从1开始的！！！并不是有顶点下标组成，也就是并不是由0开始！！
+		int sizef = face[i].size();
+		for (int j = 0; j < sizef; j++)
+		{
+			outfile1 << " " << face[i][j];
+
+		}
+		outfile1 << endl;
+	}
+	outfile1.close();
 }
 
 void write_para(string filepath, vector<int> indexs, vector<Point2f> new_places)
@@ -2165,11 +2232,11 @@ void contour_fine_tuning(vector<Point2f> &contour_)
 	imshow(to_string(iter_times) + " After contour fine tuning: ", imagefine);
 }
 
-vector<Point2f> triangulateContour(vector<Point2f>& con_ori, MatrixXd& V, MatrixXi& F)
+vector<Point2f> triangulateContour(vector<Point2f>& con_ori, MatrixXd& V, MatrixXi& F, double ratio)
 {
 	vector<Point2f>  contour = con_ori;
 	Point2f cen = center_p(con_ori);
-	int ori_num = add_points(contour, 0.08);
+	int ori_num = add_points(contour, ratio);
 	// create a Subdiv2D object from the contour
 	cv::Subdiv2D subdiv(Rect(cen.x - 500, cen.y - 500, 1000, 1000)); // change the rectangle size according to your contour
 	for (int i = 0; i < contour.size(); i++) {

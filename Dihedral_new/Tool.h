@@ -95,7 +95,7 @@ void fileout(string filepath, vector<Point2f> contour_);
 void save_svg(string svg_path, vector<Point2f> contour, Scalar color, Point2f shift, double zoom_scale);
 void write_avi(vector<Mat> images, string filename, double fps);
 void write_obj(string filepath, MatrixXd V, MatrixXi F);
-void contour2obj(string filepath);
+void contour2obj(string savepath, vector<Point2f> contour, Point2f shift, double height);
 void write_para(string filepath, vector<int> indexs, vector<Point2f> new_places);
 void write_twoCon(string filepath, vector<int> in1, vector<Point2f> c1, vector<int> in2, vector<Point2f> c2);
 
@@ -121,7 +121,7 @@ void contour_de_crossing(vector<Point2f> &contour_);  //交叉的优化
 void contour_fine_tuning(vector<Point2f> &contour_);  //过近的优化
 
 //contour triangulation
-vector<Point2f> triangulateContour(vector<Point2f>& con_ori, MatrixXd& V, MatrixXi& F);
+vector<Point2f> triangulateContour(vector<Point2f>& con_ori, MatrixXd& V, MatrixXi& F, double ratio = 0.08);
 vector<Point2f> triangulate_2Contours(vector<Point2f>& cont1, vector<Point2f>& cont2, MatrixXd& V, MatrixXi& F);
 vector<Point2f> triangulate_Contours_bbx(vector<Point2f>& cont1, vector<int> anc1, MatrixXd& V, MatrixXi& F);
 vector<Point2f> triangulate_bbx(vector<Point2f>& cont1, MatrixXd& V, MatrixXi& F);
