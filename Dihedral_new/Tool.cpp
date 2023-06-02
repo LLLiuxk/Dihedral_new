@@ -1443,6 +1443,15 @@ void write_obj(string filepath, MatrixXd V, MatrixXi F)
 	outfile.close();
 }
 
+void contour2obj(string filepath)
+{
+	vector<Point2f> con = load_point_file(filepath);
+	MatrixXd V;
+	MatrixXi F;
+	triangulateContour(con, V, F);
+
+}
+
 void write_para(string filepath, vector<int> indexs, vector<Point2f> new_places)
 {
 	//para 文件的格式为：第一行 锚点个数，第二行锚点的下标，之后每行为每个锚点的目标坐标 

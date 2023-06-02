@@ -14,7 +14,7 @@ int main()
 	start = clock();
 	Tiling_opt tiling;
 	
-	int f = 1;
+	int f = 10;
 
 	if (f == 0)
 	{
@@ -63,6 +63,14 @@ int main()
 	}
 	if (f == 2)
 	{
+		string savepath = SaveSpecPath;
+		savepath = savepath + "71/";
+		vector<Point2f> con1 = load_point_file(savepath + "c1.txt");
+		vector<Point2f> con2 = load_point_file(savepath + "c2.txt");
+
+	}
+	if (f == 3)
+	{
 		//tiling.load_dataset(true);
 		string filepath = DefaultPath;
 		string filepath1 = filepath + "contour/189.txt";
@@ -102,7 +110,7 @@ int main()
 		//tiling.load_dataset(false);
 		string filepath = DefaultPath;
 		//string filepath1 = filepath + "contour/189.txt";
-		string filepath1 = "D:/vs2015project/Dihedral_new/Dihedral_new/mid_shape.txt";
+		string filepath1 = "D:/vs2015project/Dihedral_new/Dihedral_new/c1.txt";
 		tiling.prototile_first = protoTile(filepath1);
 		MatrixXd V;
 		MatrixXi F;
@@ -129,11 +137,11 @@ int main()
 		imshow("Triangulation", image);
 
 		write_obj("duck.obj", V,F);
-		string obj_path = ParaPath;
+	/*	string obj_path = ParaPath;
 		string para_path = ParaPath;
 		string command = "D:/vs2015project/ARAP_Deform/x64/Debug/ARAP_Deform.exe "+ obj_path+"duck.obj "+ para_path+"deform_para.txt";
 		cout << command << endl;
-		system(command.c_str());
+		system(command.c_str());*/
 
 	}
 	else if (f == 11) //save contours

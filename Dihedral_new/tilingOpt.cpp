@@ -277,9 +277,9 @@ namespace Tiling_tiles {
 			Point pt3(V.row(F(i, 2)).x(), V.row(F(i, 2)).y());
 			//cout << F(i, 0) << "   " << F(i, 1) << "   " << F(i, 2) << endl;
 			//cout << pt1 << "    " << pt2 << "   " << pt3 << endl;
-			line(image, pt1 + stf, pt2 + stf, Scalar(0, 255, 0), 1, LINE_AA);
-			line(image, pt2 + stf, pt3 + stf, Scalar(0, 255, 0), 1, LINE_AA);
-			line(image, pt3 + stf, pt1 + stf, Scalar(0, 255, 0), 1, LINE_AA);
+			line(image, pt1 + stf, pt2 + stf, Scalar(0, 180, 0), 1, LINE_AA);
+			line(image, pt2 + stf, pt3 + stf, Scalar(0, 180, 0), 1, LINE_AA);
+			line(image, pt3 + stf, pt1 + stf, Scalar(0, 180, 0), 1, LINE_AA);
 		}
 		//imwrite("Triangulation.png", image);
 		imshow("Triangulation", image);

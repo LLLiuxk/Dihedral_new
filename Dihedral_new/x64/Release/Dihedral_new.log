@@ -1,7 +1,15 @@
-﻿生成启动时间为 2023/6/2 22:25:45。
+﻿生成启动时间为 2023/6/2 23:35:09。
      1>项目“D:\vs2015project\Dihedral_new\Dihedral_new\Dihedral_new.vcxproj”在节点 2 上(Build 个目标)。
      1>ClCompile:
-         D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /IC:\local\opencv\build\include /IC:\local\opencv\build\include\opencv /IC:\local\opencv\build\include\opencv2 /I"C:\local\eigen-3.3.8" /Zi /nologo /W3 /WX- /sdl /O2 /Oi /GL /D NDEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"x64\Release\\" /Fd"x64\Release\vc140.pdb" /Gd /TP /errorReport:prompt tilingOpt.cpp
+         D:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /IC:\local\opencv\build\include /IC:\local\opencv\build\include\opencv /IC:\local\opencv\build\include\opencv2 /I"C:\local\eigen-3.3.8" /Zi /nologo /W3 /WX- /sdl /O2 /Oi /GL /D NDEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"x64\Release\\" /Fd"x64\Release\vc140.pdb" /Gd /TP /errorReport:prompt main.cpp tilingOpt.cpp
+         main.cpp
+     1>d:\vs2015project\dihedral_new\dihedral_new\tilingOpt.h(76): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>main.cpp(101): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
+     1>main.cpp(125): warning C4018: “<”: 有符号/无符号不匹配
+     1>main.cpp(127): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+     1>main.cpp(128): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+     1>main.cpp(129): warning C4244: “参数”: 从“double”转换到“int”，可能丢失数据
+     1>main.cpp(13): warning C4101: “midtime”: 未引用的局部变量
          tilingOpt.cpp
      1>d:\vs2015project\dihedral_new\dihedral_new\tilingOpt.h(76): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
      1>tilingOpt.cpp(23): warning C4267: “初始化”: 从“size_t”转换到“int”，可能丢失数据
@@ -52,13 +60,13 @@
          x64\Release\tilingOpt.obj
          x64\Release\Tool.obj
          正在生成代码
-         11 of 2886 functions ( 0.4%) were compiled, the rest were copied from previous compilation.
-           1 functions were new in current compilation
-           21 functions had inline decision re-evaluated but remain unchanged
+         32 of 2886 functions ( 1.1%) were compiled, the rest were copied from previous compilation.
+           0 functions were new in current compilation
+           27 functions had inline decision re-evaluated but remain unchanged
          已完成代码的生成
          Dihedral_new.vcxproj -> D:\vs2015project\Dihedral_new\x64\Release\Dihedral_new.exe
      1>已完成生成项目“D:\vs2015project\Dihedral_new\Dihedral_new\Dihedral_new.vcxproj”(Build 个目标)的操作。
 
 已成功生成。
 
-已用时间 00:00:02.98
+已用时间 00:00:04.39
