@@ -1454,8 +1454,7 @@ void contour2obj(string savepath, vector<Point2f> contour, Point2f shift, double
 	vector<Point2f> contour_add = triangulateContour(contour, V, F, 0.15);
 	int add_size = contour_add.size();
 
-	string save_path = savepath+"c1.obj";
-	ofstream outfile1(save_path, ios::out);
+	ofstream outfile1(savepath, ios::out);
 	//注意在生成.obj文件的时候，面的信息是由顶点下标+1组成的，是从1开始的！！！并不是由0开始！！！
 	if (!outfile1)
 	{

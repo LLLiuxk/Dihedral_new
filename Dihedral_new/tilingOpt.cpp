@@ -221,7 +221,8 @@ namespace Tiling_tiles {
 				con2 = load_point_file(savepath + "c2.txt");
 				vector<vector<Point2f>> tex1 = load_texture(savepath + "texture1.txt");
 				vector<vector<Point2f>> tex2 = load_texture(savepath + "texture2.txt");
-
+				contour2obj(savepath + "c1.obj", con1, Point2f(200,200) -center_p(con1), 15);
+				contour2obj(savepath + "c2.obj", con2, Point2f(200, 200) - center_p(con1), 15);
 
 				protoTile c1, c2;
 				c1.set_contour(con1, anc_re, tex1);

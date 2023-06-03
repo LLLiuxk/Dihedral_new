@@ -66,9 +66,9 @@ int main()
 		string savepath = SaveSpecPath;
 		savepath = savepath + "71/";
 		vector<Point2f> con1 = load_point_file(savepath + "c1.txt");
-		//vector<Point2f> con1 = { Point2f(100,100),Point2f(300,100),Point2f(300,300),Point2f(100,300) };
-		//vector<Point2f> con2 = load_point_file(savepath + "c2.txt");
-		contour2obj(savepath, con1, OP, 15);
+		vector<Point2f> con2 = load_point_file(savepath + "c2.txt");
+		contour2obj(savepath + "c1.obj", con1, OP, 15);
+		contour2obj(savepath + "c2.obj", con2, OP, 15);
 	}
 	if (f == 3)
 	{
