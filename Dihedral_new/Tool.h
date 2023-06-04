@@ -139,6 +139,10 @@ double SPIA(vector<Point2f> a, vector<Point2f> b);//SimplePolygonIntersectArea µ
 double evaluation_area(vector<Point2f> c1, vector<Point2f> c2);
 double evaluation_area_pixels(vector<Point2f> c1, vector<Point2f> c2);
 
+//calculate the Poisson¡¯s ratios
+double cal_Poisson_ratio(vector<Point2f> con_ori, vector<Point2f> con_new);
+void drawLineGraph(vector<double>& x, vector<double>& y);
+
 template<typename T>
 T delete_vector(vector<T> &vec, int index_p)
 {

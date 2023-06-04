@@ -14,7 +14,7 @@ int main()
 	start = clock();
 	Tiling_opt tiling;
 	
-	int f = 2;
+	int f = 4;
 
 	if (f == 0)
 	{
@@ -48,8 +48,8 @@ int main()
 		//       70: 0,8,19,28    192: 0,9,18,27   157:6,12,23,31
 		//Escher 22: 8,19,28,36    71: 4,14,22,32    172: 6,13,23,32    bad:171: 7,19,29,33
 		//New  5: 6,11,16,29    13: 1,12,27,36    37: 10,18,25,37   44:6,19,24,31   53:0,12,17,36
-		vector<int> anc_points = { 8,19,28,36 };
-		tiling.tiliing_gen_specify("22", anc_points);
+		vector<int> anc_points = { 1,12,27,36 };
+		tiling.tiliing_gen_specify("13", anc_points);
 
 		/*Mat draw2 = Mat(600, 600, CV_8UC3, Scalar(255, 255, 255));
 		
@@ -70,7 +70,7 @@ int main()
 		contour2obj(savepath + "c1.obj", con1, OP, 15);
 		contour2obj(savepath + "c2.obj", con2, OP, 15);
 	}
-	if (f == 3)
+	else if (f == 3)
 	{
 		//tiling.load_dataset(true);
 		string filepath = DefaultPath;
@@ -105,6 +105,14 @@ int main()
 			line(draw, f1,f2, colorbar[6].second);
 		}
 		imshow("fea match", draw);
+	}
+	else if (f == 4)
+	{
+		std::vector<double> c = { 1.0, 2.0, 3.0, 4.0, 5.0 };
+		std::vector<double> v = { 1.0, 4.0, 9.0, 16.0, 25.0 };
+
+		// ªÊ÷∆’€œﬂÕº
+		drawLineGraph(c, v);
 	}
 	else if (f == 10) //save contours
 	{

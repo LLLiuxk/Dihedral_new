@@ -2804,6 +2804,83 @@ double evaluation_area_pixels(vector<Point2f> c1, vector<Point2f> c2)
 	return area_score;
 }
 
+double cal_Poisson_ratio(vector<Point2f> con_ori, vector<Point2f> con_new)
+{
+	vector<Point2f> bbx1(con_ori);
+	vector<Point2f> bbx2(con_new);
+	double dx = abs(bbx2[2].x - bbx2[0].x) - abs(bbx1[2].x - bbx1[0].x);
+	double dy = abs(bbx2[2].y - bbx2[0].y) - abs(bbx1[2].y - bbx1[0].y);
+	double Pr = -dx / dy;
+}
+
+void drawLineGraph(vector<double>& x, vector<double>& y)
+{
+	// 查找最大和最小值以确定坐标轴范围
+	double minX = *std::min_element(x.begin(), x.end());
+	double maxX = *std::max_element(x.begin(), x.end());
+	double minY = *std::min_element(y.begin(), y.end());
+	double maxY = *std::max_element(y.begin(), y.end());
+
+	// 创建一个图像以容纳折线图
+	cv::Mat graph(cv::Size(800, 600), CV_8UC3, cv::Scalar(255, 255, 255));
+
+	// 计算坐标轴的尺寸和位置
+	int margin = 50; // 边距大小
+	int axisWidth = graph.cols - 2 * margin;
+	int axisHeight = graph.rows - 2 * margin;
+	int xStart = margin;
+	int yStart = graph.rows - margin;
+	int xEnd = xStart + axisWidth;
+	int yEnd = margin;
+
+	// 绘制坐标轴
+	cv::line(graph, cv::Point(xStart, yStart), cv::Point(xEnd, yStart), cv::Scalar(0, 0, 0), 2); // X轴
+	cv::line(graph, cv::Point(xStart, yStart), cv::Point(xStart, yEnd), cv::Scalar(0, 0, 0), 2); // Y轴
+
+	// 添加x轴标签
+	int numXLabels = x.size(); // x轴标签数量
+	for (int i = 0; i < numXLabels; ++i)
+	{
+		double labelValue = minX + (i * (maxX - minX) / (numXLabels - 1));
+		std::string label = std::to_string(labelValue);
+		cv::putText(graph, label, cv::Point(xStart + (i * axisWidth / (numXLabels - 1)), yStart + 30),
+			cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 0, 0), 1);
+	}
+
+	// 添加y轴标签
+	int numYLabels = y.size(); // y轴标签数量
+	for (int i = 0; i < numYLabels; ++i)
+	{
+		double labelValue = minY + (i * (maxY - minY) / (numYLabels - 1));
+		std::string label = std::to_string(labelValue);
+		cv::putText(graph, label, cv::Point(xStart - 50, yStart - (i * axisHeight / (numYLabels - 1))),
+			cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 0, 0), 1);
+	}
+
+	// 绘制折线图
+	for (size_t i = 0; i < x.size(); ++i)
+	{
+		// 将坐标映射到图像上
+		int xPixel = xStart + ((x[i] - minX) / (maxX - minX)) * axisWidth;
+		int yPixel = yStart - ((y[i] - minY) / (maxY - minY)) * axisHeight;
+
+		// 绘制数据点
+		cv::circle(graph, cv::Point(xPixel, yPixel), 5, cv::Scalar(255, 0, 0), cv::FILLED);
+
+		// 绘制数据点之间的连线
+		if (i > 0)
+		{
+			int prevXPixel = xStart + ((x[i - 1] - minX) / (maxX - minX)) * axisWidth;
+			int prevYPixel = yStart - ((y[i - 1] - minY) / (maxY - minY)) * axisHeight;
+			cv::line(graph, cv::Point(prevXPixel, prevYPixel), cv::Point(xPixel, yPixel), cv::Scalar(0, 0, 255), 2);
+		}
+	}
+
+	// 显示折线图
+	cv::imshow("Line Graph", graph);
+}
+
+
 
 
 

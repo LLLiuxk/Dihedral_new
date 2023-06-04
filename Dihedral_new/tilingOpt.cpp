@@ -221,7 +221,7 @@ namespace Tiling_tiles {
 				con2 = load_point_file(savepath + "c2.txt");
 				vector<vector<Point2f>> tex1 = load_texture(savepath + "texture1.txt");
 				vector<vector<Point2f>> tex2 = load_texture(savepath + "texture2.txt");
-				contour2obj(savepath + "c1.obj", con1, Point2f(200,200) -center_p(con1), 15);
+				contour2obj(savepath + "c1.obj", con1, Point2f(200, 200) - center_p(con1), 15);
 				contour2obj(savepath + "c2.obj", con2, Point2f(200, 200) - center_p(con1), 15);
 
 				protoTile c1, c2;
@@ -507,17 +507,6 @@ namespace Tiling_tiles {
 		//对齐到图案中央
 		c1.Trans_proTile(Point2f(draw_row / 2, draw_col / 2) - center_p(c1.contour));
 		c2.Trans_proTile(c1.contour[c1.anchor_points[0]] - c2.contour[c2.anchor_points[3]]);
-
-		//protoTile c3 = c2;
-		//c3.Trans_proTile(c1.contour[c1.anchor_points[3]] - c2.contour[c2.anchor_points[0]]);
-
-		//Mat drawing = Mat(draw_row, draw_col, CV_8UC3, Scalar(255, 255, 255));
-		//c1.draw_proTile(drawing, colorbar[0].second, Point2f(0, 0));
-		//c2.draw_proTile(drawing, colorbar[4].second, Point2f(0, 0));
-		//c3.draw_proTile(drawing, colorbar[4].second, Point2f(0, 0));
-
-		//imshow("hhahaha", drawing);
-		//cout << "scale: " << scale_ratio << endl;
 
 		int add_degree = 1;
 		int cut_mar = CutMargin;
