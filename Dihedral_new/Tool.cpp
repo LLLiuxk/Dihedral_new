@@ -2806,14 +2806,15 @@ double evaluation_area_pixels(vector<Point2f> c1, vector<Point2f> c2)
 
 double cal_Poisson_ratio(vector<Point2f> con_ori, vector<Point2f> con_new)
 {
-	vector<Point2f> bbx1(con_ori);
-	vector<Point2f> bbx2(con_new);
+	vector<Point2f> bbx1 = bbx(con_ori);
+	vector<Point2f> bbx2 = bbx(con_new);
 	double dx = abs(bbx2[2].x - bbx2[0].x) - abs(bbx1[2].x - bbx1[0].x);
 	double dy = abs(bbx2[2].y - bbx2[0].y) - abs(bbx1[2].y - bbx1[0].y);
 	double Pr = -dx / dy;
+	return Pr;
 }
 
-void drawLineGraph(vector<double>& x, vector<double>& y)
+void drawLineGraph(vector<double>& x, vector<double>& y, string save_path)
 {
 	// 查找最大和最小值以确定坐标轴范围
 	double minX = *std::min_element(x.begin(), x.end());
@@ -2836,28 +2837,31 @@ void drawLineGraph(vector<double>& x, vector<double>& y)
 	// 绘制坐标轴
 	cv::line(graph, cv::Point(xStart, yStart), cv::Point(xEnd, yStart), cv::Scalar(0, 0, 0), 2); // X轴
 	cv::line(graph, cv::Point(xStart, yStart), cv::Point(xStart, yEnd), cv::Scalar(0, 0, 0), 2); // Y轴
-
+	cv::putText(graph, "0", cv::Point(xStart, yStart + 30),
+		cv::FONT_HERSHEY_SIMPLEX, 0.3, cv::Scalar(0, 0, 0), 1);
 	// 添加x轴标签
-	int numXLabels = x.size(); // x轴标签数量
-	for (int i = 0; i < numXLabels; ++i)
+	int numXLabels = x.size() + 1; // x轴标签数量
+	for (int i = 1; i < numXLabels; ++i)
 	{
-		double labelValue = minX + (i * (maxX - minX) / (numXLabels - 1));
-		std::string label = std::to_string(labelValue);
+		double labelValue = minX + ((i - 1)* (maxX - minX) / (numXLabels - 1));
+		std::string label = d2str(labelValue, 2);
 		cv::putText(graph, label, cv::Point(xStart + (i * axisWidth / (numXLabels - 1)), yStart + 30),
-			cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 0, 0), 1);
+			cv::FONT_HERSHEY_SIMPLEX, 0.3, cv::Scalar(0, 0, 0), 1);
 	}
 
 	// 添加y轴标签
-	int numYLabels = y.size(); // y轴标签数量
-	for (int i = 0; i < numYLabels; ++i)
+	int numYLabels = y.size() + 1; // y轴标签数量
+	for (int i = 1; i < numYLabels; ++i)
 	{
-		double labelValue = minY + (i * (maxY - minY) / (numYLabels - 1));
-		std::string label = std::to_string(labelValue);
+		double labelValue = minY + ((i - 1) * (maxY - minY) / (numYLabels - 1));
+		std::string label = d2str(labelValue, 2);
 		cv::putText(graph, label, cv::Point(xStart - 50, yStart - (i * axisHeight / (numYLabels - 1))),
-			cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 0, 0), 1);
+			cv::FONT_HERSHEY_SIMPLEX, 0.3, cv::Scalar(0, 0, 0), 1);
 	}
 
 	// 绘制折线图
+	xStart = xStart + axisWidth / (numXLabels - 1);
+	yStart = yStart - axisHeight / (numYLabels - 1);
 	for (size_t i = 0; i < x.size(); ++i)
 	{
 		// 将坐标映射到图像上
@@ -2878,6 +2882,30 @@ void drawLineGraph(vector<double>& x, vector<double>& y)
 
 	// 显示折线图
 	cv::imshow("Line Graph", graph);
+	cv::imwrite(save_path, graph);
+}
+
+vector<Point2f> mergedVector(vector<vector<Point2f>> vecs, vector<Point2f> shifts)
+{
+	vector<Point2f> mergedV;
+	for (int i = 0; i < vecs.size(); i++)
+	{
+		Point2f sh = shifts[i];
+		for (int j = 0; j < vecs[i].size(); j++)
+		{
+			mergedV.push_back(vecs[i][j] + sh);
+		}
+	}
+	return mergedV;
+}
+
+string d2str(double value, int tail_num)
+{
+	stringstream ss;
+	ss << setiosflags(ios::fixed) << setprecision(tail_num) << value << endl;
+	string x_value;
+	ss >> x_value;
+	return x_value;
 }
 
 

@@ -219,6 +219,11 @@ namespace Tiling_tiles {
 				vector<Point2f> con2 = conf_trans(contour_2);
 				con1 = load_point_file(savepath + "c1.txt");
 				con2 = load_point_file(savepath + "c2.txt");
+				if (con1.empty() || con2.empty())
+				{
+					cout << "No contours! Exit!" << endl;
+					exit(0);
+				}
 				vector<vector<Point2f>> tex1 = load_texture(savepath + "texture1.txt");
 				vector<vector<Point2f>> tex2 = load_texture(savepath + "texture2.txt");
 				contour2obj(savepath + "c1.obj", con1, Point2f(200, 200) - center_p(con1), 15);
@@ -510,6 +515,10 @@ namespace Tiling_tiles {
 
 		int add_degree = 1;
 		int cut_mar = CutMargin;
+		vector<double> Angles;
+		vector<double> Prs;
+		vector<Point2f> c1_total_ori;
+
 		if (clockorder == ClockWise)
 		{
 			cout << "ClockWise" << endl;
@@ -520,15 +529,37 @@ namespace Tiling_tiles {
 				protoTile c3 = c2;
 				c3.Trans_proTile(c1.contour[c1.anchor_points[3]] - c2.contour[c2.anchor_points[0]]);			
 				//from top to bottom, from left to right
-				c1.draw_proTile(drawing, colorbar[0].second, c2.contour[c2.anchor_points[3]] - c1.contour[c1.anchor_points[2]], -cut_mar);
-				c2.draw_proTile(drawing, colorbar[4].second, c1.contour[c1.anchor_points[0]] - c2.contour[c2.anchor_points[1]], cut_mar);
-				c1.draw_proTile(drawing, colorbar[0].second, c3.contour[c2.anchor_points[3]] - c1.contour[c1.anchor_points[2]], -cut_mar);
-				c2.draw_proTile(drawing, colorbar[4].second, Point2f(0, 0), cut_mar);
-				c1.draw_proTile(drawing, colorbar[0].second, Point2f(0, 0), -cut_mar);
-				c3.draw_proTile(drawing, colorbar[4].second, Point2f(0, 0), cut_mar);
-				c1.draw_proTile(drawing, colorbar[0].second, c2.contour[c2.anchor_points[1]] - c1.contour[c1.anchor_points[0]], -cut_mar);
-				c2.draw_proTile(drawing, colorbar[4].second, c1.contour[c1.anchor_points[2]] - c2.contour[c2.anchor_points[3]], cut_mar);
-				c1.draw_proTile(drawing, colorbar[0].second, c3.contour[c2.anchor_points[1]] - c1.contour[c1.anchor_points[0]], -cut_mar);
+				vector<Point2f> shifts = { 
+					c2.contour[c2.anchor_points[3]] - c1.contour[c1.anchor_points[2]] ,
+					c1.contour[c1.anchor_points[0]] - c2.contour[c2.anchor_points[1]],
+					c3.contour[c2.anchor_points[3]] - c1.contour[c1.anchor_points[2]],
+					OP,OP,OP,
+					c2.contour[c2.anchor_points[1]] - c1.contour[c1.anchor_points[0]],
+					c1.contour[c1.anchor_points[2]] - c2.contour[c2.anchor_points[3]],
+					c3.contour[c2.anchor_points[1]] - c1.contour[c1.anchor_points[0]]
+				};
+				c1.draw_proTile(drawing, colorbar[0].second, shifts[0], -cut_mar);
+				c2.draw_proTile(drawing, colorbar[4].second, shifts[1], cut_mar);
+				c1.draw_proTile(drawing, colorbar[0].second, shifts[2], -cut_mar);
+				c2.draw_proTile(drawing, colorbar[4].second, shifts[3], cut_mar);
+				c1.draw_proTile(drawing, colorbar[0].second, shifts[4], -cut_mar);
+				c3.draw_proTile(drawing, colorbar[4].second, shifts[5], cut_mar);
+				c1.draw_proTile(drawing, colorbar[0].second, shifts[6], -cut_mar);
+				c2.draw_proTile(drawing, colorbar[4].second, shifts[7], cut_mar);
+				c1.draw_proTile(drawing, colorbar[0].second, shifts[8], -cut_mar);
+
+				if (degree % 2 == 0)
+				{
+					vector<Point2f> c1_total = mergedVector({ c1.contour,c1.contour,c1.contour,c1.contour }, { shifts[0],shifts[2],shifts[6],shifts[8] });
+					if (degree == 0) c1_total_ori = c1_total;
+					else
+					{
+						double pr = cal_Poisson_ratio(c1_total_ori, c1_total);
+						Angles.push_back(degree);
+						Prs.push_back(pr);
+						//cout << "DEGREE: " << degree << "    " << pr << endl;
+					}
+				}
 
 				c1.Rotate_proTile(c1.contour[c1.anchor_points[1]], -add_degree);
 				c2.Rotate_proTile(c2.contour[c2.anchor_points[2]], add_degree);
@@ -542,7 +573,6 @@ namespace Tiling_tiles {
 		else if (clockorder == AntiClockWise)
 		{
 			cout << "AntiClockWise" << endl;
-
 			for (int degree = 0; degree < rot_deg; degree += add_degree)
 			{
 				if (degree != 0) cut_mar = 0;
@@ -550,15 +580,37 @@ namespace Tiling_tiles {
 				protoTile c3 = c2;
 				c3.Trans_proTile(c1.contour[c1.anchor_points[2]] - c2.contour[c2.anchor_points[1]]);
 				//from top to bottom, from left to right
-				c1.draw_proTile(drawing, colorbar[0].second, c2.contour[c2.anchor_points[0]] - c1.contour[c1.anchor_points[1]], cut_mar);
-				c2.draw_proTile(drawing, colorbar[4].second, c1.contour[c1.anchor_points[3]] - c2.contour[c2.anchor_points[2]], -cut_mar);
-				c1.draw_proTile(drawing, colorbar[0].second, c3.contour[c2.anchor_points[0]] - c1.contour[c1.anchor_points[1]], cut_mar);
-				c2.draw_proTile(drawing, colorbar[4].second, Point2f(0, 0), -cut_mar);
-				c1.draw_proTile(drawing, colorbar[0].second, Point2f(0, 0), cut_mar);
-				c3.draw_proTile(drawing, colorbar[4].second, Point2f(0, 0), -cut_mar);
-				c1.draw_proTile(drawing, colorbar[0].second, c2.contour[c2.anchor_points[2]] - c1.contour[c1.anchor_points[3]], cut_mar);
-				c2.draw_proTile(drawing, colorbar[4].second, c1.contour[c1.anchor_points[1]] - c2.contour[c2.anchor_points[0]], -cut_mar);
-				c1.draw_proTile(drawing, colorbar[0].second, c3.contour[c2.anchor_points[2]] - c1.contour[c1.anchor_points[3]], cut_mar);
+				vector<Point2f> shifts = {
+					c2.contour[c2.anchor_points[0]] - c1.contour[c1.anchor_points[1]],
+					c1.contour[c1.anchor_points[3]] - c2.contour[c2.anchor_points[2]],
+					c3.contour[c2.anchor_points[0]] - c1.contour[c1.anchor_points[1]],
+					OP,OP,OP,
+					c2.contour[c2.anchor_points[2]] - c1.contour[c1.anchor_points[3]],
+					c1.contour[c1.anchor_points[1]] - c2.contour[c2.anchor_points[0]],
+					c3.contour[c2.anchor_points[2]] - c1.contour[c1.anchor_points[3]]
+				};
+				c1.draw_proTile(drawing, colorbar[0].second, shifts[0], cut_mar);
+				c2.draw_proTile(drawing, colorbar[4].second, shifts[1], -cut_mar);
+				c1.draw_proTile(drawing, colorbar[0].second, shifts[2], cut_mar);
+				c2.draw_proTile(drawing, colorbar[4].second, shifts[3], -cut_mar);
+				c1.draw_proTile(drawing, colorbar[0].second, shifts[4], cut_mar);
+				c3.draw_proTile(drawing, colorbar[4].second, shifts[5], -cut_mar);
+				c1.draw_proTile(drawing, colorbar[0].second, shifts[6], cut_mar);
+				c2.draw_proTile(drawing, colorbar[4].second, shifts[7], -cut_mar);
+				c1.draw_proTile(drawing, colorbar[0].second, shifts[8], cut_mar);
+
+				if (degree % 2 == 0)
+				{
+					vector<Point2f> c1_total = mergedVector({ c1.contour,c1.contour,c1.contour,c1.contour }, { shifts[0],shifts[2],shifts[6],shifts[8] });
+					if (degree == 0) c1_total_ori = c1_total;
+					else
+					{
+						double pr = cal_Poisson_ratio(c1_total_ori, c1_total);
+						Angles.push_back(degree);
+						Prs.push_back(pr);
+						//cout << "DEGREE: " << degree << "    " << pr << endl;
+					}
+				}
 
 				c1.Rotate_proTile(c1.contour[c1.anchor_points[0]], add_degree);
 				c2.Rotate_proTile(c2.contour[c2.anchor_points[3]], -add_degree);
@@ -569,6 +621,7 @@ namespace Tiling_tiles {
 				waitKey(100);
 			}
 		}
+		drawLineGraph(Angles, Prs, save_path + "NPR_angle.png");
 		write_avi(images, save_path + "output.avi", 5);
 		imwrite(save_path + "Rotation Visualization.png", images[0]);
 		imshow("Rotation Visualization2222", images[0]);

@@ -141,9 +141,12 @@ double evaluation_area_pixels(vector<Point2f> c1, vector<Point2f> c2);
 
 //calculate the Poisson¡¯s ratios
 double cal_Poisson_ratio(vector<Point2f> con_ori, vector<Point2f> con_new);
-void drawLineGraph(vector<double>& x, vector<double>& y);
+void drawLineGraph(vector<double>& x, vector<double>& y, string save_path);
+vector<Point2f> mergedVector(vector<vector<Point2f>> vecs, vector<Point2f> shifts);
+string d2str(double value, int tail_num);
 
 template<typename T>
+
 T delete_vector(vector<T> &vec, int index_p)
 {
 	vector<T> vec1;
@@ -151,8 +154,7 @@ T delete_vector(vector<T> &vec, int index_p)
 	//cout << vsize << "  " << index_p << endl;
 	for (int i = 0; i < index_p; i++)
 	{
-		vec1.push_back(ve
-			c[i]);
+		vec1.push_back(vec[i]);
 	}
 	T delete_p = vec[index_p];
 	for (int i = index_p + 1; i <vsize; i++)
@@ -162,4 +164,5 @@ T delete_vector(vector<T> &vec, int index_p)
 	vec = vec1;
 	return delete_p;
 }
+
 
