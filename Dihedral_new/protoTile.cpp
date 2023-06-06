@@ -225,22 +225,31 @@ namespace Tiling_tiles {
 		}
 		else
 		{
-			for (int t = 0; t < n; t++)
-			{
-				Scalar green(0, 255, 100);
-				line(drawing_, contour[t] + shift, contour[(t + 1) % n] + shift, green, thickness, lineType);
-			}
+			vector<int> miss_index;
 			for (int anc_in = 0; anc_in < 4; anc_in++)
 			{
 				int anc_index = anchor_points[anc_in];
 				//cout << anc_index << "   " << cut_margin << endl;
 				for (int m = 0; m < abs(cut_margin); m++)
 				{
-					int add_m = (anc_index + cut_margin / abs(cut_margin)*m + n) % n;
-					int add_m1 = (anc_index + cut_margin / abs(cut_margin)*(m + 1) + n) % n;
-					//cout << add_m<<"   "<< (anc_index + add_m) % n<<"   "<<(anc_index + m) % n << "   " << contour[(anc_index + m) % n] << endl;
-					line(drawing_, contour[add_m] + shift, contour[add_m1] + shift, color, thickness, lineType);
+					int flag = cut_margin / abs(cut_margin);
+					int add_m = (anc_index + flag*m + n) % n;
+					int add_m1 = (anc_index + flag*(m + 1) + n) % n;
+					if (flag > 0) miss_index.push_back(add_m);
+					else miss_index.push_back(add_m1);
+					//cout << "add_m: "<<add_m<<"   "<< (anc_index + add_m) % n<<"   "<<(anc_index + m) % n << "   " << contour[(anc_index + m) % n] << endl;
 				}
+			}
+			for (int t = 0; t < n; t++)
+			{
+				//Scalar cut_color(0, 255, 100);
+				Scalar cut_color(0, 0, 0);
+				auto it = std::find(miss_index.begin(), miss_index.end(), t);
+
+				if (it == miss_index.end()) {
+					line(drawing_, contour[t] + shift, contour[(t + 1) % n] + shift, cut_color, thickness, lineType);
+				}
+				
 			}
 		}
 
