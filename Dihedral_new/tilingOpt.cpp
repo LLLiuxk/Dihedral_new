@@ -174,8 +174,8 @@ namespace Tiling_tiles {
 				std::cout << "---------------------------------------" << endl << "Optimize The Dihedral Tessellation" << endl << "---------------------------------------" << endl;
 				Clock_order = AntiClockWise;  //指示初始input形状旋转的方向
 				int Clock_order2 = abs(Clock_order - 1);
-				con_re = contour_opt(con_re, anc_re, 1, 1, 1, 1, 1, Clock_order);
-				contour_2 = contour_opt(contour_2, anc_mid, 1, 0, 1, 1, 1, Clock_order2);
+				con_re = contour_opt(con_re, anc_re, 1, 0, 1, 0, 0, Clock_order);
+				contour_2 = contour_opt(contour_2, anc_mid, 1, 1, 1, 0, 0, Clock_order2);
 				//cout << "size: " << contour_2.size() << "  " << con_re.size() << endl;
 				//将两个轮廓对齐
 				Point2f shift = contour_2[anc_mid[3]].point - con_re[anc_re[0]].point;
@@ -209,9 +209,46 @@ namespace Tiling_tiles {
 					cout << "mr: "<<mr<<"   merge_score: " << merge_score << endl;
 				}
 				cout << endl << "min_ratio: " << merge_ratio << "   " << min_mers << endl << endl;
+
+				string file_name ="Two_contour.svg";
+				std::ofstream file(file_name);
+				file << "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1000\" height=\"1000\">\n";
+				FOR(p_index, 0, con_re.size())
+				{
+					file << "<line x1=\"" << con_re[p_index].point.x << "\" y1=\"" << con_re[p_index].point.y << "\" x2=\"" << con_re[(p_index + 1)% con_re.size()].point.x << "\" y2=\"" << con_re[(p_index + 1) % con_re.size()].point.y << "\" stroke=\"rgb(120,120,120)\" />\n";
+					if(con_re[p_index].type==fixed_p)
+						file << "<circle cx=\"" << con_re[p_index].point.x << "\" cy=\"" << con_re[p_index].point.y << "\" r=\"2\" fill=\"rgb(240, 176, 30)\" />\n";
+				}
+				FOR(p_index, 0, contour_2.size())
+				{
+					file << "<line x1=\"" << contour_2[p_index].point.x+300 << "\" y1=\"" << contour_2[p_index].point.y << "\" x2=\"" << contour_2[(p_index + 1) % contour_2.size()].point.x + 300 << "\" y2=\"" << contour_2[(p_index + 1) % contour_2.size()].point.y << "\" stroke=\"rgb(120,120,120)\" />\n";
+					if (contour_2[p_index].type == fixed_p)
+						file << "<circle cx=\"" << contour_2[p_index].point.x + 300 << "\" cy=\"" << contour_2[p_index].point.y << "\" r=\"2\" fill=\"rgb(240, 176, 30)\" />\n";
+				}
+				file << "</svg>";
+				file.close();
 				//merge_contours(contour_2, con_re, anc_mid, anc_re, merge_ratio);
 				merge_contours(con_re, contour_2,  anc_re, anc_mid, merge_ratio);
 				//FOR(gg, 0, 4)  cout << contour_2[anc_mid[gg]].point << "    " << con_re[anc_re[gg]].point << endl;
+				
+				file_name = "Merged_contour.svg";
+				std::ofstream file1(file_name);
+				file1 << "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1000\" height=\"1000\">\n";
+				FOR(p_index, 0, con_re.size())
+				{
+					file1 << "<line x1=\"" << con_re[p_index].point.x << "\" y1=\"" << con_re[p_index].point.y << "\" x2=\"" << con_re[(p_index + 1) % con_re.size()].point.x << "\" y2=\"" << con_re[(p_index + 1) % con_re.size()].point.y << "\" stroke=\"rgb(120,120,120)\" />\n";
+					if (con_re[p_index].type == fixed_p)
+						file1 << "<circle cx=\"" << con_re[p_index].point.x << "\" cy=\"" << con_re[p_index].point.y << "\" r=\"2\" fill=\"rgb(240, 176, 30)\" />\n";
+				}
+				FOR(p_index, 0, contour_2.size())
+				{
+					file1 << "<line x1=\"" << contour_2[p_index].point.x + 300 << "\" y1=\"" << contour_2[p_index].point.y << "\" x2=\"" << contour_2[(p_index + 1) % contour_2.size()].point.x + 300 << "\" y2=\"" << contour_2[(p_index + 1) % contour_2.size()].point.y << "\" stroke=\"rgb(120,120,120)\" />\n";
+					if (contour_2[p_index].type == fixed_p)
+						file1 << "<circle cx=\"" << contour_2[p_index].point.x + 300 << "\" cy=\"" << contour_2[p_index].point.y << "\" r=\"2\" fill=\"rgb(240, 176, 30)\" />\n";
+				}
+				file1 << "</svg>";
+				file1.close();
+
 				write_twoCon(savepath + "twoCon.txt", anc_re, conf_trans(con_re), anc_mid, conf_trans(contour_2));
 				string command = "DDET.exe  " + to_string(Clock_order) + "  "+ savepath;
 				system(command.c_str());
@@ -274,6 +311,10 @@ namespace Tiling_tiles {
 			tt = triangulate_bbx(contour_dst, V, F);
 		else if (type == 2)
 			tt= triangulate_Contours_bbx(contour_dst, anc_p, V, F);
+	/*	else if (type == 3)
+		{
+			tt = triangulate_2Contours(vector<Point2f>& cont1, vector<Point2f>& cont2, MatrixXd& V, MatrixXi& F);
+		}*/
 		Mat image = Mat(1200, 1200, CV_8UC3, Scalar(255, 255, 255));
 		Point stf=Point2f(600, 600) - center_p(contour_dst);
 		for (size_t i = 0; i < F.rows(); i++)
@@ -338,7 +379,7 @@ namespace Tiling_tiles {
 			write_para(para_path, anc_mid_, frame_b);
 			//write_para(para_path, anc_mid, frame_b);
 			//write_para(para_path, handle_area, handle_points);
-			string command = "D:/vs2015project/Dihedral_new/Dihedral_new/ARAP_Deform.exe  " + to_string(times) + "  " + obj_path + "  " + para_path + " " + deformed_c;
+			string command = "D:/vs2015project/Dihedral_new/Dihedral_new/ARAP_Deform.exe  " + to_string(times) + "  " + obj_path + "  " + para_path + " " + deformed_c+"  "+to_string(csize);
 			//string command = "D:/vs2015project/ARAP_Deform/x64/Debug/ARAP_Deform.exe  " + obj_path + "  " + para_path + " " + deformed_c;
 			cout << command << endl;
 			system(command.c_str());
@@ -347,23 +388,40 @@ namespace Tiling_tiles {
 			FOR(m, 0, csize) con_tem.push_back(contour_dst[m]);
 			contour_dst = con_tem;
 			//recover the boundary
+			string file_name = to_string(times) + "_After_align.svg";
+			std::ofstream file(file_name);
+			file << "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1000\" height=\"1000\">\n";
+			for (int i = 0; i < csize; i++)
+			{
+				file << "<line x1=\"" << contour_dst[i].x << "\" y1=\"" << contour_dst[i].y << "\" x2=\"" << contour_dst[(i + 1) % csize].x << "\" y2=\"" << contour_dst[(i + 1) % csize].y << "\" stroke=\"rgb(120,120,120)\" />\n";
+				file << "<circle cx=\"" << contour_dst[i].x << "\" cy=\"" << contour_dst[i].y << "\" r=\"2\" fill=\"rgb(100, 100, 100)\" />\n";
+			}
 			FOR(index_h, 0, handle_area.size())
 			{
-				vector<int> new_indes = handle_area[index_h];
+				vector<int> new_indexs = handle_area[index_h];
 				vector<Point2f> new_handp;
 				//cout << "index_h: " << index_h << "   " << handle_area.size() << endl;
-				FOR(i,0, new_indes.size())
+				FOR(i,0, new_indexs.size())
 				{
-					new_handp.push_back(contour_dst[new_indes[i]]);
+					new_handp.push_back(contour_dst[new_indexs[i]]);
 					//cout << "i: " << i << "   " << contour_dst[new_indes[i]] << endl;
 				}
+				
 				bound_recover(handle_points[index_h], new_handp);
-				FOR(i, 0, new_indes.size())
+
+				FOR(i, 0, new_indexs.size())
+					contour_dst[new_indexs[i]] = new_handp[i];
+				file << "<line x1=\"" << contour_dst[(new_indexs[0] - 1 + csize)%csize].x << "\" y1=\"" << contour_dst[(new_indexs[0] - 1 + csize) % csize].y << "\" x2=\"" << contour_dst[new_indexs[0]].x << "\" y2=\"" << contour_dst[new_indexs[0]].y << "\" stroke=\"rgb(149, 202, 135)\" />\n";
+				FOR(i, 0, new_indexs.size())
 				{
-					contour_dst[new_indes[i]] = new_handp[i];
-					//cout << "i: " << i << "   " << contour_dst[new_indes[i]] << endl;
+					file << "<line x1=\"" << contour_dst[new_indexs[i]].x << "\" y1=\"" << contour_dst[new_indexs[i]].y << "\" x2=\"" << contour_dst[(new_indexs[i] + 1) % csize].x << "\" y2=\"" << contour_dst[(new_indexs[i] + 1) % csize].y << "\" stroke=\"rgb(149, 202, 135)\" />\n";
+					file << "<circle cx=\"" << contour_dst[new_indexs[i]].x << "\" cy=\"" << contour_dst[new_indexs[i]].y << "\" r=\"2\" fill=\"rgb(250, 65, 65)\" />\n";
 				}
+				/*FOR(i, 0, new_indexs.size())
+					file << "<circle cx=\"" << contour_dst[new_indexs[i]].x << "\" cy=\"" << contour_dst[new_indexs[i]].y << "\" r=\"2\" fill=\"rgb(250, 65, 65)\" />\n";*/
 			}
+			file << "</svg>";
+			file.close();
 			//resample contour_dst
 			
 			Mat draw_22 = Mat(800, 1200, CV_8UC3, Scalar(255, 255, 255));
@@ -387,7 +445,7 @@ namespace Tiling_tiles {
 			draw_contour_points(draw_22, contour_dst, sht);
 			circle(draw_22, contour_dst[0] + sht, 3, Scalar(0, 255, 0), 1);
 			FOR(tt,0,4) circle(draw_22, contour_dst[anc_re[tt]] + sht, 3, Scalar(0, 0, 255), 3);
-			imwrite("D:/ressample.png", draw_22);
+			//imwrite("D:/ressample.png", draw_22);
 			FOR(ii, 0, 4)
 			{
 				cout << anc_p[ii]<<"   "<<resam_[ii] << "   " << anc_re[ii]<<"   "<< contour_dst[anc_p[ii]]<<"   "<<contour_dst[anc_re[ii]] << endl;
@@ -407,9 +465,25 @@ namespace Tiling_tiles {
 		{
 			cout << "contour fine tuning......" << endl;
 			//contour_de_crossing(contour_dst);
+			string file_name = to_string(times) + "_Fine_tuning.svg";
+			std::ofstream file(file_name);
+			file << "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1000\" height=\"1000\">\n";
+			for (int i = 0; i < csize; i++)
+			{
+				file << "<line x1=\"" << contour_dst[i].x << "\" y1=\"" << contour_dst[i].y << "\" x2=\"" << contour_dst[(i + 1) % csize].x << "\" y2=\"" << contour_dst[(i + 1) % csize].y << "\" stroke=\"rgb(120,120,120)\" />\n";
+				file << "<circle cx=\"" << contour_dst[i].x << "\" cy=\"" << contour_dst[i].y << "\" r=\"2\" fill=\"rgb(100, 100, 100)\" />\n";
+			}
+
 			contour_fine_tuning(contour_dst);
 			//con_re = set_flags(contour_dst, cont);
 			con_re = set_flags(contour_dst, con_re);
+
+			for (int i = 0; i < csize; i++)
+			{
+				file << "<line x1=\"" << contour_dst[i].x << "\" y1=\"" << contour_dst[i].y << "\" x2=\"" << contour_dst[(i + 1) % csize].x << "\" y2=\"" << contour_dst[(i + 1) % csize].y << "\" stroke=\"rgb(100,100,200)\" />\n";
+				file << "<circle cx=\"" << contour_dst[i].x << "\" cy=\"" << contour_dst[i].y << "\" r=\"2\" fill=\"rgb(100, 100, 100)\" />\n";
+			}
+
 			cout << "csize " << csize << "  " << contour_dst.size() << "  " << con_re.size() << endl;
 		}
 		if (deve_opt)
@@ -1779,8 +1853,7 @@ namespace Tiling_tiles {
 			Point2f start2 = c2_seg[(i + 2) % 4][0].point;
 			Point2f sh_ = start1 - start2;
 			each_seg_ = merge_segment(conf_trans(c1_seg[i]), conf_trans(c2_seg[(i + 2) % 4]), ratio, num_e);
-			degree_opt = edge_nd_opt(each_seg_, Clock_order);
-			//degree_opt = edge_nd_degree(each_seg_, 1);
+		    degree_opt = edge_nd_opt(each_seg_, Clock_order);
 			cout << "After degree_opt: " << degree_opt << endl;
 			for (auto p : each_seg_) each_seg.push_back(Point_f(p, general_p));
 			each_seg[0].type = fixed_p;
