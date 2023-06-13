@@ -114,6 +114,7 @@ namespace Tiling_tiles {
 				vector<Point_f> con_re;
 				vector<int> anc_mid;
 				vector<int> anc_re;
+				Mat draw_min;
 
 				for (double r = 0.1; r <= 0.91; r += 0.05) 
 				{
@@ -156,8 +157,11 @@ namespace Tiling_tiles {
 						con_re = c_re;
 						anc_mid = a_mid;
 						anc_re = a_re;
+						draw_min = draw2;
 					}
 				}
+				imshow( "[" + to_string(anc_mid[0]) + "," + to_string(anc_mid[1]) + "," + to_string(anc_mid[2]) + "," + to_string(anc_mid[3]) + "]_placement", draw_min);
+
 				cout << endl << "min ratio: " << ratio << "   min score: " << min_score << "   c1&c2 size:  " << contour1.size() << "  " << contour2.size() << "  contour_2.size: " << contour_2.size() << endl << endl;
 				Mat pair_match = Mat(600, 1000, CV_8UC3, Scalar(255, 255, 255));
 				Point2f sh = Point2f(300, 300) - center_p(conf_trans(contour1));
@@ -221,9 +225,9 @@ namespace Tiling_tiles {
 				}
 				FOR(p_index, 0, contour_2.size())
 				{
-					file << "<line x1=\"" << contour_2[p_index].point.x+300 << "\" y1=\"" << contour_2[p_index].point.y << "\" x2=\"" << contour_2[(p_index + 1) % contour_2.size()].point.x + 300 << "\" y2=\"" << contour_2[(p_index + 1) % contour_2.size()].point.y << "\" stroke=\"rgb(120,120,120)\" />\n";
+					file << "<line x1=\"" << contour_2[p_index].point.x - 300 << "\" y1=\"" << contour_2[p_index].point.y << "\" x2=\"" << contour_2[(p_index + 1) % contour_2.size()].point.x - 300 << "\" y2=\"" << contour_2[(p_index + 1) % contour_2.size()].point.y << "\" stroke=\"rgb(120,120,120)\" />\n";
 					if (contour_2[p_index].type == fixed_p)
-						file << "<circle cx=\"" << contour_2[p_index].point.x + 300 << "\" cy=\"" << contour_2[p_index].point.y << "\" r=\"2\" fill=\"rgb(240, 176, 30)\" />\n";
+						file << "<circle cx=\"" << contour_2[p_index].point.x - 300 << "\" cy=\"" << contour_2[p_index].point.y << "\" r=\"2\" fill=\"rgb(240, 176, 30)\" />\n";
 				}
 				file << "</svg>";
 				file.close();
@@ -242,9 +246,9 @@ namespace Tiling_tiles {
 				}
 				FOR(p_index, 0, contour_2.size())
 				{
-					file1 << "<line x1=\"" << contour_2[p_index].point.x + 300 << "\" y1=\"" << contour_2[p_index].point.y << "\" x2=\"" << contour_2[(p_index + 1) % contour_2.size()].point.x + 300 << "\" y2=\"" << contour_2[(p_index + 1) % contour_2.size()].point.y << "\" stroke=\"rgb(120,120,120)\" />\n";
+					file1 << "<line x1=\"" << contour_2[p_index].point.x - 300 << "\" y1=\"" << contour_2[p_index].point.y << "\" x2=\"" << contour_2[(p_index + 1) % contour_2.size()].point.x - 300 << "\" y2=\"" << contour_2[(p_index + 1) % contour_2.size()].point.y << "\" stroke=\"rgb(120,120,120)\" />\n";
 					if (contour_2[p_index].type == fixed_p)
-						file1 << "<circle cx=\"" << contour_2[p_index].point.x + 300 << "\" cy=\"" << contour_2[p_index].point.y << "\" r=\"2\" fill=\"rgb(240, 176, 30)\" />\n";
+						file1 << "<circle cx=\"" << contour_2[p_index].point.x - 300 << "\" cy=\"" << contour_2[p_index].point.y << "\" r=\"2\" fill=\"rgb(240, 176, 30)\" />\n";
 				}
 				file1 << "</svg>";
 				file1.close();
@@ -695,6 +699,26 @@ namespace Tiling_tiles {
 				waitKey(100);
 			}
 		}
+
+		string file_name = "result.svg";
+		std::ofstream file1(file_name);
+		file1 << "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1000\" height=\"1000\">\n";
+		file1 << "<polygon points=\"";
+
+		for (const auto& point : c1.contour) {
+			file1 << point.x << "," << point.y << " ";
+		}
+		file1 << "\" stroke=\"black\"  fill=\"rgb(199,144,172)\" />\n";
+		file1 << "<polygon points=\"";
+
+		for (const auto& point : c2.contour) {
+			file1 << point.x << "," << point.y << " ";
+		}
+		file1 << "\" stroke=\"black\"  fill=\"rgb(202,225,195)\" />\n";
+		file1 << "</svg>";
+		file1.close();
+
+
 		drawLineGraph(Angles, Prs, save_path + "NPR_angle.png");
 		write_avi(images, save_path + "output.avi", 5);
 		imwrite(save_path + "Rotation Visualization.png", images[0]);
@@ -1843,6 +1867,10 @@ namespace Tiling_tiles {
 		vector<vector<Point_f>> c2_segs(4, vector<Point_f>());
 		double degree_opt = 0;
 		double num_e = 0;
+		string file_name = "opt_compare.svg";
+		std::ofstream file(file_name);
+		file << "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1000\" height=\"1000\">\n";
+
 		FOR(i, 0, 4)
 		{
 			vector<Point_f> each_seg; 
@@ -1853,7 +1881,20 @@ namespace Tiling_tiles {
 			Point2f start2 = c2_seg[(i + 2) % 4][0].point;
 			Point2f sh_ = start1 - start2;
 			each_seg_ = merge_segment(conf_trans(c1_seg[i]), conf_trans(c2_seg[(i + 2) % 4]), ratio, num_e);
+
+
+			FOR(p_index, 0, each_seg_.size() - 1) 
+				file << "<line x1=\"" << each_seg_[p_index].x << "\" y1=\"" << each_seg_[p_index].y << "\" x2=\"" << each_seg_[p_index + 1].x << "\" y2=\"" << each_seg_[p_index + 1].y << "\" stroke=\"rgb(120,120,120)\" />\n";
+			FOR(p_index, 0, each_seg_.size())
+				file << "<circle cx=\"" << each_seg_[p_index].x << "\" cy=\"" << each_seg_[p_index].y << "\" r=\"2\" fill=\"rgb(100,100,100)\" />\n";
+
 		    degree_opt = edge_nd_opt(each_seg_, Clock_order);
+
+			FOR(p_index, 0, each_seg_.size() - 1)
+				file << "<line x1=\"" << each_seg_[p_index].x+500 << "\" y1=\"" << each_seg_[p_index].y << "\" x2=\"" << each_seg_[p_index + 1].x + 500 << "\" y2=\"" << each_seg_[p_index + 1].y << "\" stroke=\"rgb(149, 202, 135)\" />\n";
+			FOR(p_index, 0, each_seg_.size())
+				file << "<circle cx=\"" << each_seg_[p_index].x + 500 << "\" cy=\"" << each_seg_[p_index].y << "\" r=\"2\" fill=\"rgb(250, 65, 65)\" />\n";
+
 			cout << "After degree_opt: " << degree_opt << endl;
 			for (auto p : each_seg_) each_seg.push_back(Point_f(p, general_p));
 			each_seg[0].type = fixed_p;
@@ -1869,6 +1910,8 @@ namespace Tiling_tiles {
 				c2_segs[(i + 2) % 4].push_back(Point_f(c2_p, general_p));*/
 			}
 		}
+		file << "</svg>";
+		file.close();
 		FOR(n, 0, 4)
 		{
 			for (auto p : c2_segs[n])

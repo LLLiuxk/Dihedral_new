@@ -14,7 +14,7 @@ int main()
 	start = clock();
 	Tiling_opt tiling;
 	
-	int f = 1;
+	int f = 11;
 
 	if (f == 0)
 	{
@@ -48,8 +48,8 @@ int main()
 		//       70: 0,8,19,28    192: 0,9,18,27   157:6,12,23,31
 		//Escher 22: 8,19,28,36    71: 4,14,22,32    172: 6,13,23,32    bad:171: 7,19,29,33
 		//New  5: 6,11,16,29    13: 1,12,27,36    37: 10,18,25,37   44:6,19,24,31  44:6,19,25,39  53:0,12,17,36
-		vector<int> anc_points = { 4,14,22,32 };
-		tiling.tiliing_gen_specify("71", anc_points);
+		vector<int> anc_points = { 1,12,27,36 };
+		tiling.tiliing_gen_specify("13", anc_points);
 
 		/*Mat draw2 = Mat(600, 600, CV_8UC3, Scalar(255, 255, 255));
 		
@@ -60,6 +60,19 @@ int main()
 		bound_recover(old_edge, new_edge);
 		draw_contour_points(draw2, new_edge, OP, 7,3);
 		imshow("show:", draw2);*/
+	}
+	if (f == 11) //specify
+	{
+		string savepath = SaveSpecPath;
+		savepath = savepath + "71/";
+		vector<Point2f> con1 = load_point_file(savepath + "c1.txt");
+		vector<Point2f> con2 = load_point_file(savepath + "c2.txt");
+		Mat two_c = Mat(1000, 1600, CV_8UC3, Scalar(255, 255, 255));
+		Mat two_c2 = Mat(1000, 1600, CV_8UC3, Scalar(255, 255, 255));
+		draw_contour(two_c, con1, OP ,0,3);
+		draw_contour(two_c2, con2, OP,0,3);
+		imshow("123", two_c);
+		imshow("1234", two_c2);
 	}
 	if (f == 2)
 	{
