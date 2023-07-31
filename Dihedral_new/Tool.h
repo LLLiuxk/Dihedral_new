@@ -36,6 +36,7 @@ void draw_pair(Mat &drawing_, vector<Point2f> contour1, vector<Point2f> contour2
 void draw_overlap(Mat &drawing_, vector<Point2f> contour1, vector<Point2f> contour2, Point2f shift);
 void draw_path(vector<Point2f> contour1, vector<Point2f> contour2, vector<int> fea1, vector<int> fea2, vector<pair<int, int>> path_fea);
 void progress_bar(double index, double total);
+void draw_repeat(cv::Mat& image, vector<Point2f> c1, vector<int> anc1, vector<Point2f> c2, vector<int> anc2);
 
 //geometry tools
 //---------polygon process-----------
@@ -98,6 +99,7 @@ void write_obj(string filepath, MatrixXd V, MatrixXi F);
 void contour2obj(string savepath, vector<Point2f> contour, Point2f shift, double height);
 void write_para(string filepath, vector<int> indexs, vector<Point2f> new_places);
 void write_twoCon(string filepath, vector<int> in1, vector<Point2f> c1, vector<int> in2, vector<Point2f> c2);
+
 
 //compare two contours by TAR
 vector<vector<double>> compute_TAR(vector<Point2f> &contour_, double &shape_complexity, double frac = 0.5);

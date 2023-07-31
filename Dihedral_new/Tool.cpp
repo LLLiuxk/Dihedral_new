@@ -155,6 +155,12 @@ void progress_bar(double index, double total)
 	}
 }
 
+void draw_repeat(cv::Mat& image, vector<Point2f> c1, vector<int> anc1, vector<Point2f> c2, vector<int> anc2)
+{
+
+}
+
+
 //geometry tool
 Point2f center_p(vector<Point2f> contour_)
 {
@@ -1563,6 +1569,7 @@ void write_twoCon(string filepath, vector<int> in1, vector<Point2f> c1, vector<i
 		outfile << c2[i].x << " " << c2[i].y << endl;
 	outfile.close();
 }
+
 
 //compare two contours by TAR
 vector<vector<double>> compute_TAR(vector<Point2f> &contour_, double &shape_complexity, double frac)

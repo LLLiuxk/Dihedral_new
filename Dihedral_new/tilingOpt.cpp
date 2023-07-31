@@ -677,6 +677,7 @@ namespace Tiling_tiles {
 				c2.draw_proTile(drawing, colorbar[4].second, shifts[7], -cut_mar);
 				c1.draw_proTile(drawing, colorbar[0].second, shifts[8], cut_mar);
 
+				/*if(degree)*/
 				if (degree % 2 == 0)
 				{
 					vector<Point2f> c1_total = mergedVector({ c1.contour,c1.contour,c1.contour,c1.contour }, { shifts[0],shifts[2],shifts[6],shifts[8] });
@@ -723,6 +724,11 @@ namespace Tiling_tiles {
 		write_avi(images, save_path + "output.avi", 5);
 		imwrite(save_path + "Rotation Visualization.png", images[0]);
 		imshow("Rotation Visualization2222", images[0]);
+
+		Mat drawing_all = Mat(5000, 5000, CV_8UC3, Scalar(255, 255, 255));
+		//draw_repeat(drawing_all, vector<Point2f> c1, vector<int> anc1, vector<Point2f> c2, vector<int> anc2);
+
+
 	}
 
 
