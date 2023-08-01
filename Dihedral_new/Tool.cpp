@@ -155,10 +155,35 @@ void progress_bar(double index, double total)
 	}
 }
 
-void draw_repeat(cv::Mat& image, vector<Point2f> c1, vector<int> anc1, vector<Point2f> c2, vector<int> anc2)
+void mix_mat(Mat &a, Mat b, Point2f shift) //shift 表示b放在a的什么位置  a size>b size
 {
+	int start_x = max(0, int(-shift.x));
+	int start_y = max(0, int(-shift.y));
+	int add_x = min(int(a.cols - shift.x), b.cols);
+	int add_y = min(int(a.rows - shift.y), b.rows);
+	cout << shift <<"   "<<start_x<<"   "<<start_y<<"   "<<add_x<<"   "<<add_y<< endl;
+	if (add_x != b.cols || add_y != b.rows || start_x!=0|| start_y!=0)
+		cout << "beyond size of Mat!" << endl;
 
+	for (int y = start_y; y < add_y; ++y) {
+		for (int x = start_x; x < add_x; ++x) {
+			cv::Vec3b pixel_a = a.at<cv::Vec3b>(y+ shift.y, x+ shift.x);
+			cv::Vec3b pixel_b = b.at<cv::Vec3b>(y, x);
+
+			// 判断是否都是黑色
+			if ((pixel_a[0] == 0 && pixel_a[1] == 0 && pixel_a[2] == 0) ||
+				(pixel_b[0] == 0 && pixel_b[1] == 0 && pixel_b[2] == 0)) {
+				// 设置为黑色
+				a.at<cv::Vec3b>(y + shift.y, x + shift.x) = cv::Vec3b(0, 0, 0);
+			}
+			else {
+				// 设置为白色
+				a.at<cv::Vec3b>(y + shift.y, x + shift.x) = cv::Vec3b(255, 255, 255);
+			}
+		}
+	}
 }
+//void draw_repeat(cv::Mat& image, vector<Point2f> c1, vector<int> anc1, vector<Point2f> c2, vector<int> anc2){}
 
 
 //geometry tool

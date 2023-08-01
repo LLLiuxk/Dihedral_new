@@ -345,10 +345,10 @@ namespace Tiling_tiles {
 				Point2f sh1 = frame[3] - frame[0];
 				FOR(n, 0, 4) frame[n] += sh1;
 			}
-			int min_type = 0;
+			int min_type = 3;
 			double min_l = 10000;
 			vector<Point2f> frame_b = base_frame(frame, min_type);
-			FOR(f_type, 0, 4)
+			/*FOR(f_type, 0, 4)
 			{
 				vector<Point2f> frame_bb = base_frame(frame, f_type);
 				vector<pair<int, int>> path_min = { make_pair(0,0),make_pair(1,1),make_pair(2,2),make_pair(3,3) };
@@ -359,7 +359,7 @@ namespace Tiling_tiles {
 					min_type = f_type;
 					frame_b = frame_bb;
 				}
-			}
+			}*/
 			cout << "frame_type: " << frame_type[min_type] << "   " << min_l << endl;
 			vector<int> anc_mid_;
 			FOR(g, 0, 4)
@@ -596,7 +596,11 @@ namespace Tiling_tiles {
 		vector<double> Angles;
 		vector<double> Prs;
 		vector<Point2f> c1_total_ori;
-
+		Point2f draw_shift1 = c1.contour[c1.anchor_points[2]] - c1.contour[c1.anchor_points[0]];
+		Point2f draw_shift2 = c1.contour[c1.anchor_points[3]] - c1.contour[c1.anchor_points[1]];
+		if (draw_shift1.x < 0) draw_shift1 = -draw_shift1;
+		if (draw_shift2.y < 0) draw_shift2 = -draw_shift2;
+		cout << "draw_shift1:  " << draw_shift1 << "   " << draw_shift2 << endl;
 		if (clockorder == ClockWise)
 		{
 			cout << "ClockWise" << endl;
@@ -727,7 +731,14 @@ namespace Tiling_tiles {
 
 		Mat drawing_all = Mat(5000, 5000, CV_8UC3, Scalar(255, 255, 255));
 		//draw_repeat(drawing_all, vector<Point2f> c1, vector<int> anc1, vector<Point2f> c2, vector<int> anc2);
-
+		int max_num = 5000 / max(length_2p(draw_shift1, OP), length_2p(draw_shift2, OP));
+		for (int rep1 = 0; rep1 < max_num; rep1++)
+			for (int rep2 = 0; rep2 < max_num; rep2++)
+			{
+				Point2f shifttt = draw_shift1*rep1 + draw_shift2*rep2;
+				mix_mat(drawing_all, images[0], shifttt);
+			}
+		imwrite(save_path + "repeat_all.png", drawing_all);
 
 	}
 

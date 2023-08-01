@@ -36,7 +36,8 @@ void draw_pair(Mat &drawing_, vector<Point2f> contour1, vector<Point2f> contour2
 void draw_overlap(Mat &drawing_, vector<Point2f> contour1, vector<Point2f> contour2, Point2f shift);
 void draw_path(vector<Point2f> contour1, vector<Point2f> contour2, vector<int> fea1, vector<int> fea2, vector<pair<int, int>> path_fea);
 void progress_bar(double index, double total);
-void draw_repeat(cv::Mat& image, vector<Point2f> c1, vector<int> anc1, vector<Point2f> c2, vector<int> anc2);
+void mix_mat(Mat &a, Mat b, Point2f shift);
+//void draw_repeat(cv::Mat& image, vector<Point2f> c1, vector<int> anc1, vector<Point2f> c2, vector<int> anc2);
 
 //geometry tools
 //---------polygon process-----------

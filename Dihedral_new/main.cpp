@@ -14,7 +14,7 @@ int main()
 	start = clock();
 	Tiling_opt tiling;
 	
-	int f = 100;
+	int f = 1;
 	// 100: test   0: generate all  1: generate specify  2: show pure contours  3: obj  4: test matching  5: change color  6: dilate
 	if (f == 100)  //test item
 	{
@@ -35,43 +35,26 @@ int main()
 		//write_avi( images, "output.avi",1);
 
 
-		Mat a = Mat(600, 800, CV_8UC3, Scalar(255, 255, 255));
-		vector<Point2f> con = { Point2f(100,100),Point2f(300,100),Point2f(300,300) ,Point2f(100,300) };
-		draw_contour(a, con, OP);
-		// 创建图像 c
-		cv::Mat c;
-
-		// 计算交集并复制到 c
-		int new_width = a.cols + 200;
-		int new_height = a.rows + 200;
-		cv::Mat b(new_height, new_width, a.type(), cv::Scalar(255, 255, 255));
-		a.copyTo(b(cv::Rect(200, 0, a.cols, a.rows)));
-
-		for (int y = 0; y < a.rows; ++y) {
-			for (int x = 0; x < a.cols; ++x) {
-				cv::Vec3b pixel_a = a.at<cv::Vec3b>(y, x);
-				cv::Vec3b pixel_b = b.at<cv::Vec3b>(y, x);
-
-				// 判断是否都是黑色
-				if (pixel_a[0] == 0 || pixel_a[1] == 0 || pixel_a[2] == 0 ||
-					pixel_b[0] == 0 || pixel_b[1] == 0 || pixel_b[2] == 0) {
-					// 设置为黑色
-					b.at<cv::Vec3b>(y, x) = cv::Vec3b(0, 0, 0);
-				}
-				else {
-					// 设置为白色
-					b.at<cv::Vec3b>(y, x) = cv::Vec3b(255, 255, 255);
-				}
+		Mat drawing_all = Mat(5000, 5000, CV_8UC3, Scalar(255, 255, 255));
+		Mat a = imread("D:\\vs2015project\\Dihedral_new\\result_spe\\71\\Rotation Visualization.png");
+		cv::imshow("Image a", a);
+		Point2f draw_shift1(194.032, 3.43524);
+		Point2f draw_shift2(-0.788452, 205.266);
+		//draw_repeat(drawing_all, vector<Point2f> c1, vector<int> anc1, vector<Point2f> c2, vector<int> anc2);
+		//mix_mat(drawing_all, a, draw_shift1*2);
+		//mix_mat(drawing_all, a, draw_shift2*repeat_times);
+		for (int rep1 = 0; rep1 < 15;rep1++)
+			for (int rep2 = 0; rep2 < 15; rep2++)
+			{
+				Point2f shifttt = draw_shift1*rep1 + draw_shift2*rep2;
+				mix_mat(drawing_all, a, shifttt);
 			}
-		}
 
-		// 计算 a 和 b 的交集
-		//cv::bitwise_and(a, b, c);
-
+		//imwrite(save_path + "repeat_all.png", drawing_all);
 		// 显示原图 a 和结果图像 c
 		cv::imshow("Image a", a);
-		cv::imshow("Intersection Image c", b);
-
+		//cv::imshow("Intersection Image c", drawing_all);
+		cv::imwrite("Intersection Image.png", drawing_all);
 	}
 	if (f == 0)  //generate all
 	{
@@ -170,7 +153,8 @@ int main()
 	else if (f == 5)  //change color
 	{
 		Mat src;
-		string name = "D:\\input.png";
+		string name = "C:\\Users\\liuxk\\OneDrive\\Recent\\DualNPR\\tex_ff.png";
+		//string name = "D:\\input.png"; 
 		src = imread(name, IMREAD_COLOR);
 		if (src.empty())
 		{
@@ -198,7 +182,7 @@ int main()
 				if ((int)src.at<uchar>(i, j) == 0) dst.at<Vec3b>(i, j) = color1;
 				if ((int)src.at<uchar>(i, j) == 255) dst.at<Vec3b>(i, j) = color2;
 			}
-		imwrite("D:\\dst.png", dst);
+		imwrite("C:\\Users\\liuxk\\OneDrive\\Recent\\DualNPR\\tex_cuf.png", dst);
 	}
 	else if (f == 6)  //加粗，扩张白色
 	{
@@ -208,7 +192,7 @@ int main()
 		//int const max_elem = 2;
 		//int const max_kernel_size = 21;
 
-		string name = "D:\\dst.png";//"D:\\result.png";
+		string name = "C:\\Users\\liuxk\\OneDrive\\Recent\\DualNPR\\tex_f.png";//"D:\\result.png";
 									//string name = "D:\\print.png";
 		src = imread(name, IMREAD_COLOR);
 		if (src.empty())
@@ -216,7 +200,7 @@ int main()
 			return -1;
 		}
 		int dilation_type = 0;
-		namedWindow("Erosion Demo", WINDOW_AUTOSIZE);
+		//namedWindow("Erosion Demo", WINDOW_AUTOSIZE);
 		if (dilation_elem == 0) { dilation_type = MORPH_RECT; }
 		else if (dilation_elem == 1) { dilation_type = MORPH_CROSS; }
 		else if (dilation_elem == 2) { dilation_type = MORPH_ELLIPSE; }
@@ -224,7 +208,7 @@ int main()
 			Size(2 * dilation_size + 1, 2 * dilation_size + 1),
 			cv::Point(dilation_size, dilation_size));
 		dilate(src, dilation_dst, element);
-		imwrite("D:\\Erosion Demo2.png", dilation_dst);
+		imwrite("C:\\Users\\liuxk\\OneDrive\\Recent\\DualNPR\\tex_ff.png", dilation_dst);
 	}
 
 	finish = clock();
