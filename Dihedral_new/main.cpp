@@ -14,7 +14,7 @@ int main()
 	start = clock();
 	Tiling_opt tiling;
 	
-	int f = 1;
+	int f = 6;
 	// 100: test   0: generate all  1: generate specify  2: show pure contours  3: obj  4: test matching  5: change color  6: dilate
 	if (f == 100)  //test item
 	{
@@ -153,7 +153,7 @@ int main()
 	else if (f == 5)  //change color
 	{
 		Mat src;
-		string name = "C:\\Users\\liuxk\\OneDrive\\Recent\\DualNPR\\tex_ff.png";
+		string name = "C:\\Users\\liuxk\\OneDrive\\Recent\\DualNPR\\textureff.png";
 		//string name = "D:\\input.png"; 
 		src = imread(name, IMREAD_COLOR);
 		if (src.empty())
@@ -182,17 +182,17 @@ int main()
 				if ((int)src.at<uchar>(i, j) == 0) dst.at<Vec3b>(i, j) = color1;
 				if ((int)src.at<uchar>(i, j) == 255) dst.at<Vec3b>(i, j) = color2;
 			}
-		imwrite("C:\\Users\\liuxk\\OneDrive\\Recent\\DualNPR\\tex_cuf.png", dst);
+		imwrite("C:\\Users\\liuxk\\OneDrive\\Recent\\DualNPR\\texturefff.png", dst);
 	}
 	else if (f == 6)  //¼Ó´Ö£¬À©ÕÅ°×É«
 	{
 		Mat src, dilation_dst;
 		int dilation_elem = 2;
-		int dilation_size = 2;
+		int dilation_size = 3;
 		//int const max_elem = 2;
 		//int const max_kernel_size = 21;
 
-		string name = "C:\\Users\\liuxk\\OneDrive\\Recent\\DualNPR\\tex_f.png";//"D:\\result.png";
+		string name = "C:\\Users\\liuxk\\OneDrive\\Recent\\DualNPR\\texturefff.png";//"D:\\result.png";
 									//string name = "D:\\print.png";
 		src = imread(name, IMREAD_COLOR);
 		if (src.empty())
@@ -208,7 +208,7 @@ int main()
 			Size(2 * dilation_size + 1, 2 * dilation_size + 1),
 			cv::Point(dilation_size, dilation_size));
 		dilate(src, dilation_dst, element);
-		imwrite("C:\\Users\\liuxk\\OneDrive\\Recent\\DualNPR\\tex_ff.png", dilation_dst);
+		imwrite("C:\\Users\\liuxk\\OneDrive\\Recent\\DualNPR\\texturefff_cu.png", dilation_dst);
 	}
 
 	finish = clock();

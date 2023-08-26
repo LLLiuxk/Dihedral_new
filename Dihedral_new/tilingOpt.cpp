@@ -345,7 +345,7 @@ namespace Tiling_tiles {
 				Point2f sh1 = frame[3] - frame[0];
 				FOR(n, 0, 4) frame[n] += sh1;
 			}
-			int min_type = 3;
+			int min_type = templateType;
 			double min_l = 10000;
 			vector<Point2f> frame_b = base_frame(frame, min_type);
 			/*FOR(f_type, 0, 4)
@@ -729,9 +729,9 @@ namespace Tiling_tiles {
 		imwrite(save_path + "Rotation Visualization.png", images[0]);
 		imshow("Rotation Visualization2222", images[0]);
 
-		Mat drawing_all = Mat(5000, 5000, CV_8UC3, Scalar(255, 255, 255));
+		Mat drawing_all = Mat(ImageSize, ImageSize, CV_8UC3, Scalar(255, 255, 255));
 		//draw_repeat(drawing_all, vector<Point2f> c1, vector<int> anc1, vector<Point2f> c2, vector<int> anc2);
-		int max_num = 5000 / max(length_2p(draw_shift1, OP), length_2p(draw_shift2, OP));
+		int max_num = ImageSize / max(length_2p(draw_shift1, OP), length_2p(draw_shift2, OP));
 		for (int rep1 = 0; rep1 < max_num; rep1++)
 			for (int rep2 = 0; rep2 < max_num; rep2++)
 			{

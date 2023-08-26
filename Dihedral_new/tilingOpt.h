@@ -21,7 +21,9 @@
 #define WindowsWidth 10
 #define path_margin 6
 #define handle_area_width 4
-#define CutMargin 2
+#define CutMargin 3
+#define ImageSize 8000
+#define templateType 3
 #define DefaultPath "C:/Users/liuxk/OneDrive/Recent/DualNPR/"
 #define SavePath "D:/vs2015project/Dihedral_new/result/"
 #define SaveSpecPath "D:/vs2015project/Dihedral_new/result_spe/"
