@@ -14,7 +14,7 @@ int main()
 	start = clock();
 	Tiling_opt tiling;
 	
-	int f = 6;
+	int f = 1;
 	// 100: test   0: generate all  1: generate specify  2: show pure contours  3: obj  4: test matching  5: change color  6: dilate
 	if (f == 100)  //test item
 	{
@@ -33,7 +33,6 @@ int main()
 		//	images.push_back(image);
 		//}
 		//write_avi( images, "output.avi",1);
-
 
 		Mat drawing_all = Mat(5000, 5000, CV_8UC3, Scalar(255, 255, 255));
 		Mat a = imread("D:\\vs2015project\\Dihedral_new\\result_spe\\71\\Rotation Visualization.png");

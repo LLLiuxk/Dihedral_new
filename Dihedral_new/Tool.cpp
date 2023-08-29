@@ -161,9 +161,9 @@ void mix_mat(Mat &a, Mat b, Point2f shift) //shift 表示b放在a的什么位置  a size>
 	int start_y = max(0, int(-shift.y));
 	int add_x = min(int(a.cols - shift.x), b.cols);
 	int add_y = min(int(a.rows - shift.y), b.rows);
-	cout << shift <<"   "<<start_x<<"   "<<start_y<<"   "<<add_x<<"   "<<add_y<< endl;
-	if (add_x != b.cols || add_y != b.rows || start_x!=0|| start_y!=0)
-		cout << "beyond size of Mat!" << endl;
+	//cout << shift <<"   "<<start_x<<"   "<<start_y<<"   "<<add_x<<"   "<<add_y<< endl;
+	//if (add_x != b.cols || add_y != b.rows || start_x!=0|| start_y!=0)
+	//	cout << "beyond size of Mat!" << endl;
 
 	for (int y = start_y; y < add_y; ++y) {
 		for (int x = start_x; x < add_x; ++x) {

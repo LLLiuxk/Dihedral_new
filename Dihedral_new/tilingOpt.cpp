@@ -590,7 +590,7 @@ namespace Tiling_tiles {
 		//对齐到图案中央
 		c1.Trans_proTile(Point2f(draw_row / 2, draw_col / 2) - center_p(c1.contour));
 		c2.Trans_proTile(c1.contour[c1.anchor_points[0]] - c2.contour[c2.anchor_points[3]]);
-
+		protoTile c_temp = c2;
 		int add_degree = 1;
 		int cut_mar = CutMargin;
 		vector<double> Angles;
@@ -604,6 +604,8 @@ namespace Tiling_tiles {
 		if (clockorder == ClockWise)
 		{
 			cout << "ClockWise" << endl;
+			//c_temp = c2;
+
 			for (int degree = 0; degree < rot_deg; degree += add_degree)
 			{
 				if (degree != 0) cut_mar = 0;
@@ -705,6 +707,12 @@ namespace Tiling_tiles {
 			}
 		}
 
+		Mat drawing_t = Mat(5000, 5000, CV_8UC3, Scalar(255, 255, 255));
+		draw_region(drawing_t, c_temp, Point2f(200,200), Point2f(4500,4500), draw_shift1, draw_shift2, save_path + "repeat_test.png", 1);
+		Mat drawing_all = Mat(ImageSize, ImageSize, CV_8UC3, Scalar(255, 255, 255));
+		draw_region(drawing_all, c_temp, OP, Point2f(ImageSize, ImageSize), draw_shift1, draw_shift2, save_path + "repeat_all.png", 0);
+		
+
 		string file_name = "result.svg";
 		std::ofstream file1(file_name);
 		file1 << "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1000\" height=\"1000\">\n";
@@ -729,17 +737,46 @@ namespace Tiling_tiles {
 		imwrite(save_path + "Rotation Visualization.png", images[0]);
 		imshow("Rotation Visualization2222", images[0]);
 
-		Mat drawing_all = Mat(ImageSize, ImageSize, CV_8UC3, Scalar(255, 255, 255));
-		//draw_repeat(drawing_all, vector<Point2f> c1, vector<int> anc1, vector<Point2f> c2, vector<int> anc2);
-		int max_num = ImageSize / max(length_2p(draw_shift1, OP), length_2p(draw_shift2, OP));
+		//Mat drawing_all = Mat(ImageSize, ImageSize, CV_8UC3, Scalar(255, 255, 255));
+		////draw_repeat(drawing_all, vector<Point2f> c1, vector<int> anc1, vector<Point2f> c2, vector<int> anc2);
+		//int max_num = ImageSize / max(length_2p(draw_shift1, OP), length_2p(draw_shift2, OP));
+		//for (int rep1 = 0; rep1 < max_num; rep1++)
+		//	for (int rep2 = 0; rep2 < max_num; rep2++)
+		//	{
+		//		Point2f shifttt = draw_shift1*rep1 + draw_shift2*rep2;
+		//		mix_mat(drawing_all, images[0], shifttt);
+		//	}
+		//imwrite(save_path + "repeat_all.png", drawing_all);
+
+	}
+
+	void Tiling_opt::draw_region(Mat draw_, protoTile c_temp, Point2f leftTop, Point2f rightBottom, Point2f shift1, Point2f shift2, string save_name, int type)  //type:0-parallelogram   1-circle
+	{
+		vector<Point2f> region;
+		Point2f center = 0.5*(leftTop + rightBottom);
+		double radius = abs(center.x - leftTop.x);
+		for (int degree = 0; degree < 360; degree += 5)
+		{
+			double dd = degree*PI / 180;
+			Point2f ptemp = radius*Point2f(cos(dd), sin(dd)) + center;
+			region.push_back(ptemp);
+		}
+		double max_length = 2 * radius;
+		int max_num = max_length / max(length_2p(shift1, OP), length_2p(shift2, OP)) + 1;
+		Point2f cen_c = center_p(c_temp.contour);
+		Point2f ori_sft = leftTop - cen_c;
 		for (int rep1 = 0; rep1 < max_num; rep1++)
 			for (int rep2 = 0; rep2 < max_num; rep2++)
 			{
-				Point2f shifttt = draw_shift1*rep1 + draw_shift2*rep2;
-				mix_mat(drawing_all, images[0], shifttt);
+				Point2f shifttt = shift1*rep1 + shift2*rep2 + ori_sft;
+				circle(draw_, cen_c + shifttt, 2, Scalar(0, 0, 255), -1);
+				if (type == 1 && pointPolygonTest(region, cen_c + shifttt, false) < 0)
+					continue;
+				else 
+					c_temp.draw_proTile(draw_, colorbar[0].second, shifttt, -CutMargin);
 			}
-		imwrite(save_path + "repeat_all.png", drawing_all);
-
+		draw_contour(draw_, region, OP, 5, 2);
+		imwrite(save_name, draw_);
 	}
 
 

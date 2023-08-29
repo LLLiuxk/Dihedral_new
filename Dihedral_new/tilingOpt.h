@@ -149,7 +149,7 @@ namespace Tiling_tiles {
 		void load_dataset(bool input_images);
 		void load_para(string filename);
 		void RotationVis(protoTile c1, protoTile c2, int clockorder, string save_path);
-
+		void draw_region(Mat draw_, protoTile c_temp, Point2f leftTop, Point2f rightBottom, Point2f shift1, Point2f shift2, string save_name, int type);  //type:0-parallelogram   1-circle
 		//tiling rules
 		int Tanslation_rule(vector<int> cand_points, vector<Point_f> &contour_s, string rootname);
 		int Tanslation_rule_spec(vector<int> cand_points, vector<Point_f> &contour_s, string rootname, vector<int> anc_points);
